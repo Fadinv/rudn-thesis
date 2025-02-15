@@ -16,6 +16,9 @@ yarn-error.log*
 dist/
 build/
 
+# Turbo
+.turbo/
+
 # IDE
 .vscode/
 .idea/

@@ -1,15 +1,24 @@
 {
   "name": "rudn-thesis",
   "version": "0.0.1",
-  "description": "",
-  "main": "index.js",
+  "private": true,
+  "packageManager": "npm@10.5.2",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "start": "docker compose up --build",
+    "restart": "docker compose down && docker compose up --build",
+    "clean": "rm -rf node_modules package-lock.json apps/backend/node_modules apps/frontend/node_modules && npm cache clean --force",
+    "clean:docker": "docker system prune -af && docker builder prune -af && docker volume prune -f && docker rmi $(docker images -q) || true",
+    "clean:all": "npm run clean && npm run clean:docker",
+    "reinstall": "npm run clean && npm install",
+    "restart:docker": "npm run clean:docker && docker compose down && docker compose build --no-cache && docker compose up"
   },
-  "keywords": [],
-  "author": "Vladimir Fadin fadinvv95@gmail.com",
-  "license": "ISC",
   "devDependencies": {
     "turbo": "^2.4.2"
-  }
+  },
+  "workspaces": [
+    "apps/backend",
+    "apps/frontend"
+  ]
 }

@@ -1,12 +1,21 @@
 {
-  "pipeline": {
+  "tasks": {
+    "install": {
+      "cache": false
+    },
     "dev": {
-      "dependsOn": ["^dev"],
+      "dependsOn": [
+        "^dev"
+      ],
       "cache": false
     },
     "build": {
-      "dependsOn": ["^build"],
-      "outputs": ["dist/**"]
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "dist/**"
+      ]
     }
   }
 }
