@@ -18,6 +18,7 @@ export class UsersService {
 		const user = new User();
 		user.email = email;
 		user.password = await bcrypt.hash(password, 10);
+		console.log('PASSWORDS: ', user.password, password);
 		await this.userRepository.save(user);
 		return user; // Возвращаем созданного пользователя
 	}
@@ -71,9 +72,20 @@ export class UsersService {
 	// Метод логина пользователя и возвращение токена
 	async login(email: string, password: string) {
 		const user = await this.findByEmail(email);
-		if (!user || !(await user.validatePassword(password))) {
+		console.log('user:', user);
+
+		if (!user) {
+			throw new Error('User not found');
+		}
+
+		console.log('Введённый пароль:', password);
+		console.log('Хэш в БД:', user.password);
+
+		if (!(await user.validatePassword(password))) {
 			throw new Error('Invalid credentials');
 		}
-		return this.generateToken(user); // Возвращаем токен
+
+		return this.generateToken(user);
 	}
+
 }

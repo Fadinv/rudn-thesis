@@ -11,6 +11,7 @@ import {UsersModule} from './users/users.module';
 			autoSchemaFile: 'schema.gql',
 			playground: true,
 			path: '/graphql',
+			context: ({req, res}) => ({req, res}),
 		}),
 		TypeOrmModule.forRoot({
 			type: 'postgres',

@@ -1,4 +1,7 @@
-import {Resolver, Query, Mutation, Args} from '@nestjs/graphql';
+import {UseGuards} from '@nestjs/common';
+import {Resolver, Query, Mutation, Args, Context} from '@nestjs/graphql';
+import {AuthGuard} from '@nestjs/passport';
+import {GqlAuthGuard} from '../auth/auth.guard';
 import {UsersService} from './users.service';
 import {User} from './user.entity';
 
@@ -39,7 +42,8 @@ export class UsersResolver {
 	}
 
 	@Mutation(() => Boolean)
-	async deleteUser(@Args('id') id: number): Promise<boolean> {
+	@UseGuards(GqlAuthGuard)
+	async deleteUser(@Args('id') id: number, @Context('req') req): Promise<boolean> {
 		return this.usersService.deleteUser(id);
 	}
 }

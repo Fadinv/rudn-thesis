@@ -11,10 +11,13 @@ type Query {
   getUsers: [User!]!
   getUserById(id: Float!): User
   getUserByEmail(email: String!): User
+  protected: String!
 }
 
 type Mutation {
   createUser(email: String!, password: String!): User!
   updateUser(id: Float!, email: String!, password: String): User!
   deleteUser(id: Float!): Boolean!
+  register(email: String!, password: String!): String!
+  login(email: String!, password: String!): String!
 }
