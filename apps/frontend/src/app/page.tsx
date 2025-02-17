@@ -31,7 +31,9 @@ export default function IndexPage() {
 			{data?.currentUser ? (
 				<Home/>
 			) : (
-				<LoginForm/> // Здесь можно вставить форму входа
+				<Center h="100vh">
+					<LoginForm/>
+				</Center>
 			)}
 		</div>
 	);

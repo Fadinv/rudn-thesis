@@ -23,7 +23,7 @@ const LoginForm = () => {
 	};
 
 	return (
-		<Box maxW="md" mx="auto" mt={8} p={6} borderWidth={1} borderRadius="lg" boxShadow="md">
+		<Box maxW="md" minW="md" mx="auto" p={6} borderWidth={1} borderRadius="lg" boxShadow="md">
 			<Heading size="lg" mb={4} textAlign="center">Login</Heading>
 			{error && <Text color="red.500">Error logging in</Text>}
 			<form onSubmit={handleLogin}>
