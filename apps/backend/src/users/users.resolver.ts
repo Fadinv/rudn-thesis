@@ -1,13 +1,30 @@
 import {UseGuards} from '@nestjs/common';
 import {Resolver, Query, Mutation, Args, Context} from '@nestjs/graphql';
-import {AuthGuard} from '@nestjs/passport';
+import {JwtService} from '@nestjs/jwt';
+import {Request} from 'express';
 import {GqlAuthGuard} from '../auth/auth.guard';
 import {UsersService} from './users.service';
 import {User} from './user.entity';
 
 @Resolver(() => User)
 export class UsersResolver {
-	constructor(private readonly usersService: UsersService) {}
+	constructor(
+		private readonly usersService: UsersService,
+		private readonly jwtService: JwtService,
+	) {}
+
+	@Query(() => User, {nullable: true})
+	async currentUser(@Context('req') req: Request): Promise<User | null> {
+		const token = req.cookies?.access_token; // ✅ Читаем токен из куки
+		if (!token) return null;
+
+		try {
+			const payload = this.jwtService.verify(token); // ✅ Декодируем токен
+			return this.usersService.findById(payload.userId); // ✅ Ищем пользователя по ID
+		} catch (err) {
+			return null; // Если токен невалидный, возвращаем `null`
+		}
+	}
 
 	@Query(() => [User])
 	async getUsers(): Promise<User[]> {

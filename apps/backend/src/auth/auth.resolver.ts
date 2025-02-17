@@ -1,7 +1,6 @@
 import {Resolver, Mutation, Args, Query, Context} from '@nestjs/graphql';
+import {Response} from 'express';
 import {UsersService} from '../users/users.service';
-import {JwtAuthGuard} from './jwt-auth.guard';
-import {UseGuards} from '@nestjs/common';
 
 @Resolver()
 export class AuthResolver {
@@ -23,16 +22,29 @@ export class AuthResolver {
 	async login(
 		@Args('email') email: string,
 		@Args('password') password: string,
+		@Context('res') res: Response, // ✅ Добавляем `res`
 	): Promise<string> {
 		// Логиним пользователя и генерируем токен
 		const result = await this.usersService.login(email, password);
+		// ✅ Устанавливаем accessToken в `HttpOnly` cookie
+		res.cookie('access_token', result.access_token, {
+			httpOnly: true,  // ✅ Доступен только серверу
+			secure: process.env.NODE_ENV === 'production', // ✅ Только HTTPS в продакшене
+			sameSite: 'lax', // ✅ Защита от CSRF
+			maxAge: 60 * 60 * 1000, // ✅ 1 час
+		});
 		return result.access_token;  // Возвращаем токен
 	}
 
-	// Пример защищенного запроса, доступного только для авторизованных пользователей
-	@Query(() => String)
-	@UseGuards(JwtAuthGuard)  // Защищаем этот запрос с помощью guard, который проверяет токен
-	async protected(@Context() ctx): Promise<string> {
-		return `Hello, ${ctx.user.email}`;  // ctx.user будет содержать данные из токена
+	// Выход пользователя (удаление токена)
+	@Mutation(() => Boolean)
+	async logout(@Context('res') res: Response): Promise<boolean> {
+		res.clearCookie('access_token', {
+			httpOnly: true,  // ✅ Доступен только серверу
+			secure: process.env.NODE_ENV === 'production', // ✅ Только HTTPS в продакшене
+			sameSite: 'lax', // ✅ Защита от CSRF
+		});
+		return true; // ✅ Успешный выход
 	}
+
 }

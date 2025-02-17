@@ -8,10 +8,10 @@ type User {
 }
 
 type Query {
+  currentUser: User
   getUsers: [User!]!
   getUserById(id: Float!): User
   getUserByEmail(email: String!): User
-  protected: String!
 }
 
 type Mutation {
@@ -20,4 +20,5 @@ type Mutation {
   deleteUser(id: Float!): Boolean!
   register(email: String!, password: String!): String!
   login(email: String!, password: String!): String!
+  logout: Boolean!
 }
