@@ -1,5 +1,5 @@
 import {ObjectType, Field, Int} from '@nestjs/graphql';
-import {Entity, PrimaryGeneratedColumn, Column, BeforeInsert} from 'typeorm';
+import {Entity, PrimaryGeneratedColumn, Column} from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 
 @ObjectType()

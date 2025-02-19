@@ -2,10 +2,8 @@ import {Module} from '@nestjs/common';
 import {GraphQLModule} from '@nestjs/graphql';
 import {ApolloDriver, ApolloDriverConfig} from '@nestjs/apollo';
 import {TypeOrmModule} from '@nestjs/typeorm';
-import * as path from 'node:path';
 import {UsersModule} from './users/users.module';
 
-console.log(__dirname)
 @Module({
 	imports: [
 		GraphQLModule.forRoot<ApolloDriverConfig>({

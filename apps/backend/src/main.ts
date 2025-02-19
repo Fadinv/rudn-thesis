@@ -1,6 +1,6 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import {NestFactory} from '@nestjs/core';
+import {AppModule} from './app.module';
+import {ValidationPipe} from '@nestjs/common';
 import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
@@ -11,7 +11,7 @@ async function bootstrap() {
 
 	// Настраиваем CORS
 	app.enableCors({
-		origin: ['http://localhost:3000', 'http://localhost:4000/graphql'], // Разрешаем запросы только с твоего фронтенда
+		origin: ['http://localhost:3000', 'http://localhost:4000/graphql'], // cors
 		credentials: true, // Разрешаем передачу кук и заголовков авторизации
 	});
 

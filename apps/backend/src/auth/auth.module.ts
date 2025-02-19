@@ -10,9 +10,9 @@ import {JwtStrategy} from './jwt.strategy';
 
 @Module({
 	imports: [
-		ConfigModule.forRoot({isGlobal: true}), // ✅ Загружаем переменные из .env
-		TypeOrmModule.forFeature([User]), // ✅ Добавляем репозиторий пользователей
-		PassportModule.register({defaultStrategy: 'jwt'}), // ✅ Регистрируем стратегию Passport
+		ConfigModule.forRoot({isGlobal: true}), // Загружаем переменные из .env
+		TypeOrmModule.forFeature([User]), // Добавляем репозиторий пользователей
+		PassportModule.register({defaultStrategy: 'jwt'}), // Регистрируем стратегию Passport
 		JwtModule.registerAsync({
 			imports: [ConfigModule],
 			inject: [ConfigService],
@@ -22,7 +22,7 @@ import {JwtStrategy} from './jwt.strategy';
 			}),
 		}),
 	],
-	providers: [AuthResolver, UsersService, JwtStrategy], // ✅ Добавили JwtStrategy
-	exports: [UsersService, PassportModule, JwtModule], // ✅ Экспортируем модули, чтобы их можно было использовать в других частях проекта
+	providers: [AuthResolver, UsersService, JwtStrategy], // Добавили JwtStrategy
+	exports: [UsersService, PassportModule, JwtModule], // Экспортируем модули, чтобы их можно было использовать в других частях проекта
 })
 export class AuthModule {}
