@@ -17,7 +17,7 @@ export const Logout = () => {
 	};
 
 	return (
-		<Button colorScheme="red" onClick={handleLogout} loading={loading}>
+		<Button colorPalette="red" onClick={handleLogout} loading={loading}>
 			Logout
 		</Button>
 	);
