@@ -7,11 +7,31 @@ type User {
   email: String!
 }
 
+type Stock {
+  id: Float!
+  ticker: String!
+  name: String!
+  market: String!
+  locale: String!
+  primary_exchange: String!
+  type: String!
+  active: Boolean!
+  currency_name: String!
+  cik: String
+  composite_figi: String
+  share_class_figi: String
+  last_updated_utc: String!
+  logoUrl: String
+}
+
 type Query {
   currentUser: User
   getUsers: [User!]!
   getUserById(id: Float!): User
   getUserByEmail(email: String!): User
+  getStocks: [Stock!]!
+  getStockById(id: Float!): Stock
+  getStockByTicker(ticker: String!): Stock
 }
 
 type Mutation {
@@ -21,4 +41,23 @@ type Mutation {
   register(email: String!, password: String!): String!
   login(email: String!, password: String!): String!
   logout: Boolean!
+  createStock(data: StockInput!): Stock!
+  updateStock(id: Float!, data: StockInput!): Stock!
+  deleteStock(id: Float!): Boolean!
+}
+
+input StockInput {
+  ticker: String!
+  name: String!
+  market: String!
+  locale: String!
+  primary_exchange: String!
+  type: String!
+  active: Boolean!
+  currency_name: String!
+  cik: String
+  composite_figi: String
+  share_class_figi: String
+  last_updated_utc: String!
+  logoUrl: String
 }

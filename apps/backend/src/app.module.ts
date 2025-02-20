@@ -3,6 +3,7 @@ import {GraphQLModule} from '@nestjs/graphql';
 import {ApolloDriver, ApolloDriverConfig} from '@nestjs/apollo';
 import {TypeOrmModule} from '@nestjs/typeorm';
 import {UsersModule} from './users/users.module';
+import {StocksModule} from './stocks/stocks.module';
 
 @Module({
 	imports: [
@@ -27,6 +28,7 @@ import {UsersModule} from './users/users.module';
 			synchronize: true, // Таблицы создаются автоматически (Для production лучше отключить и создавать миграции)
 		}),
 		UsersModule,
+		StocksModule,
 	],
 })
 export class AppModule {}
