@@ -25,8 +25,8 @@ export class Stock {
 	locale: string;
 
 	@Field()
-	@Column()
-	primary_exchange: string;
+	@Column({name: 'primary_exchange'})
+	primaryExchange: string;
 
 	@Field()
 	@Column()
@@ -37,26 +37,26 @@ export class Stock {
 	active: boolean;
 
 	@Field()
-	@Column()
-	currency_name: string;
+	@Column({name: 'currency_name'})
+	currencyName: string;
 
 	@Field({nullable: true})
-	@Column({nullable: true})
-	cik: string;
+	@Column({nullable: true, name: 'cik'})
+	cik?: string;
 
 	@Field({nullable: true})
-	@Column({nullable: true})
-	composite_figi: string;
+	@Column({nullable: true, name: 'composite_figi'})
+	compositeFigi?: string;
 
 	@Field({nullable: true})
-	@Column({nullable: true})
-	share_class_figi: string;
+	@Column({nullable: true, name: 'share_class_figi'})
+	shareClassFigi?: string;
 
 	@Field()
-	@Column()
-	last_updated_utc: string;
+	@Column({name: 'last_updated_utc'})
+	lastUpdatedUtc: string;
 
 	@Field({nullable: true})
-	@Column({nullable: true})
-	logoUrl: string;
+	@Column({nullable: true, name: 'logo_url'})
+	logoUrl?: string;
 }

@@ -15,7 +15,7 @@ export class StockInput {
 	locale: string;
 
 	@Field()
-	primary_exchange: string;
+	primaryExchange: string;
 
 	@Field()
 	type: string;
@@ -24,19 +24,19 @@ export class StockInput {
 	active: boolean;
 
 	@Field()
-	currency_name: string;
+	currencyName: string;
 
 	@Field({nullable: true})
 	cik?: string;
 
 	@Field({nullable: true})
-	composite_figi?: string;
+	compositeFigi?: string;
 
 	@Field({nullable: true})
-	share_class_figi?: string;
+	shareClassFigi?: string;
 
 	@Field()
-	last_updated_utc: string;
+	lastUpdatedUtc: string;
 
 	@Field({nullable: true})
 	logoUrl?: string;

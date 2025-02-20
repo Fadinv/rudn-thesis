@@ -13,14 +13,14 @@ type Stock {
   name: String!
   market: String!
   locale: String!
-  primary_exchange: String!
+  primaryExchange: String!
   type: String!
   active: Boolean!
-  currency_name: String!
+  currencyName: String!
   cik: String
-  composite_figi: String
-  share_class_figi: String
-  last_updated_utc: String!
+  compositeFigi: String
+  shareClassFigi: String
+  lastUpdatedUtc: String!
   logoUrl: String
 }
 
@@ -51,13 +51,13 @@ input StockInput {
   name: String!
   market: String!
   locale: String!
-  primary_exchange: String!
+  primaryExchange: String!
   type: String!
   active: Boolean!
-  currency_name: String!
+  currencyName: String!
   cik: String
-  composite_figi: String
-  share_class_figi: String
-  last_updated_utc: String!
+  compositeFigi: String
+  shareClassFigi: String
+  lastUpdatedUtc: String!
   logoUrl: String
 }
