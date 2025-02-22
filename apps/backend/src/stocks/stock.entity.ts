@@ -28,9 +28,9 @@ export class Stock {
 	@Column({name: 'primary_exchange'})
 	primaryExchange: string;
 
-	@Field()
-	@Column()
-	type: string;
+	@Field({nullable: true})
+	@Column({nullable: true})
+	type?: string;
 
 	@Field()
 	@Column()

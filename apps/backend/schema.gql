@@ -14,7 +14,7 @@ type Stock {
   market: String!
   locale: String!
   primaryExchange: String!
-  type: String!
+  type: String
   active: Boolean!
   currencyName: String!
   cik: String

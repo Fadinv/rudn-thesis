@@ -39,5 +39,17 @@ services:
       - ./apps/frontend:/app
     command: sh -c "npm install && npm run dev"
 
+  ticker-updater:
+    build:
+      context: .
+      dockerfile: apps/ticker-updater/Dockerfile
+    env_file:
+      - ./apps/ticker-updater/.env
+    depends_on:
+      - postgres
+    volumes:
+      - ./apps/ticker-updater:/app
+    command: sh -c "npm install && npm run start"
+
 volumes:
   postgres-data:
