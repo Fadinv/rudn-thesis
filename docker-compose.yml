@@ -16,6 +16,7 @@ services:
       context: .
       dockerfile: apps/backend/Dockerfile
     env_file:
+      - ./.env.shared
       - ./apps/backend/.env
     ports:
       - "4000:4000"
@@ -44,6 +45,7 @@ services:
       context: .
       dockerfile: apps/ticker-updater/Dockerfile
     env_file:
+      - ./.env.shared
       - ./apps/ticker-updater/.env
     depends_on:
       - postgres

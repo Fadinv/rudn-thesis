@@ -1,51 +1,86 @@
 import axios from 'axios';
 import {Client} from 'pg';
 
-const API_KEY = process.env.API_KEY!;
+const API_KEY = process.env.POLYGON_API_KEY!;
 const DB_URL = process.env.DATABASE_URL!;
-const EODHD_API_TOKEN = process.env.EODHD_API_TOKEN!;
-const API_URL = `https://api.polygon.io/v3/reference/tickers?market=stocks&active=true&limit=1000&apiKey=${API_KEY}`;
+const STOCK_API_URL = `https://api.polygon.io/v3/reference/tickers?market=stocks&active=true&limit=1000&apiKey=${API_KEY}`;
 
-// Загружаем список S&P 500
-const SP500_TICKERS = new Set([
-	'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'TSLA', 'META', 'NVDA', 'BRK.B', 'JPM', 'UNH',
-	// Добавь полный список S&P 500 сюда
-]);
+const REQUEST_DELAY = 250; // ⏳ 250 мс между запросами
+const MAX_RETRIES = 5; // 🔄 Повтор запроса до 5 раз
 
+// ⏳ Функция задержки перед каждым API-запросом
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// 🔄 Функция с обработкой 429 и повторными попытками
+async function fetchWithRetry(url: string, retries = MAX_RETRIES) {
+	for (let attempt = 1; attempt <= retries; attempt++) {
+		try {
+			const response = await axios.get(url);
+			return response.data.results;
+		} catch (error: any) {
+			if (error.response?.status === 429) {
+				console.warn(`⚠️ 429 Too Many Requests. Повтор через 5 сек (попытка ${attempt})`);
+				await sleep(5000); // ⏳ Ждем 5 секунд перед повтором
+			} else {
+				console.error(`❌ Ошибка запроса: ${error.message}`);
+				return null;
+			}
+		}
+	}
+	return null;
+}
+
+// 🏦 Получаем список всех акций
 async function fetchTickers() {
 	let tickers: any[] = [];
-	let nextUrl: string | null = API_URL;
+	let nextUrl: string | null = STOCK_API_URL;
 
 	try {
 		while (nextUrl) {
-			// @ts-ignore
-			const response = await axios.get(nextUrl);
-			if (!response.data.results || response.data.results.length === 0) break;
-
-			tickers = tickers.concat(response.data.results);
-			// nextUrl = response.data.next_url ? `${response.data.next_url}&apiKey=${API_KEY}` : null;
-			nextUrl = null;
+			console.log('Загружаем новые данные --- ', nextUrl)
+			const data = await fetchWithRetry(nextUrl);
+			if (!data) break;
+			tickers = [...tickers, ...data];
+			nextUrl = data.next_url ? `${data.next_url}&apiKey=${API_KEY}` : null;
 		}
 	} catch (error) {
-		console.error('Ошибка запроса API:', error);
+		console.error('❌ Ошибка запроса API:', error);
 	}
 
-	// return tickers.filter((t) => SP500_TICKERS.has(t.ticker));
 	return tickers;
 }
 
+// 📈 Получаем цену и логотип для тикера
+async function fetchTickerDetails(ticker: string) {
+	await sleep(REQUEST_DELAY); // ⏳ Делаем задержку между запросами
+
+	const url = `https://api.polygon.io/v3/reference/tickers/${ticker}?apiKey=${API_KEY}`;
+	return fetchWithRetry(url);
+}
+
+// 🔄 Обновляем тикеры в БД
 async function updateTickers() {
 	const client = new Client({connectionString: DB_URL});
 	await client.connect();
 
-	const tickers = await fetchTickers();
+	// const tickers = await fetchTickers();
+	const tickers: any[] = [];
 	if (tickers.length === 0) {
-		console.log('Нет новых данных.');
+		console.log('❌ Нет новых данных.');
 		await client.end();
 		return;
 	}
 
+	let count = 0;
 	for (const ticker of tickers) {
+		let logoUrl: string | null = null;
+
+		try {
+			const details = await fetchTickerDetails(ticker.ticker);
+			logoUrl = details?.branding?.logo_url || null;
+			count++;
+		} catch (_) {}
+
 		await client.query(
 			`
       INSERT INTO stock (ticker, name, market, locale, primary_exchange, type, active, currency_name, cik, composite_figi, share_class_figi, last_updated_utc, logo_url)
@@ -69,12 +104,12 @@ async function updateTickers() {
 				ticker.composite_figi || null,
 				ticker.share_class_figi || null,
 				ticker.last_updated_utc,
-				`https://assets.parqet.com/logos/symbol/${ticker.ticker}`
+				logoUrl,
 			],
 		);
 	}
 
-	console.log(`Обновлено ${tickers.length} тикеров.`);
+	console.log(`✅ Обновлено ${tickers.length} тикеров.`);
 	await client.end();
 }
 
