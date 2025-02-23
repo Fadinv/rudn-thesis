@@ -20,18 +20,56 @@ export type Scalars = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  addStockToPortfolio: PortfolioStock;
+  createPortfolio: Portfolio;
+  createStock: Stock;
   createUser: User;
+  deleteAllStocks: Scalars['Boolean']['output'];
+  deletePortfolio: Scalars['Boolean']['output'];
+  deleteStock: Scalars['Boolean']['output'];
   deleteUser: Scalars['Boolean']['output'];
   login: Scalars['String']['output'];
   logout: Scalars['Boolean']['output'];
   register: Scalars['String']['output'];
+  updatePortfolio: Portfolio;
+  updatePortfolioStock: PortfolioStock;
+  updatePortfolioStocks: Array<PortfolioStock>;
+  updateStock: Stock;
   updateUser: User;
+};
+
+
+export type MutationAddStockToPortfolioArgs = {
+  averagePrice: Scalars['Float']['input'];
+  portfolioId: Scalars['Int']['input'];
+  quantity: Scalars['Float']['input'];
+  stockId: Scalars['Int']['input'];
+};
+
+
+export type MutationCreatePortfolioArgs = {
+  name: Scalars['String']['input'];
+};
+
+
+export type MutationCreateStockArgs = {
+  data: StockInput;
 };
 
 
 export type MutationCreateUserArgs = {
   email: Scalars['String']['input'];
   password: Scalars['String']['input'];
+};
+
+
+export type MutationDeletePortfolioArgs = {
+  portfolioId: Scalars['Int']['input'];
+};
+
+
+export type MutationDeleteStockArgs = {
+  id: Scalars['Float']['input'];
 };
 
 
@@ -52,18 +90,86 @@ export type MutationRegisterArgs = {
 };
 
 
+export type MutationUpdatePortfolioArgs = {
+  newName: Scalars['String']['input'];
+  portfolioId: Scalars['Int']['input'];
+};
+
+
+export type MutationUpdatePortfolioStockArgs = {
+  averagePrice: Scalars['Float']['input'];
+  portfolioStockId: Scalars['Int']['input'];
+  quantity: Scalars['Float']['input'];
+};
+
+
+export type MutationUpdatePortfolioStocksArgs = {
+  updates: Array<PortfolioStockUpdateInput>;
+};
+
+
+export type MutationUpdateStockArgs = {
+  data: StockInput;
+  id: Scalars['Float']['input'];
+};
+
+
 export type MutationUpdateUserArgs = {
   email: Scalars['String']['input'];
   id: Scalars['Float']['input'];
   password?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type Portfolio = {
+  __typename?: 'Portfolio';
+  id: Scalars['Int']['output'];
+  isReadyForAnalysis: Scalars['Boolean']['output'];
+  name: Scalars['String']['output'];
+  stocks: Array<PortfolioStock>;
+  user: User;
+};
+
+export type PortfolioStock = {
+  __typename?: 'PortfolioStock';
+  averagePrice?: Maybe<Scalars['Float']['output']>;
+  id: Scalars['Int']['output'];
+  portfolio: Portfolio;
+  quantity?: Maybe<Scalars['Float']['output']>;
+  stock: Stock;
+};
+
+export type PortfolioStockUpdateInput = {
+  averagePrice?: InputMaybe<Scalars['Float']['input']>;
+  portfolioStockId: Scalars['Int']['input'];
+  quantity?: InputMaybe<Scalars['Int']['input']>;
+};
+
 export type Query = {
   __typename?: 'Query';
   currentUser?: Maybe<User>;
+  getPortfolioStocks: Array<PortfolioStock>;
+  getStockById?: Maybe<Stock>;
+  getStockByTicker?: Maybe<Stock>;
+  getStocks: Array<Stock>;
   getUserByEmail?: Maybe<User>;
   getUserById?: Maybe<User>;
+  getUserPortfolios: Array<Portfolio>;
   getUsers: Array<User>;
+};
+
+
+export type QueryGetPortfolioStocksArgs = {
+  portfolioId: Scalars['Int']['input'];
+};
+
+
+export type QueryGetStockByIdArgs = {
+  id: Scalars['Float']['input'];
+};
+
+
+export type QueryGetStockByTickerArgs = {
+  ticker: Scalars['String']['input'];
 };
 
 
@@ -76,10 +182,45 @@ export type QueryGetUserByIdArgs = {
   id: Scalars['Float']['input'];
 };
 
+export type Stock = {
+  __typename?: 'Stock';
+  active: Scalars['Boolean']['output'];
+  cik?: Maybe<Scalars['String']['output']>;
+  compositeFigi?: Maybe<Scalars['String']['output']>;
+  currencyName: Scalars['String']['output'];
+  id: Scalars['Float']['output'];
+  lastUpdatedUtc: Scalars['String']['output'];
+  locale: Scalars['String']['output'];
+  logoUrl?: Maybe<Scalars['String']['output']>;
+  market: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+  primaryExchange: Scalars['String']['output'];
+  shareClassFigi?: Maybe<Scalars['String']['output']>;
+  ticker: Scalars['String']['output'];
+  type?: Maybe<Scalars['String']['output']>;
+};
+
+export type StockInput = {
+  active: Scalars['Boolean']['input'];
+  cik?: InputMaybe<Scalars['String']['input']>;
+  compositeFigi?: InputMaybe<Scalars['String']['input']>;
+  currencyName: Scalars['String']['input'];
+  lastUpdatedUtc: Scalars['String']['input'];
+  locale: Scalars['String']['input'];
+  logoUrl?: InputMaybe<Scalars['String']['input']>;
+  market: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+  primaryExchange: Scalars['String']['input'];
+  shareClassFigi?: InputMaybe<Scalars['String']['input']>;
+  ticker: Scalars['String']['input'];
+  type: Scalars['String']['input'];
+};
+
 export type User = {
   __typename?: 'User';
   email: Scalars['String']['output'];
   id: Scalars['Int']['output'];
+  portfolios?: Maybe<Array<Portfolio>>;
 };
 
 export type CurrentUserQueryVariables = Exact<{ [key: string]: never; }>;

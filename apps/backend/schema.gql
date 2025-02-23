@@ -2,11 +2,6 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type User {
-  id: Int!
-  email: String!
-}
-
 type Stock {
   id: Float!
   ticker: String!
@@ -24,6 +19,28 @@ type Stock {
   logoUrl: String
 }
 
+type PortfolioStock {
+  id: Int!
+  portfolio: Portfolio!
+  stock: Stock!
+  quantity: Float
+  averagePrice: Float
+}
+
+type Portfolio {
+  id: Int!
+  name: String!
+  user: User!
+  stocks: [PortfolioStock!]!
+  isReadyForAnalysis: Boolean!
+}
+
+type User {
+  id: Int!
+  email: String!
+  portfolios: [Portfolio!]
+}
+
 type Query {
   currentUser: User
   getUsers: [User!]!
@@ -32,6 +49,8 @@ type Query {
   getStocks: [Stock!]!
   getStockById(id: Float!): Stock
   getStockByTicker(ticker: String!): Stock
+  getUserPortfolios: [Portfolio!]!
+  getPortfolioStocks(portfolioId: Int!): [PortfolioStock!]!
 }
 
 type Mutation {
@@ -44,6 +63,13 @@ type Mutation {
   createStock(data: StockInput!): Stock!
   updateStock(id: Float!, data: StockInput!): Stock!
   deleteStock(id: Float!): Boolean!
+  deleteAllStocks: Boolean!
+  createPortfolio(name: String!): Portfolio!
+  addStockToPortfolio(portfolioId: Int!, stockId: Int!, quantity: Float!, averagePrice: Float!): PortfolioStock!
+  updatePortfolioStock(portfolioStockId: Int!, quantity: Float!, averagePrice: Float!): PortfolioStock!
+  updatePortfolioStocks(updates: [PortfolioStockUpdateInput!]!): [PortfolioStock!]!
+  deletePortfolio(portfolioId: Int!): Boolean!
+  updatePortfolio(portfolioId: Int!, newName: String!): Portfolio!
 }
 
 input StockInput {
@@ -60,4 +86,10 @@ input StockInput {
   shareClassFigi: String
   lastUpdatedUtc: String!
   logoUrl: String
+}
+
+input PortfolioStockUpdateInput {
+  portfolioStockId: Int!
+  quantity: Int
+  averagePrice: Float
 }

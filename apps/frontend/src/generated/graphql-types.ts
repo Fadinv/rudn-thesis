@@ -18,18 +18,56 @@ export type Scalars = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  addStockToPortfolio: PortfolioStock;
+  createPortfolio: Portfolio;
+  createStock: Stock;
   createUser: User;
+  deleteAllStocks: Scalars['Boolean']['output'];
+  deletePortfolio: Scalars['Boolean']['output'];
+  deleteStock: Scalars['Boolean']['output'];
   deleteUser: Scalars['Boolean']['output'];
   login: Scalars['String']['output'];
   logout: Scalars['Boolean']['output'];
   register: Scalars['String']['output'];
+  updatePortfolio: Portfolio;
+  updatePortfolioStock: PortfolioStock;
+  updatePortfolioStocks: Array<PortfolioStock>;
+  updateStock: Stock;
   updateUser: User;
+};
+
+
+export type MutationAddStockToPortfolioArgs = {
+  averagePrice: Scalars['Float']['input'];
+  portfolioId: Scalars['Int']['input'];
+  quantity: Scalars['Float']['input'];
+  stockId: Scalars['Int']['input'];
+};
+
+
+export type MutationCreatePortfolioArgs = {
+  name: Scalars['String']['input'];
+};
+
+
+export type MutationCreateStockArgs = {
+  data: StockInput;
 };
 
 
 export type MutationCreateUserArgs = {
   email: Scalars['String']['input'];
   password: Scalars['String']['input'];
+};
+
+
+export type MutationDeletePortfolioArgs = {
+  portfolioId: Scalars['Int']['input'];
+};
+
+
+export type MutationDeleteStockArgs = {
+  id: Scalars['Float']['input'];
 };
 
 
@@ -50,18 +88,86 @@ export type MutationRegisterArgs = {
 };
 
 
+export type MutationUpdatePortfolioArgs = {
+  newName: Scalars['String']['input'];
+  portfolioId: Scalars['Int']['input'];
+};
+
+
+export type MutationUpdatePortfolioStockArgs = {
+  averagePrice: Scalars['Float']['input'];
+  portfolioStockId: Scalars['Int']['input'];
+  quantity: Scalars['Float']['input'];
+};
+
+
+export type MutationUpdatePortfolioStocksArgs = {
+  updates: Array<PortfolioStockUpdateInput>;
+};
+
+
+export type MutationUpdateStockArgs = {
+  data: StockInput;
+  id: Scalars['Float']['input'];
+};
+
+
 export type MutationUpdateUserArgs = {
   email: Scalars['String']['input'];
   id: Scalars['Float']['input'];
   password?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type Portfolio = {
+  __typename?: 'Portfolio';
+  id: Scalars['Int']['output'];
+  isReadyForAnalysis: Scalars['Boolean']['output'];
+  name: Scalars['String']['output'];
+  stocks: Array<PortfolioStock>;
+  user: User;
+};
+
+export type PortfolioStock = {
+  __typename?: 'PortfolioStock';
+  averagePrice?: Maybe<Scalars['Float']['output']>;
+  id: Scalars['Int']['output'];
+  portfolio: Portfolio;
+  quantity?: Maybe<Scalars['Float']['output']>;
+  stock: Stock;
+};
+
+export type PortfolioStockUpdateInput = {
+  averagePrice?: InputMaybe<Scalars['Float']['input']>;
+  portfolioStockId: Scalars['Int']['input'];
+  quantity?: InputMaybe<Scalars['Int']['input']>;
+};
+
 export type Query = {
   __typename?: 'Query';
   currentUser?: Maybe<User>;
+  getPortfolioStocks: Array<PortfolioStock>;
+  getStockById?: Maybe<Stock>;
+  getStockByTicker?: Maybe<Stock>;
+  getStocks: Array<Stock>;
   getUserByEmail?: Maybe<User>;
   getUserById?: Maybe<User>;
+  getUserPortfolios: Array<Portfolio>;
   getUsers: Array<User>;
+};
+
+
+export type QueryGetPortfolioStocksArgs = {
+  portfolioId: Scalars['Int']['input'];
+};
+
+
+export type QueryGetStockByIdArgs = {
+  id: Scalars['Float']['input'];
+};
+
+
+export type QueryGetStockByTickerArgs = {
+  ticker: Scalars['String']['input'];
 };
 
 
@@ -74,10 +180,45 @@ export type QueryGetUserByIdArgs = {
   id: Scalars['Float']['input'];
 };
 
+export type Stock = {
+  __typename?: 'Stock';
+  active: Scalars['Boolean']['output'];
+  cik?: Maybe<Scalars['String']['output']>;
+  compositeFigi?: Maybe<Scalars['String']['output']>;
+  currencyName: Scalars['String']['output'];
+  id: Scalars['Float']['output'];
+  lastUpdatedUtc: Scalars['String']['output'];
+  locale: Scalars['String']['output'];
+  logoUrl?: Maybe<Scalars['String']['output']>;
+  market: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+  primaryExchange: Scalars['String']['output'];
+  shareClassFigi?: Maybe<Scalars['String']['output']>;
+  ticker: Scalars['String']['output'];
+  type?: Maybe<Scalars['String']['output']>;
+};
+
+export type StockInput = {
+  active: Scalars['Boolean']['input'];
+  cik?: InputMaybe<Scalars['String']['input']>;
+  compositeFigi?: InputMaybe<Scalars['String']['input']>;
+  currencyName: Scalars['String']['input'];
+  lastUpdatedUtc: Scalars['String']['input'];
+  locale: Scalars['String']['input'];
+  logoUrl?: InputMaybe<Scalars['String']['input']>;
+  market: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+  primaryExchange: Scalars['String']['input'];
+  shareClassFigi?: InputMaybe<Scalars['String']['input']>;
+  ticker: Scalars['String']['input'];
+  type: Scalars['String']['input'];
+};
+
 export type User = {
   __typename?: 'User';
   email: Scalars['String']['output'];
   id: Scalars['Int']['output'];
+  portfolios?: Maybe<Array<Portfolio>>;
 };
 
 
@@ -155,7 +296,12 @@ export type ResolversTypes = {
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   Mutation: ResolverTypeWrapper<{}>;
+  Portfolio: ResolverTypeWrapper<Portfolio>;
+  PortfolioStock: ResolverTypeWrapper<PortfolioStock>;
+  PortfolioStockUpdateInput: PortfolioStockUpdateInput;
   Query: ResolverTypeWrapper<{}>;
+  Stock: ResolverTypeWrapper<Stock>;
+  StockInput: StockInput;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
   User: ResolverTypeWrapper<User>;
 };
@@ -166,36 +312,96 @@ export type ResolversParentTypes = {
   Float: Scalars['Float']['output'];
   Int: Scalars['Int']['output'];
   Mutation: {};
+  Portfolio: Portfolio;
+  PortfolioStock: PortfolioStock;
+  PortfolioStockUpdateInput: PortfolioStockUpdateInput;
   Query: {};
+  Stock: Stock;
+  StockInput: StockInput;
   String: Scalars['String']['output'];
   User: User;
 };
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
+  addStockToPortfolio?: Resolver<ResolversTypes['PortfolioStock'], ParentType, ContextType, RequireFields<MutationAddStockToPortfolioArgs, 'averagePrice' | 'portfolioId' | 'quantity' | 'stockId'>>;
+  createPortfolio?: Resolver<ResolversTypes['Portfolio'], ParentType, ContextType, RequireFields<MutationCreatePortfolioArgs, 'name'>>;
+  createStock?: Resolver<ResolversTypes['Stock'], ParentType, ContextType, RequireFields<MutationCreateStockArgs, 'data'>>;
   createUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'email' | 'password'>>;
+  deleteAllStocks?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  deletePortfolio?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeletePortfolioArgs, 'portfolioId'>>;
+  deleteStock?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteStockArgs, 'id'>>;
   deleteUser?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteUserArgs, 'id'>>;
   login?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationLoginArgs, 'email' | 'password'>>;
   logout?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   register?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationRegisterArgs, 'email' | 'password'>>;
+  updatePortfolio?: Resolver<ResolversTypes['Portfolio'], ParentType, ContextType, RequireFields<MutationUpdatePortfolioArgs, 'newName' | 'portfolioId'>>;
+  updatePortfolioStock?: Resolver<ResolversTypes['PortfolioStock'], ParentType, ContextType, RequireFields<MutationUpdatePortfolioStockArgs, 'averagePrice' | 'portfolioStockId' | 'quantity'>>;
+  updatePortfolioStocks?: Resolver<Array<ResolversTypes['PortfolioStock']>, ParentType, ContextType, RequireFields<MutationUpdatePortfolioStocksArgs, 'updates'>>;
+  updateStock?: Resolver<ResolversTypes['Stock'], ParentType, ContextType, RequireFields<MutationUpdateStockArgs, 'data' | 'id'>>;
   updateUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationUpdateUserArgs, 'email' | 'id'>>;
+};
+
+export type PortfolioResolvers<ContextType = any, ParentType extends ResolversParentTypes['Portfolio'] = ResolversParentTypes['Portfolio']> = {
+  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  isReadyForAnalysis?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  stocks?: Resolver<Array<ResolversTypes['PortfolioStock']>, ParentType, ContextType>;
+  user?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type PortfolioStockResolvers<ContextType = any, ParentType extends ResolversParentTypes['PortfolioStock'] = ResolversParentTypes['PortfolioStock']> = {
+  averagePrice?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  portfolio?: Resolver<ResolversTypes['Portfolio'], ParentType, ContextType>;
+  quantity?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  stock?: Resolver<ResolversTypes['Stock'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   currentUser?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
+  getPortfolioStocks?: Resolver<Array<ResolversTypes['PortfolioStock']>, ParentType, ContextType, RequireFields<QueryGetPortfolioStocksArgs, 'portfolioId'>>;
+  getStockById?: Resolver<Maybe<ResolversTypes['Stock']>, ParentType, ContextType, RequireFields<QueryGetStockByIdArgs, 'id'>>;
+  getStockByTicker?: Resolver<Maybe<ResolversTypes['Stock']>, ParentType, ContextType, RequireFields<QueryGetStockByTickerArgs, 'ticker'>>;
+  getStocks?: Resolver<Array<ResolversTypes['Stock']>, ParentType, ContextType>;
   getUserByEmail?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryGetUserByEmailArgs, 'email'>>;
   getUserById?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryGetUserByIdArgs, 'id'>>;
+  getUserPortfolios?: Resolver<Array<ResolversTypes['Portfolio']>, ParentType, ContextType>;
   getUsers?: Resolver<Array<ResolversTypes['User']>, ParentType, ContextType>;
+};
+
+export type StockResolvers<ContextType = any, ParentType extends ResolversParentTypes['Stock'] = ResolversParentTypes['Stock']> = {
+  active?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  cik?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  compositeFigi?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  currencyName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  lastUpdatedUtc?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  locale?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  logoUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  market?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  primaryExchange?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  shareClassFigi?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  ticker?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  type?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  portfolios?: Resolver<Maybe<Array<ResolversTypes['Portfolio']>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type Resolvers<ContextType = any> = {
   Mutation?: MutationResolvers<ContextType>;
+  Portfolio?: PortfolioResolvers<ContextType>;
+  PortfolioStock?: PortfolioStockResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
+  Stock?: StockResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
 };
 

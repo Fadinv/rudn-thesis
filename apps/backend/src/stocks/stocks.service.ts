@@ -25,6 +25,11 @@ export class StocksService {
 		return (result.affected ?? 0) > 0;
 	}
 
+	async deleteAllStocks(): Promise<boolean> {
+		const result = await this.stockRepository.delete({});
+		return (result.affected ?? 0) > 0;
+	}
+
 	async findAll(): Promise<Stock[]> {
 		return this.stockRepository.find();
 	}

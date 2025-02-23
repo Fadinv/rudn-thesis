@@ -4,6 +4,7 @@ import {ApolloDriver, ApolloDriverConfig} from '@nestjs/apollo';
 import {TypeOrmModule} from '@nestjs/typeorm';
 import {UsersModule} from './users/users.module';
 import {StocksModule} from './stocks/stocks.module';
+import {PortfolioModule} from './portfolio/portfolio.module';
 
 @Module({
 	imports: [
@@ -29,6 +30,7 @@ import {StocksModule} from './stocks/stocks.module';
 		}),
 		UsersModule,
 		StocksModule,
+		PortfolioModule,
 	],
 })
 export class AppModule {}

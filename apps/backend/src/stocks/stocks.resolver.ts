@@ -44,4 +44,10 @@ export class StocksResolver {
 	async deleteStock(@Args('id') id: number): Promise<boolean> {
 		return this.stocksService.deleteStock(id);
 	}
+
+	@Mutation(() => Boolean)
+	@UseGuards(GqlAuthGuard)
+	async deleteAllStocks(): Promise<boolean> {
+		return this.stocksService.deleteAllStocks();
+	}
 }

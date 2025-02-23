@@ -3,6 +3,7 @@ import {Resolver, Query, Mutation, Args, Context} from '@nestjs/graphql';
 import {JwtService} from '@nestjs/jwt';
 import {Request} from 'express';
 import {GqlAuthGuard} from '../auth/auth.guard';
+import {CurrentUser} from '../auth/current-user.decorator';
 import {UsersService} from './users.service';
 import {User} from './user.entity';
 
@@ -14,16 +15,8 @@ export class UsersResolver {
 	) {}
 
 	@Query(() => User, {nullable: true})
-	async currentUser(@Context('req') req: Request): Promise<User | null> {
-		const token = req.cookies?.access_token; // ✅ Читаем токен из куки
-		if (!token) return null;
-
-		try {
-			const payload = this.jwtService.verify(token); // ✅ Декодируем токен
-			return this.usersService.findById(payload.userId); // ✅ Ищем пользователя по ID
-		} catch (err) {
-			return null; // Если токен невалидный, возвращаем `null`
-		}
+	async currentUser(@CurrentUser() user: User): Promise<User | null> {
+		return user;
 	}
 
 	@Query(() => [User])
