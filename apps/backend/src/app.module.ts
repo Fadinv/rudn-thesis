@@ -1,19 +1,31 @@
-import {Module} from '@nestjs/common';
-import {GraphQLModule} from '@nestjs/graphql';
-import {ApolloDriver, ApolloDriverConfig} from '@nestjs/apollo';
-import {TypeOrmModule} from '@nestjs/typeorm';
-import {UsersModule} from './users/users.module';
-import {StocksModule} from './stocks/stocks.module';
-import {PortfolioModule} from './portfolio/portfolio.module';
+import { Module } from '@nestjs/common';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UsersModule } from './users/users.module';
+import { StocksModule } from './stocks/stocks.module';
+import { PortfolioModule } from './portfolio/portfolio.module';
+import { AuthModule } from './auth/auth.module';
+import { JwtService } from '@nestjs/jwt';
+import { UsersService } from './users/users.service';
 
 @Module({
 	imports: [
-		GraphQLModule.forRoot<ApolloDriverConfig>({
+		GraphQLModule.forRootAsync({
 			driver: ApolloDriver,
-			autoSchemaFile: './schema.gql',
-			playground: true,
-			path: '/graphql',
-			context: ({req, res}) => ({req, res}),
+			imports: [AuthModule, UsersModule],
+			inject: [JwtService, UsersService],
+			useFactory: (jwtService: JwtService, usersService: UsersService) => ({
+				autoSchemaFile: './schema.gql',
+				playground: true,
+				path: '/graphql',
+				context: ({ req, res }) => ({
+					req,
+					res,
+					jwtService,
+					usersService,
+				}),
+			}),
 		}),
 		TypeOrmModule.forRoot({
 			type: 'postgres',
@@ -23,11 +35,9 @@ import {PortfolioModule} from './portfolio/portfolio.module';
 			password: 'password',
 			database: 'portfolio_db',
 			autoLoadEntities: true,
-			/** Создание миграций */
-			// npm run typeorm migration:generate -- -n InitialMigration
-			// npm run typeorm migration:run
-			synchronize: true, // Таблицы создаются автоматически (Для production лучше отключить и создавать миграции)
+			synchronize: true,
 		}),
+		AuthModule,
 		UsersModule,
 		StocksModule,
 		PortfolioModule,
