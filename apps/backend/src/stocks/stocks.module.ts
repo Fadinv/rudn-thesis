@@ -8,7 +8,7 @@ import {AuthModule} from '../auth/auth.module';
 @Module({
 	imports: [
 		TypeOrmModule.forFeature([Stock]),
-		AuthModule, // ✅ Доступ к JwtService
+		AuthModule,
 	],
 	providers: [StocksService, StocksResolver],
 	exports: [StocksService],

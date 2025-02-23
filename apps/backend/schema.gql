@@ -2,6 +2,16 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type StockPrice {
+  ticker: String!
+  date: String!
+  open: Float!
+  high: Float!
+  low: Float!
+  close: Float!
+  volume: Float!
+}
+
 type Stock {
   id: Float!
   ticker: String!
@@ -59,6 +69,7 @@ type Query {
   searchStocks(search: String!): [Stock!]!
   getUserPortfolios: [Portfolio!]!
   getPortfolioStocks(portfolioId: Int!): [PortfolioStock!]!
+  getStockPrices(ticker: String!, from: Float, to: Float): [StockPrice!]!
 }
 
 type Mutation {

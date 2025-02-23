@@ -1,13 +1,14 @@
-import { Module } from '@nestjs/common';
-import { GraphQLModule } from '@nestjs/graphql';
-import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { UsersModule } from './users/users.module';
-import { StocksModule } from './stocks/stocks.module';
-import { PortfolioModule } from './portfolio/portfolio.module';
-import { AuthModule } from './auth/auth.module';
-import { JwtService } from '@nestjs/jwt';
-import { UsersService } from './users/users.service';
+import {Module} from '@nestjs/common';
+import {GraphQLModule} from '@nestjs/graphql';
+import {ApolloDriver} from '@nestjs/apollo';
+import {TypeOrmModule} from '@nestjs/typeorm';
+import {StockPriceModule} from './stockPrice/stockPrice.module';
+import {UsersModule} from './users/users.module';
+import {StocksModule} from './stocks/stocks.module';
+import {PortfolioModule} from './portfolio/portfolio.module';
+import {AuthModule} from './auth/auth.module';
+import {JwtService} from '@nestjs/jwt';
+import {UsersService} from './users/users.service';
 
 @Module({
 	imports: [
@@ -19,7 +20,7 @@ import { UsersService } from './users/users.service';
 				autoSchemaFile: './schema.gql',
 				playground: true,
 				path: '/graphql',
-				context: ({ req, res }) => ({
+				context: ({req, res}) => ({
 					req,
 					res,
 					jwtService,
@@ -41,6 +42,7 @@ import { UsersService } from './users/users.service';
 		UsersModule,
 		StocksModule,
 		PortfolioModule,
+		StockPriceModule,
 	],
 })
 export class AppModule {}
