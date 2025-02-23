@@ -50,4 +50,10 @@ export class StocksResolver {
 	async deleteAllStocks(): Promise<boolean> {
 		return this.stocksService.deleteAllStocks();
 	}
+
+	@Query(() => [Stock])
+	@UseGuards(GqlAuthGuard)
+	async searchStocks(@Args('search', { type: () => String }) search: string): Promise<Stock[]> {
+		return this.stocksService.searchStocks(search);
+	}
 }

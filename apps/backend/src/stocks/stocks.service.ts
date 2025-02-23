@@ -1,6 +1,6 @@
 import {Injectable} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
-import {Repository} from 'typeorm';
+import {ILike, Repository} from 'typeorm';
 import {Stock} from './stock.entity';
 
 @Injectable()
@@ -40,5 +40,16 @@ export class StocksService {
 
 	async findByTicker(ticker: string): Promise<Stock | null> {
 		return this.stockRepository.findOne({where: {ticker}});
+	}
+
+	// Поиск акций по тикеру или названию (регистр не учитывается)
+	async searchStocks(search: string): Promise<Stock[]> {
+		return this.stockRepository.find({
+			where: [
+				{ticker: ILike(`%${search}%`)},
+				{name: ILike(`%${search}%`)},
+			],
+			take: 10, // Ограничиваем результат 10 акциями
+		});
 	}
 }
