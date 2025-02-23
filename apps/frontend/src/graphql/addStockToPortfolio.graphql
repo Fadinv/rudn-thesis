@@ -1,0 +1,22 @@
+mutation AddStockToPortfolio(
+    $portfolioId: Int!
+    $stockId: Int!
+    $quantity: Int!
+    $averagePrice: Float!
+) {
+    addStockToPortfolio(
+        portfolioId: $portfolioId
+        stockId: $stockId
+        quantity: $quantity
+        averagePrice: $averagePrice
+    ) {
+        id
+        quantity
+        averagePrice
+        stock {
+            id
+            ticker
+            name
+        }
+    }
+}

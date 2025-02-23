@@ -18,8 +18,8 @@ export class PortfolioStock {
 	@ManyToOne(() => Stock)
 	stock: Stock; // Какая акция в портфеле
 
-	@Field(() => Float, {nullable: true})
-	@Column('float', {nullable: true})
+	@Field(() => Int, { nullable: true })
+	@Column('int', { nullable: true })
 	quantity?: number; // Общее количество акций
 
 	@Field(() => Float, {nullable: true})

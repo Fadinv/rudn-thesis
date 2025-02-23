@@ -1,0 +1,7 @@
+query GetUserPortfolios {
+    getUserPortfolios {
+        id
+        name
+        createdAt
+    }
+}

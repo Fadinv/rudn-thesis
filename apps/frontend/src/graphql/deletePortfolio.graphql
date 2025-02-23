@@ -1,0 +1,3 @@
+mutation DeletePortfolio($portfolioId: Int!) {
+    deletePortfolio(portfolioId: $portfolioId)
+}

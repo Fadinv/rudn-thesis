@@ -1,0 +1,6 @@
+mutation UpdatePortfolio($portfolioId: Int!, $newName: String!) {
+    updatePortfolio(portfolioId: $portfolioId, newName: $newName) {
+        id
+        name
+    }
+}

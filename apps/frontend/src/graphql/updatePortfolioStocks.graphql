@@ -1,0 +1,7 @@
+mutation UpdatePortfolioStocks($updates: [PortfolioStockUpdateInput!]!) {
+    updatePortfolioStocks(updates: $updates) {
+        id
+        quantity
+        averagePrice
+    }
+}

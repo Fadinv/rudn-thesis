@@ -1,0 +1,7 @@
+mutation CreatePortfolio($name: String!) {
+    createPortfolio(name: $name) {
+        id
+        name
+        createdAt
+    }
+}

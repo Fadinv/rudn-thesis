@@ -1,0 +1,12 @@
+query GetPortfolioStocks($portfolioId: Int!) {
+    getPortfolioStocks(portfolioId: $portfolioId) {
+        id
+        quantity
+        averagePrice
+        stock {
+            id
+            ticker
+            name
+        }
+    }
+}

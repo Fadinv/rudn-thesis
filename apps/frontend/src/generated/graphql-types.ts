@@ -1,4 +1,4 @@
-import { GraphQLResolveInfo } from 'graphql';
+import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -14,6 +14,7 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean; }
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
+  DateTime: { input: any; output: any; }
 };
 
 export type Mutation = {
@@ -40,7 +41,7 @@ export type Mutation = {
 export type MutationAddStockToPortfolioArgs = {
   averagePrice: Scalars['Float']['input'];
   portfolioId: Scalars['Int']['input'];
-  quantity: Scalars['Float']['input'];
+  quantity: Scalars['Int']['input'];
   stockId: Scalars['Int']['input'];
 };
 
@@ -97,7 +98,7 @@ export type MutationUpdatePortfolioArgs = {
 export type MutationUpdatePortfolioStockArgs = {
   averagePrice: Scalars['Float']['input'];
   portfolioStockId: Scalars['Int']['input'];
-  quantity: Scalars['Float']['input'];
+  quantity: Scalars['Int']['input'];
 };
 
 
@@ -120,10 +121,12 @@ export type MutationUpdateUserArgs = {
 
 export type Portfolio = {
   __typename?: 'Portfolio';
+  createdAt: Scalars['DateTime']['output'];
   id: Scalars['Int']['output'];
   isReadyForAnalysis: Scalars['Boolean']['output'];
   name: Scalars['String']['output'];
   stocks: Array<PortfolioStock>;
+  updatedAt: Scalars['DateTime']['output'];
   user: User;
 };
 
@@ -132,7 +135,7 @@ export type PortfolioStock = {
   averagePrice?: Maybe<Scalars['Float']['output']>;
   id: Scalars['Int']['output'];
   portfolio: Portfolio;
-  quantity?: Maybe<Scalars['Float']['output']>;
+  quantity?: Maybe<Scalars['Int']['output']>;
   stock: Stock;
 };
 
@@ -293,6 +296,7 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
+  DateTime: ResolverTypeWrapper<Scalars['DateTime']['output']>;
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   Mutation: ResolverTypeWrapper<{}>;
@@ -309,6 +313,7 @@ export type ResolversTypes = {
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
   Boolean: Scalars['Boolean']['output'];
+  DateTime: Scalars['DateTime']['output'];
   Float: Scalars['Float']['output'];
   Int: Scalars['Int']['output'];
   Mutation: {};
@@ -321,6 +326,10 @@ export type ResolversParentTypes = {
   String: Scalars['String']['output'];
   User: User;
 };
+
+export interface DateTimeScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['DateTime'], any> {
+  name: 'DateTime';
+}
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   addStockToPortfolio?: Resolver<ResolversTypes['PortfolioStock'], ParentType, ContextType, RequireFields<MutationAddStockToPortfolioArgs, 'averagePrice' | 'portfolioId' | 'quantity' | 'stockId'>>;
@@ -342,10 +351,12 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 };
 
 export type PortfolioResolvers<ContextType = any, ParentType extends ResolversParentTypes['Portfolio'] = ResolversParentTypes['Portfolio']> = {
+  createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   isReadyForAnalysis?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   stocks?: Resolver<Array<ResolversTypes['PortfolioStock']>, ParentType, ContextType>;
+  updatedAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   user?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -354,7 +365,7 @@ export type PortfolioStockResolvers<ContextType = any, ParentType extends Resolv
   averagePrice?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   portfolio?: Resolver<ResolversTypes['Portfolio'], ParentType, ContextType>;
-  quantity?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  quantity?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   stock?: Resolver<ResolversTypes['Stock'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -397,6 +408,7 @@ export type UserResolvers<ContextType = any, ParentType extends ResolversParentT
 };
 
 export type Resolvers<ContextType = any> = {
+  DateTime?: GraphQLScalarType;
   Mutation?: MutationResolvers<ContextType>;
   Portfolio?: PortfolioResolvers<ContextType>;
   PortfolioStock?: PortfolioStockResolvers<ContextType>;

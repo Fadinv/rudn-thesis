@@ -1,0 +1,15 @@
+mutation UpdatePortfolioStock(
+    $portfolioStockId: Int!
+    $quantity: Int!
+    $averagePrice: Float!
+) {
+    updatePortfolioStock(
+        portfolioStockId: $portfolioStockId
+        quantity: $quantity
+        averagePrice: $averagePrice
+    ) {
+        id
+        quantity
+        averagePrice
+    }
+}

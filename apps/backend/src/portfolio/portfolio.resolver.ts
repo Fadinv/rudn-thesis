@@ -24,7 +24,7 @@ export class PortfolioResolver {
 		@CurrentUser() user: User,
 		@Args('portfolioId', {type: () => Int}) portfolioId: number,
 		@Args('stockId', {type: () => Int}) stockId: number,
-		@Args('quantity') quantity: number,
+		@Args('quantity', {type: () => Int}) quantity: number,
 		@Args('averagePrice') averagePrice: number,
 	): Promise<PortfolioStock> {
 		return this.portfolioService.addStockToPortfolio(user, portfolioId, stockId, quantity, averagePrice);
@@ -35,7 +35,7 @@ export class PortfolioResolver {
 	async updatePortfolioStock(
 		@CurrentUser() user: User,
 		@Args('portfolioStockId', {type: () => Int}) portfolioStockId: number,
-		@Args('quantity') quantity: number,
+		@Args('quantity', {type: () => Int}) quantity: number,
 		@Args('averagePrice') averagePrice: number,
 	): Promise<PortfolioStock> {
 		return this.portfolioService.updatePortfolioStock(user, portfolioStockId, quantity, averagePrice);

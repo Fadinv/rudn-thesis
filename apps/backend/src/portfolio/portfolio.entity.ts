@@ -1,5 +1,13 @@
 import {ObjectType, Field, Int} from '@nestjs/graphql';
-import {Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany} from 'typeorm';
+import {
+	Entity,
+	PrimaryGeneratedColumn,
+	Column,
+	ManyToOne,
+	OneToMany,
+	UpdateDateColumn,
+	CreateDateColumn,
+} from 'typeorm';
 import {User} from '../users/user.entity';
 import {PortfolioStock} from './portfolioStock.entity';
 
@@ -25,4 +33,12 @@ export class Portfolio {
 	@Field()
 	@Column({default: false})
 	isReadyForAnalysis: boolean;
+
+	@Field()
+	@CreateDateColumn()
+	createdAt: Date; // Дата создания портфеля
+
+	@Field()
+	@UpdateDateColumn()
+	updatedAt: Date; // Дата последнего обновления портфеля
 }
