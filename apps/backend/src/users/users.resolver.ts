@@ -1,18 +1,12 @@
 import {UseGuards} from '@nestjs/common';
 import {Resolver, Query, Mutation, Args, Context} from '@nestjs/graphql';
-import {JwtService} from '@nestjs/jwt';
-import {Request} from 'express';
-import {GqlAuthGuard} from '../auth/auth.guard';
 import {CurrentUser} from '../auth/current-user.decorator';
 import {UsersService} from './users.service';
 import {User} from './user.entity';
 
 @Resolver(() => User)
 export class UsersResolver {
-	constructor(
-		private readonly usersService: UsersService,
-		private readonly jwtService: JwtService,
-	) {}
+	constructor(private readonly usersService: UsersService) {}
 
 	@Query(() => User, {nullable: true})
 	async currentUser(@CurrentUser() user: User): Promise<User | null> {
@@ -52,7 +46,6 @@ export class UsersResolver {
 	}
 
 	@Mutation(() => Boolean)
-	@UseGuards(GqlAuthGuard)
 	async deleteUser(@Args('id') id: number, @Context('req') req): Promise<boolean> {
 		return this.usersService.deleteUser(id);
 	}

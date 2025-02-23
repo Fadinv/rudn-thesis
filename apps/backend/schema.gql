@@ -61,12 +61,12 @@ type Query {
 }
 
 type Mutation {
-  createUser(email: String!, password: String!): User!
-  updateUser(id: Float!, email: String!, password: String): User!
-  deleteUser(id: Float!): Boolean!
   register(email: String!, password: String!): String!
   login(email: String!, password: String!): String!
   logout: Boolean!
+  createUser(email: String!, password: String!): User!
+  updateUser(id: Float!, email: String!, password: String): User!
+  deleteUser(id: Float!): Boolean!
   createStock(data: StockInput!): Stock!
   updateStock(id: Float!, data: StockInput!): Stock!
   deleteStock(id: Float!): Boolean!
