@@ -29,6 +29,7 @@
     "apps/ticker-updater"
   ],
   "dependencies": {
-    "graphql-codegen": "^0.4.0"
+    "graphql-codegen": "^0.4.0",
+    "react-icons": "^5.5.0"
   }
 }

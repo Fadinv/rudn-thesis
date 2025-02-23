@@ -1,13 +1,51 @@
-import React from 'react';
-import {Box, Text} from '@chakra-ui/react';
+import {useGetUserPortfoliosQuery} from '@/generated/graphql-hooks';
+import React, {useState} from 'react';
+import {Box, Flex} from '@chakra-ui/react';
+import Sidebar from './sidebar/sidebar';
+import PortfolioView from '@/components/portfolio/portfolioView';
 
-const Home = () => {
+interface HomeProps {
+	onCreatePortfolio: () => void;
+	onEditPortfolio: (id: number) => void;
+	onDeletePortfolio: (id: number) => void;
+	onAddStock: (portfolioId: number) => void;
+	onUpdateStock: (portfolioId: number, stockId: number) => void;
+}
+
+const Home: React.FC<HomeProps> = ({
+	                                   onCreatePortfolio,
+	                                   onEditPortfolio,
+	                                   onDeletePortfolio,
+	                                   onAddStock,
+	                                   onUpdateStock,
+                                   }) => {
+	const [selectedPortfolioId, setSelectedPortfolioId] = useState<number | null>(null);
+	const {data, error, loading} = useGetUserPortfoliosQuery();
+
 	return (
-		<Box>
-			<Text fontSize="xl" textAlign="center" color="gray.500">
-				Находится в разработке "Home"
-			</Text>
-		</Box>
+		<Flex>
+			<Sidebar
+				portfolios={data?.getUserPortfolios}
+				onSelectPortfolio={setSelectedPortfolioId}
+				selectedPortfolioId={selectedPortfolioId}
+				onCreatePortfolio={onCreatePortfolio}
+				onEditPortfolio={onEditPortfolio}
+				onDeletePortfolio={onDeletePortfolio}
+			/>
+			<Box flex="1" p={4}>
+				{selectedPortfolioId ? (
+					<PortfolioView
+						portfolioId={selectedPortfolioId}
+						onAddStock={onAddStock}
+						onUpdateStock={onUpdateStock}
+					/>
+				) : (
+					<Box textAlign="center" color="gray.500" fontSize="xl">
+						Выберите портфель для просмотра
+					</Box>
+				)}
+			</Box>
+		</Flex>
 	);
 };
 

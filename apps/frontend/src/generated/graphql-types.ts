@@ -156,6 +156,7 @@ export type Query = {
   getUserById?: Maybe<User>;
   getUserPortfolios: Array<Portfolio>;
   getUsers: Array<User>;
+  searchStocks: Array<Stock>;
 };
 
 
@@ -165,7 +166,7 @@ export type QueryGetPortfolioStocksArgs = {
 
 
 export type QueryGetStockByIdArgs = {
-  id: Scalars['Float']['input'];
+  id: Scalars['Int']['input'];
 };
 
 
@@ -181,6 +182,11 @@ export type QueryGetUserByEmailArgs = {
 
 export type QueryGetUserByIdArgs = {
   id: Scalars['Float']['input'];
+};
+
+
+export type QuerySearchStocksArgs = {
+  search: Scalars['String']['input'];
 };
 
 export type Stock = {
@@ -380,6 +386,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   getUserById?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryGetUserByIdArgs, 'id'>>;
   getUserPortfolios?: Resolver<Array<ResolversTypes['Portfolio']>, ParentType, ContextType>;
   getUsers?: Resolver<Array<ResolversTypes['User']>, ParentType, ContextType>;
+  searchStocks?: Resolver<Array<ResolversTypes['Stock']>, ParentType, ContextType, RequireFields<QuerySearchStocksArgs, 'search'>>;
 };
 
 export type StockResolvers<ContextType = any, ParentType extends ResolversParentTypes['Stock'] = ResolversParentTypes['Stock']> = {

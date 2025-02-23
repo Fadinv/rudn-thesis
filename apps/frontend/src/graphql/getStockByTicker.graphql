@@ -1,0 +1,11 @@
+query getStockByTicker($ticker: String!) {
+    getStockByTicker(ticker: $ticker) {
+        id
+        ticker
+        name
+        market
+        primaryExchange
+        currencyName
+        logoUrl
+    }
+}

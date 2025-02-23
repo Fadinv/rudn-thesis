@@ -1,0 +1,11 @@
+query getStockById($id: Int!) {
+    getStockById(id: $id) {
+        id
+        ticker
+        name
+        market
+        primaryExchange
+        currencyName
+        logoUrl
+    }
+}

@@ -1,12 +1,18 @@
 'use client';
 
+import React from 'react';
 import Home from '@/components/home/home';
-import {Center} from '@chakra-ui/react';
 
 export default function IndexPage() {
 	return (
-		<Center>
-			<Home/>
-		</Center>
+		<Home
+			onCreatePortfolio={() => console.log('Создать портфель')}
+			onEditPortfolio={(id) => console.log(`Редактировать портфель ${id}`)}
+			onDeletePortfolio={(id) => console.log(`Удалить портфель ${id}`)}
+			onAddStock={(portfolioId) => console.log(`Добавить акцию в портфель ${portfolioId}`)}
+			onUpdateStock={(portfolioId, stockId) =>
+				console.log(`Обновить акцию ${stockId} в портфеле ${portfolioId}`)
+			}
+		/>
 	);
 }

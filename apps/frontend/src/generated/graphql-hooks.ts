@@ -158,6 +158,7 @@ export type Query = {
   getUserById?: Maybe<User>;
   getUserPortfolios: Array<Portfolio>;
   getUsers: Array<User>;
+  searchStocks: Array<Stock>;
 };
 
 
@@ -167,7 +168,7 @@ export type QueryGetPortfolioStocksArgs = {
 
 
 export type QueryGetStockByIdArgs = {
-  id: Scalars['Float']['input'];
+  id: Scalars['Int']['input'];
 };
 
 
@@ -183,6 +184,11 @@ export type QueryGetUserByEmailArgs = {
 
 export type QueryGetUserByIdArgs = {
   id: Scalars['Float']['input'];
+};
+
+
+export type QuerySearchStocksArgs = {
+  search: Scalars['String']['input'];
 };
 
 export type Stock = {
@@ -262,6 +268,20 @@ export type GetPortfolioStocksQueryVariables = Exact<{
 
 export type GetPortfolioStocksQuery = { __typename?: 'Query', getPortfolioStocks: Array<{ __typename?: 'PortfolioStock', id: number, quantity?: number | null, averagePrice?: number | null, stock: { __typename?: 'Stock', id: number, ticker: string, name: string } }> };
 
+export type GetStockByIdQueryVariables = Exact<{
+  id: Scalars['Int']['input'];
+}>;
+
+
+export type GetStockByIdQuery = { __typename?: 'Query', getStockById?: { __typename?: 'Stock', id: number, ticker: string, name: string, market: string, primaryExchange: string, currencyName: string, logoUrl?: string | null } | null };
+
+export type GetStockByTickerQueryVariables = Exact<{
+  ticker: Scalars['String']['input'];
+}>;
+
+
+export type GetStockByTickerQuery = { __typename?: 'Query', getStockByTicker?: { __typename?: 'Stock', id: number, ticker: string, name: string, market: string, primaryExchange: string, currencyName: string, logoUrl?: string | null } | null };
+
 export type GetUserPortfoliosQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -279,6 +299,13 @@ export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
 
 
 export type LogoutMutation = { __typename?: 'Mutation', logout: boolean };
+
+export type SearchStocksQueryVariables = Exact<{
+  search: Scalars['String']['input'];
+}>;
+
+
+export type SearchStocksQuery = { __typename?: 'Query', searchStocks: Array<{ __typename?: 'Stock', id: number, ticker: string, name: string }> };
 
 export type UpdatePortfolioMutationVariables = Exact<{
   portfolioId: Scalars['Int']['input'];
@@ -506,6 +533,98 @@ export type GetPortfolioStocksQueryHookResult = ReturnType<typeof useGetPortfoli
 export type GetPortfolioStocksLazyQueryHookResult = ReturnType<typeof useGetPortfolioStocksLazyQuery>;
 export type GetPortfolioStocksSuspenseQueryHookResult = ReturnType<typeof useGetPortfolioStocksSuspenseQuery>;
 export type GetPortfolioStocksQueryResult = Apollo.QueryResult<GetPortfolioStocksQuery, GetPortfolioStocksQueryVariables>;
+export const GetStockByIdDocument = gql`
+    query getStockById($id: Int!) {
+  getStockById(id: $id) {
+    id
+    ticker
+    name
+    market
+    primaryExchange
+    currencyName
+    logoUrl
+  }
+}
+    `;
+
+/**
+ * __useGetStockByIdQuery__
+ *
+ * To run a query within a React component, call `useGetStockByIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetStockByIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetStockByIdQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetStockByIdQuery(baseOptions: ApolloReactHooks.QueryHookOptions<GetStockByIdQuery, GetStockByIdQueryVariables> & ({ variables: GetStockByIdQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useQuery<GetStockByIdQuery, GetStockByIdQueryVariables>(GetStockByIdDocument, options);
+      }
+export function useGetStockByIdLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetStockByIdQuery, GetStockByIdQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useLazyQuery<GetStockByIdQuery, GetStockByIdQueryVariables>(GetStockByIdDocument, options);
+        }
+export function useGetStockByIdSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<GetStockByIdQuery, GetStockByIdQueryVariables>) {
+          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useSuspenseQuery<GetStockByIdQuery, GetStockByIdQueryVariables>(GetStockByIdDocument, options);
+        }
+export type GetStockByIdQueryHookResult = ReturnType<typeof useGetStockByIdQuery>;
+export type GetStockByIdLazyQueryHookResult = ReturnType<typeof useGetStockByIdLazyQuery>;
+export type GetStockByIdSuspenseQueryHookResult = ReturnType<typeof useGetStockByIdSuspenseQuery>;
+export type GetStockByIdQueryResult = Apollo.QueryResult<GetStockByIdQuery, GetStockByIdQueryVariables>;
+export const GetStockByTickerDocument = gql`
+    query getStockByTicker($ticker: String!) {
+  getStockByTicker(ticker: $ticker) {
+    id
+    ticker
+    name
+    market
+    primaryExchange
+    currencyName
+    logoUrl
+  }
+}
+    `;
+
+/**
+ * __useGetStockByTickerQuery__
+ *
+ * To run a query within a React component, call `useGetStockByTickerQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetStockByTickerQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetStockByTickerQuery({
+ *   variables: {
+ *      ticker: // value for 'ticker'
+ *   },
+ * });
+ */
+export function useGetStockByTickerQuery(baseOptions: ApolloReactHooks.QueryHookOptions<GetStockByTickerQuery, GetStockByTickerQueryVariables> & ({ variables: GetStockByTickerQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useQuery<GetStockByTickerQuery, GetStockByTickerQueryVariables>(GetStockByTickerDocument, options);
+      }
+export function useGetStockByTickerLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetStockByTickerQuery, GetStockByTickerQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useLazyQuery<GetStockByTickerQuery, GetStockByTickerQueryVariables>(GetStockByTickerDocument, options);
+        }
+export function useGetStockByTickerSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<GetStockByTickerQuery, GetStockByTickerQueryVariables>) {
+          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useSuspenseQuery<GetStockByTickerQuery, GetStockByTickerQueryVariables>(GetStockByTickerDocument, options);
+        }
+export type GetStockByTickerQueryHookResult = ReturnType<typeof useGetStockByTickerQuery>;
+export type GetStockByTickerLazyQueryHookResult = ReturnType<typeof useGetStockByTickerLazyQuery>;
+export type GetStockByTickerSuspenseQueryHookResult = ReturnType<typeof useGetStockByTickerSuspenseQuery>;
+export type GetStockByTickerQueryResult = Apollo.QueryResult<GetStockByTickerQuery, GetStockByTickerQueryVariables>;
 export const GetUserPortfoliosDocument = gql`
     query GetUserPortfolios {
   getUserPortfolios {
@@ -609,6 +728,48 @@ export function useLogoutMutation(baseOptions?: ApolloReactHooks.MutationHookOpt
 export type LogoutMutationHookResult = ReturnType<typeof useLogoutMutation>;
 export type LogoutMutationResult = Apollo.MutationResult<LogoutMutation>;
 export type LogoutMutationOptions = Apollo.BaseMutationOptions<LogoutMutation, LogoutMutationVariables>;
+export const SearchStocksDocument = gql`
+    query SearchStocks($search: String!) {
+  searchStocks(search: $search) {
+    id
+    ticker
+    name
+  }
+}
+    `;
+
+/**
+ * __useSearchStocksQuery__
+ *
+ * To run a query within a React component, call `useSearchStocksQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSearchStocksQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSearchStocksQuery({
+ *   variables: {
+ *      search: // value for 'search'
+ *   },
+ * });
+ */
+export function useSearchStocksQuery(baseOptions: ApolloReactHooks.QueryHookOptions<SearchStocksQuery, SearchStocksQueryVariables> & ({ variables: SearchStocksQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useQuery<SearchStocksQuery, SearchStocksQueryVariables>(SearchStocksDocument, options);
+      }
+export function useSearchStocksLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<SearchStocksQuery, SearchStocksQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useLazyQuery<SearchStocksQuery, SearchStocksQueryVariables>(SearchStocksDocument, options);
+        }
+export function useSearchStocksSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<SearchStocksQuery, SearchStocksQueryVariables>) {
+          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useSuspenseQuery<SearchStocksQuery, SearchStocksQueryVariables>(SearchStocksDocument, options);
+        }
+export type SearchStocksQueryHookResult = ReturnType<typeof useSearchStocksQuery>;
+export type SearchStocksLazyQueryHookResult = ReturnType<typeof useSearchStocksLazyQuery>;
+export type SearchStocksSuspenseQueryHookResult = ReturnType<typeof useSearchStocksSuspenseQuery>;
+export type SearchStocksQueryResult = Apollo.QueryResult<SearchStocksQuery, SearchStocksQueryVariables>;
 export const UpdatePortfolioDocument = gql`
     mutation UpdatePortfolio($portfolioId: Int!, $newName: String!) {
   updatePortfolio(portfolioId: $portfolioId, newName: $newName) {
