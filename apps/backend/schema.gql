@@ -54,8 +54,9 @@ type Query {
   getUserById(id: Float!): User
   getUserByEmail(email: String!): User
   getStocks: [Stock!]!
-  getStockById(id: Float!): Stock
+  getStockById(id: Int!): Stock
   getStockByTicker(ticker: String!): Stock
+  searchStocks(search: String!): [Stock!]!
   getUserPortfolios: [Portfolio!]!
   getPortfolioStocks(portfolioId: Int!): [PortfolioStock!]!
 }

@@ -1,5 +1,5 @@
 import {UseGuards} from '@nestjs/common';
-import {Resolver, Query, Mutation, Args} from '@nestjs/graphql';
+import {Resolver, Query, Mutation, Args, Int} from '@nestjs/graphql';
 import {StockInput} from './stock.input';
 import {StocksService} from './stocks.service';
 import {Stock} from './stock.entity';
@@ -15,7 +15,7 @@ export class StocksResolver {
 	}
 
 	@Query(() => Stock, {nullable: true})
-	async getStockById(@Args('id') id: number): Promise<Stock | null> {
+	async getStockById(@Args('id', {type: () => Int}) id: number): Promise<Stock | null> {
 		return this.stocksService.findById(id);
 	}
 

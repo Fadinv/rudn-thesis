@@ -14,6 +14,8 @@ export class PortfolioService {
 		private readonly portfolioRepository: Repository<Portfolio>,
 		@InjectRepository(PortfolioStock)
 		private readonly portfolioStockRepository: Repository<PortfolioStock>,
+		@InjectRepository(Stock)
+		private readonly stockRepository: Repository<Stock>,
 	) {}
 
 	// Создание портфеля
@@ -34,12 +36,17 @@ export class PortfolioService {
 			where: {id: portfolioId, user},
 		});
 
+
 		if (!portfolio) throw new ForbiddenException('Портфель не найден');
+
+		const stock = await this.stockRepository.findOne({ where: { id: stockId } });
+
+		if (!stock) throw new NotFoundException('Акция не найдена');
 
 		// Всегда создаем новую запись, даже если такая акция уже есть
 		const portfolioStock = this.portfolioStockRepository.create({
 			portfolio,
-			stock: {id: stockId} as Stock,
+			stock,
 			quantity,
 			averagePrice,
 		});
@@ -116,7 +123,7 @@ export class PortfolioService {
 		const portfolio = await this.portfolioRepository.findOne({where: {id: portfolioId, user}});
 		if (!portfolio) throw new ForbiddenException('Портфель не найден');
 
-		return this.portfolioStockRepository.find({where: {portfolio}, relations: ['stock']});
+		return this.portfolioStockRepository.find({where: {portfolio: {id: portfolioId}}, relations: ['stock']});
 	}
 
 	// Удаление портфеля
@@ -140,7 +147,7 @@ export class PortfolioService {
 	// Удаление одной акции из портфеля
 	async removeStockFromPortfolio(user: User, portfolioStockId: number): Promise<boolean> {
 		const portfolioStock = await this.portfolioStockRepository.findOne({
-			where: {id: portfolioStockId, portfolio: {user}},
+			where: {id: portfolioStockId, portfolio: {user: {id: user.id}}},
 		});
 
 		if (!portfolioStock) throw new NotFoundException('Акция не найдена в портфеле');
