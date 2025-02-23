@@ -15,7 +15,7 @@ export class PortfolioStock {
 	portfolio: Portfolio; // К какому портфелю относится
 
 	@Field(() => Stock)
-	@ManyToOne(() => Stock)
+	@ManyToOne(() => Stock, {onDelete: 'CASCADE'})
 	stock: Stock; // Какая акция в портфеле
 
 	@Field(() => Int, { nullable: true })
