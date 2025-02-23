@@ -37,7 +37,7 @@ const CreatePortfolioButton: React.FC<CreatePortfolioModalProps> = (props) => {
 		<DrawerRoot size={'lg'} open={open} onOpenChange={(e) => setOpen(e.open)}>
 			<DrawerBackdrop/>
 			<DrawerTrigger asChild>
-				<Button variant="outline" size="sm">
+				<Button variant="solid" size="lg">
 					<Icon as={FaPlus} mr={2}/> Создать портфель
 				</Button>
 			</DrawerTrigger>
@@ -59,7 +59,7 @@ const CreatePortfolioButton: React.FC<CreatePortfolioModalProps> = (props) => {
 					<DrawerActionTrigger asChild>
 						<Button disabled={loading} variant="outline">Отмена</Button>
 					</DrawerActionTrigger>
-					<Button onClick={handleSave} colorPalette="green" loading={loading}>Сохранить</Button>
+					<Button onClick={handleSave} colorPalette="blue" loading={loading}>Сохранить</Button>
 				</DrawerFooter>
 				<DrawerCloseTrigger/>
 			</DrawerContent>

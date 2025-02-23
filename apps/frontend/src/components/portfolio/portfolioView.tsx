@@ -1,7 +1,9 @@
 import AddStockToPortfolioButton from '@/components/portfolio/addStockToPortfolioButton';
+import DeletePortfolioStockButton from '@/components/portfolio/deletePortfolioStockButton';
+import EditPortfolioStockButton from '@/components/portfolio/editPortfolioStockButton';
 import {useGetPortfolioStocksQuery} from '@/generated/graphql-hooks';
 import React from 'react';
-import {Box, Button, Text, IconButton, Icon, Table, Spinner} from '@chakra-ui/react';
+import {Box, Button, Text, IconButton, Icon, Table, Spinner, Flex} from '@chakra-ui/react';
 import {FaPlus, FaEdit} from 'react-icons/fa';
 
 interface PortfolioViewProps {
@@ -53,13 +55,19 @@ const PortfolioView: React.FC<PortfolioViewProps> = ({portfolioId, onAddStock, o
 								<Table.Cell>{pStock.quantity}</Table.Cell>
 								<Table.Cell>${typeof pStock.averagePrice === 'number' ? pStock.averagePrice.toFixed(2) : '-'}</Table.Cell>
 								<Table.Cell>
-									<IconButton
-										size="sm"
-										aria-label="Редактировать"
-										onClick={() => onUpdateStock(portfolioId, pStock.id)}
-									>
-										<Icon as={FaEdit}/>
-									</IconButton>
+									<Flex gap={2}>
+										<EditPortfolioStockButton
+											currentAveragePrice={pStock.averagePrice}
+											portfolioStockId={pStock.id}
+											currentQuantity={pStock.quantity}
+											onSave={() => refetch()}
+										/>
+										<DeletePortfolioStockButton
+											portfolioStockId={pStock.id}
+											stockName={pStock.stock.name}
+											onDelete={() => refetch()}
+										/>
+									</Flex>
 								</Table.Cell>
 							</Table.Row>
 						))}

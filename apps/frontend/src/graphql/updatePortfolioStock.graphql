@@ -1,7 +1,7 @@
 mutation UpdatePortfolioStock(
     $portfolioStockId: Int!
-    $quantity: Int!
-    $averagePrice: Float!
+    $quantity: Int
+    $averagePrice: Float
 ) {
     updatePortfolioStock(
         portfolioStockId: $portfolioStockId

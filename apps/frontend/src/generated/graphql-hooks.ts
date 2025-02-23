@@ -27,6 +27,7 @@ export type Mutation = {
   createUser: User;
   deleteAllStocks: Scalars['Boolean']['output'];
   deletePortfolio: Scalars['Boolean']['output'];
+  deletePortfolioStock: Scalars['Boolean']['output'];
   deleteStock: Scalars['Boolean']['output'];
   deleteUser: Scalars['Boolean']['output'];
   login: Scalars['String']['output'];
@@ -69,6 +70,11 @@ export type MutationDeletePortfolioArgs = {
 };
 
 
+export type MutationDeletePortfolioStockArgs = {
+  portfolioStockId: Scalars['Int']['input'];
+};
+
+
 export type MutationDeleteStockArgs = {
   id: Scalars['Float']['input'];
 };
@@ -98,9 +104,9 @@ export type MutationUpdatePortfolioArgs = {
 
 
 export type MutationUpdatePortfolioStockArgs = {
-  averagePrice: Scalars['Float']['input'];
+  averagePrice?: InputMaybe<Scalars['Float']['input']>;
   portfolioStockId: Scalars['Int']['input'];
-  quantity: Scalars['Int']['input'];
+  quantity?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -261,6 +267,13 @@ export type DeletePortfolioMutationVariables = Exact<{
 
 export type DeletePortfolioMutation = { __typename?: 'Mutation', deletePortfolio: boolean };
 
+export type DeletePortfolioStockMutationVariables = Exact<{
+  portfolioStockId: Scalars['Int']['input'];
+}>;
+
+
+export type DeletePortfolioStockMutation = { __typename?: 'Mutation', deletePortfolioStock: boolean };
+
 export type GetPortfolioStocksQueryVariables = Exact<{
   portfolioId: Scalars['Int']['input'];
 }>;
@@ -317,8 +330,8 @@ export type UpdatePortfolioMutation = { __typename?: 'Mutation', updatePortfolio
 
 export type UpdatePortfolioStockMutationVariables = Exact<{
   portfolioStockId: Scalars['Int']['input'];
-  quantity: Scalars['Int']['input'];
-  averagePrice: Scalars['Float']['input'];
+  quantity?: InputMaybe<Scalars['Int']['input']>;
+  averagePrice?: InputMaybe<Scalars['Float']['input']>;
 }>;
 
 
@@ -486,6 +499,37 @@ export function useDeletePortfolioMutation(baseOptions?: ApolloReactHooks.Mutati
 export type DeletePortfolioMutationHookResult = ReturnType<typeof useDeletePortfolioMutation>;
 export type DeletePortfolioMutationResult = Apollo.MutationResult<DeletePortfolioMutation>;
 export type DeletePortfolioMutationOptions = Apollo.BaseMutationOptions<DeletePortfolioMutation, DeletePortfolioMutationVariables>;
+export const DeletePortfolioStockDocument = gql`
+    mutation DeletePortfolioStock($portfolioStockId: Int!) {
+  deletePortfolioStock(portfolioStockId: $portfolioStockId)
+}
+    `;
+export type DeletePortfolioStockMutationFn = Apollo.MutationFunction<DeletePortfolioStockMutation, DeletePortfolioStockMutationVariables>;
+
+/**
+ * __useDeletePortfolioStockMutation__
+ *
+ * To run a mutation, you first call `useDeletePortfolioStockMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeletePortfolioStockMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deletePortfolioStockMutation, { data, loading, error }] = useDeletePortfolioStockMutation({
+ *   variables: {
+ *      portfolioStockId: // value for 'portfolioStockId'
+ *   },
+ * });
+ */
+export function useDeletePortfolioStockMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<DeletePortfolioStockMutation, DeletePortfolioStockMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useMutation<DeletePortfolioStockMutation, DeletePortfolioStockMutationVariables>(DeletePortfolioStockDocument, options);
+      }
+export type DeletePortfolioStockMutationHookResult = ReturnType<typeof useDeletePortfolioStockMutation>;
+export type DeletePortfolioStockMutationResult = Apollo.MutationResult<DeletePortfolioStockMutation>;
+export type DeletePortfolioStockMutationOptions = Apollo.BaseMutationOptions<DeletePortfolioStockMutation, DeletePortfolioStockMutationVariables>;
 export const GetPortfolioStocksDocument = gql`
     query GetPortfolioStocks($portfolioId: Int!) {
   getPortfolioStocks(portfolioId: $portfolioId) {
@@ -806,7 +850,7 @@ export type UpdatePortfolioMutationHookResult = ReturnType<typeof useUpdatePortf
 export type UpdatePortfolioMutationResult = Apollo.MutationResult<UpdatePortfolioMutation>;
 export type UpdatePortfolioMutationOptions = Apollo.BaseMutationOptions<UpdatePortfolioMutation, UpdatePortfolioMutationVariables>;
 export const UpdatePortfolioStockDocument = gql`
-    mutation UpdatePortfolioStock($portfolioStockId: Int!, $quantity: Int!, $averagePrice: Float!) {
+    mutation UpdatePortfolioStock($portfolioStockId: Int!, $quantity: Int, $averagePrice: Float) {
   updatePortfolioStock(
     portfolioStockId: $portfolioStockId
     quantity: $quantity

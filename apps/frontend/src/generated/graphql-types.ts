@@ -25,6 +25,7 @@ export type Mutation = {
   createUser: User;
   deleteAllStocks: Scalars['Boolean']['output'];
   deletePortfolio: Scalars['Boolean']['output'];
+  deletePortfolioStock: Scalars['Boolean']['output'];
   deleteStock: Scalars['Boolean']['output'];
   deleteUser: Scalars['Boolean']['output'];
   login: Scalars['String']['output'];
@@ -67,6 +68,11 @@ export type MutationDeletePortfolioArgs = {
 };
 
 
+export type MutationDeletePortfolioStockArgs = {
+  portfolioStockId: Scalars['Int']['input'];
+};
+
+
 export type MutationDeleteStockArgs = {
   id: Scalars['Float']['input'];
 };
@@ -96,9 +102,9 @@ export type MutationUpdatePortfolioArgs = {
 
 
 export type MutationUpdatePortfolioStockArgs = {
-  averagePrice: Scalars['Float']['input'];
+  averagePrice?: InputMaybe<Scalars['Float']['input']>;
   portfolioStockId: Scalars['Int']['input'];
-  quantity: Scalars['Int']['input'];
+  quantity?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -344,13 +350,14 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   createUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'email' | 'password'>>;
   deleteAllStocks?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   deletePortfolio?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeletePortfolioArgs, 'portfolioId'>>;
+  deletePortfolioStock?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeletePortfolioStockArgs, 'portfolioStockId'>>;
   deleteStock?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteStockArgs, 'id'>>;
   deleteUser?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteUserArgs, 'id'>>;
   login?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationLoginArgs, 'email' | 'password'>>;
   logout?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   register?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationRegisterArgs, 'email' | 'password'>>;
   updatePortfolio?: Resolver<ResolversTypes['Portfolio'], ParentType, ContextType, RequireFields<MutationUpdatePortfolioArgs, 'newName' | 'portfolioId'>>;
-  updatePortfolioStock?: Resolver<ResolversTypes['PortfolioStock'], ParentType, ContextType, RequireFields<MutationUpdatePortfolioStockArgs, 'averagePrice' | 'portfolioStockId' | 'quantity'>>;
+  updatePortfolioStock?: Resolver<ResolversTypes['PortfolioStock'], ParentType, ContextType, RequireFields<MutationUpdatePortfolioStockArgs, 'portfolioStockId'>>;
   updatePortfolioStocks?: Resolver<Array<ResolversTypes['PortfolioStock']>, ParentType, ContextType, RequireFields<MutationUpdatePortfolioStocksArgs, 'updates'>>;
   updateStock?: Resolver<ResolversTypes['Stock'], ParentType, ContextType, RequireFields<MutationUpdateStockArgs, 'data' | 'id'>>;
   updateUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationUpdateUserArgs, 'email' | 'id'>>;

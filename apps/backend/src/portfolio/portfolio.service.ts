@@ -36,10 +36,9 @@ export class PortfolioService {
 			where: {id: portfolioId, user},
 		});
 
-
 		if (!portfolio) throw new ForbiddenException('Портфель не найден');
 
-		const stock = await this.stockRepository.findOne({ where: { id: stockId } });
+		const stock = await this.stockRepository.findOne({where: {id: stockId}});
 
 		if (!stock) throw new NotFoundException('Акция не найдена');
 
@@ -84,6 +83,30 @@ export class PortfolioService {
 		await this.updatePortfolioAnalysisStatus(portfolioStock.portfolio.id);
 
 		return portfolioStock;
+	}
+
+	async deletePortfolioStock(user: User, portfolioStockId: number): Promise<boolean> {
+		const portfolioStock = await this.portfolioStockRepository.findOne({
+			where: {id: portfolioStockId},
+			// relations: ['portfolio', 'portfolio.user'],
+			relations: ['portfolio'],
+		});
+
+		if (!portfolioStock) {
+			throw new NotFoundException('Акция в портфеле не найдена');
+		}
+
+		console.log('portfolioStock.portfolio', portfolioStock.portfolio);
+		if (portfolioStock.portfolio.user.id !== user.id) {
+			throw new ForbiddenException('Вы не владеете этим портфелем');
+		}
+
+		await this.portfolioStockRepository.remove(portfolioStock);
+
+		// Пересчитываем `isReadyForAnalysis`
+		await this.updatePortfolioAnalysisStatus(portfolioStock.portfolio.id);
+
+		return true;
 	}
 
 	// Обновление акций в портфеле

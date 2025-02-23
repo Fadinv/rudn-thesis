@@ -74,7 +74,8 @@ type Mutation {
   deleteAllStocks: Boolean!
   createPortfolio(name: String!): Portfolio!
   addStockToPortfolio(portfolioId: Int!, stockId: Int!, quantity: Int!, averagePrice: Float!): PortfolioStock!
-  updatePortfolioStock(portfolioStockId: Int!, quantity: Int!, averagePrice: Float!): PortfolioStock!
+  updatePortfolioStock(portfolioStockId: Int!, quantity: Int, averagePrice: Float): PortfolioStock!
+  deletePortfolioStock(portfolioStockId: Int!): Boolean!
   updatePortfolioStocks(updates: [PortfolioStockUpdateInput!]!): [PortfolioStock!]!
   deletePortfolio(portfolioId: Int!): Boolean!
   updatePortfolio(portfolioId: Int!, newName: String!): Portfolio!

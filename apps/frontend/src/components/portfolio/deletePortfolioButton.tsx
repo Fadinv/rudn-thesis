@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Button, Field, Icon, Text} from '@chakra-ui/react';
+import {Button, Field, Icon, IconButton, Text} from '@chakra-ui/react';
 import {FaTrash, FaTimes} from 'react-icons/fa';
 import {useDeletePortfolioMutation} from '@/generated/graphql-hooks';
 import {
@@ -40,9 +40,9 @@ const DeletePortfolioButton: React.FC<DeletePortfolioButtonProps> = ({
 	return (
 		<DialogRoot open={open} onOpenChange={(e) => setOpen(e.open)}>
 			<DialogTrigger asChild>
-				<Button size="xs" colorScheme="red" colorPalette="red" variant="solid">
+				<IconButton size="xs" colorScheme="red" colorPalette="red" variant="solid">
 					<Icon as={FaTrash}/>
-				</Button>
+				</IconButton>
 			</DialogTrigger>
 			<DialogContent>
 				<DialogHeader>
@@ -50,7 +50,6 @@ const DeletePortfolioButton: React.FC<DeletePortfolioButtonProps> = ({
 				</DialogHeader>
 				<DialogDescription>
 					<Text pl={8} pr={8}>Вы уверены, что хотите удалить портфель <b>{portfolioName}</b>?</Text>
-					{error && <Field.ErrorText>{error.message}</Field.ErrorText>}
 				</DialogDescription>
 				<DialogFooter>
 					<Button colorScheme="red" colorPalette="red" onClick={handleDelete} loading={loading}>

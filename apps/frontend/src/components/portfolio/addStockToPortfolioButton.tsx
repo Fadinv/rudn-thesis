@@ -73,8 +73,8 @@ const AddStockToPortfolioButton: React.FC<AddStockToPortfolioProps> = ({
 		<DrawerRoot size={'lg'} open={open} onOpenChange={(e) => setOpen(e.open)}>
 			<DrawerBackdrop/>
 			<DrawerTrigger asChild>
-				<Button colorScheme="blue" mb={4}>
-					<Icon as={FaPlus} mr={2}/> Добавить акцию
+				<Button variant="solid" size="sm" mb={4}>
+					<Icon as={FaPlus} /> Добавить акцию
 				</Button>
 			</DrawerTrigger>
 			<DrawerContent offset="4" rounded="md">
@@ -118,7 +118,7 @@ const AddStockToPortfolioButton: React.FC<AddStockToPortfolioProps> = ({
 					<DrawerCloseTrigger asChild>
 						<Button variant="outline">Отмена</Button>
 					</DrawerCloseTrigger>
-					<Button colorScheme="blue" onClick={handleSave} loading={loading}>
+					<Button colorPalette="blue" onClick={handleSave} loading={loading}>
 						Добавить
 					</Button>
 				</DrawerFooter>

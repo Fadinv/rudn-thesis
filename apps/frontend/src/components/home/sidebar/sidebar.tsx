@@ -1,4 +1,5 @@
 import DeletePortfolioButton from '@/components/portfolio/deletePortfolioButton';
+import EditPortfolioButton from '@/components/portfolio/editPortfolioButton';
 import {useGetUserPortfoliosQuery} from '@/generated/graphql-hooks';
 import {Portfolio} from '@/generated/graphql-types';
 import React, {useState} from 'react';
@@ -57,13 +58,11 @@ const Sidebar: React.FC<SidebarProps> = ({
 						>
 							<Text fontWeight="bold">{portfolio.name}</Text>
 							<Flex gap={2}>
-								<IconButton
-									size="xs"
-									aria-label="Редактировать"
-									onClick={() => onEditPortfolio(portfolio.id)}
-								>
-									<Icon as={FaEdit}/>
-								</IconButton>
+								<EditPortfolioButton
+									portfolioId={portfolio.id}
+									currentName={portfolio.name}
+									onSave={() => refetchGetUserPortfolio()}
+								/>
 								<DeletePortfolioButton
 									onDelete={() => refetchGetUserPortfolio()}
 									portfolioId={portfolio.id}

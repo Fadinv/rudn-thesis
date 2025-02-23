@@ -30,11 +30,20 @@ export class PortfolioResolver {
 	async updatePortfolioStock(
 		@AuthUser() user: User,
 		@Args('portfolioStockId', {type: () => Int}) portfolioStockId: number,
-		@Args('quantity', {type: () => Int}) quantity: number,
-		@Args('averagePrice') averagePrice: number,
+		@Args('quantity', {type: () => Int, nullable: true}) quantity?: number,
+		@Args('averagePrice', {nullable: true}) averagePrice?: number,
 	): Promise<PortfolioStock> {
 		return this.portfolioService.updatePortfolioStock(user, portfolioStockId, quantity, averagePrice);
 	}
+
+	@Mutation(() => Boolean)
+	async deletePortfolioStock(
+		@AuthUser() user: User,
+		@Args('portfolioStockId', { type: () => Int }) portfolioStockId: number,
+	): Promise<boolean> {
+		return this.portfolioService.deletePortfolioStock(user, portfolioStockId);
+	}
+
 
 	@Mutation(() => [PortfolioStock])
 	async updatePortfolioStocks(
