@@ -2,6 +2,7 @@ import {Module} from '@nestjs/common';
 import {GraphQLModule} from '@nestjs/graphql';
 import {ApolloDriver} from '@nestjs/apollo';
 import {TypeOrmModule} from '@nestjs/typeorm';
+import {PortfolioReportModule} from './portfolioReport/portfolioReport.module';
 import {StockPriceModule} from './stockPrice/stockPrice.module';
 import {UsersModule} from './users/users.module';
 import {StocksModule} from './stocks/stocks.module';
@@ -43,6 +44,7 @@ import {UsersService} from './users/users.service';
 		StocksModule,
 		PortfolioModule,
 		StockPriceModule,
+		PortfolioReportModule,
 	],
 })
 export class AppModule {}

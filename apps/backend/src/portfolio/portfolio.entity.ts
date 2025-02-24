@@ -8,6 +8,7 @@ import {
 	UpdateDateColumn,
 	CreateDateColumn,
 } from 'typeorm';
+import {PortfolioReport} from '../portfolioReport/portfolioReport.entity';
 import {User} from '../users/user.entity';
 import {PortfolioStock} from './portfolioStock.entity';
 
@@ -41,4 +42,9 @@ export class Portfolio {
 	@Field()
 	@UpdateDateColumn()
 	updatedAt: Date; // Дата последнего обновления портфеля
+
+	@Field(() => [PortfolioReport])
+	@OneToMany(() => PortfolioReport, (report) => report.portfolio)
+	reports: PortfolioReport[];
+
 }

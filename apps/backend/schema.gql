@@ -2,14 +2,42 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type StockPrice {
-  ticker: String!
-  date: String!
-  open: Float!
-  high: Float!
-  low: Float!
-  close: Float!
-  volume: Float!
+type PortfolioReport {
+  id: String!
+  portfolio: Portfolio!
+  reportType: String!
+  data: JSON
+  status: String!
+  errorMessage: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type User {
+  id: Int!
+  email: String!
+  portfolios: [Portfolio!]
+}
+
+type Portfolio {
+  id: Int!
+  name: String!
+  user: User!
+  stocks: [PortfolioStock!]!
+  isReadyForAnalysis: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  reports: [PortfolioReport!]!
 }
 
 type Stock {
@@ -37,25 +65,14 @@ type PortfolioStock {
   averagePrice: Float
 }
 
-type Portfolio {
-  id: Int!
-  name: String!
-  user: User!
-  stocks: [PortfolioStock!]!
-  isReadyForAnalysis: Boolean!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-}
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
-
-type User {
-  id: Int!
-  email: String!
-  portfolios: [Portfolio!]
+type StockPrice {
+  ticker: String!
+  date: String!
+  open: Float!
+  high: Float!
+  low: Float!
+  close: Float!
+  volume: Float!
 }
 
 type Query {
@@ -70,6 +87,8 @@ type Query {
   getUserPortfolios: [Portfolio!]!
   getPortfolioStocks(portfolioId: Int!): [PortfolioStock!]!
   getStockPrices(ticker: String!, from: Float, to: Float): [StockPrice!]!
+  getPortfolioReport(reportId: String!): PortfolioReport
+  getPortfolioReports(portfolioId: Float!): [PortfolioReport!]!
 }
 
 type Mutation {
@@ -90,6 +109,7 @@ type Mutation {
   updatePortfolioStocks(updates: [PortfolioStockUpdateInput!]!): [PortfolioStock!]!
   deletePortfolio(portfolioId: Int!): Boolean!
   updatePortfolio(portfolioId: Int!, newName: String!): Portfolio!
+  createPortfolioReport(portfolioId: Float!, reportType: String!): PortfolioReport!
 }
 
 input StockInput {
