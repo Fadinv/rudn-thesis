@@ -6,7 +6,6 @@ from sklearn.covariance import LedoitWolf
 import json
 import os
 
-print('check 1')
 # Подключение к PostgreSQL
 DATABASE_URL = "postgresql+psycopg2://postgres:password@postgres:5432/portfolio_db"
 engine = create_engine(DATABASE_URL)
