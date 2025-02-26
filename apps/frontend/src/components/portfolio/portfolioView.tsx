@@ -2,6 +2,7 @@ import AddStockToPortfolioButton from '@/components/portfolio/addStockToPortfoli
 import CreatePortfolioReportButton from '@/components/portfolio/createPortfolioReportButton';
 import DeletePortfolioStockButton from '@/components/portfolio/deletePortfolioStockButton';
 import EditPortfolioStockButton from '@/components/portfolio/editPortfolioStockButton';
+import ShowPortfolioReportButton from '@/components/portfolio/portfolioReport/ShowPortfolioReportButton';
 import {useGetPortfolioStocksQuery} from '@/generated/graphql-hooks';
 import React from 'react';
 import {Box, Button, Text, IconButton, Icon, Table, Spinner, Flex} from '@chakra-ui/react';
@@ -25,6 +26,9 @@ const PortfolioView: React.FC<PortfolioViewProps> = ({portfolioId, onAddStock, o
 						onStockAdded={() => refetch()}
 					/>
 					<CreatePortfolioReportButton
+						portfolioId={portfolioId}
+					/>
+					<ShowPortfolioReportButton
 						portfolioId={portfolioId}
 					/>
 				</Flex>

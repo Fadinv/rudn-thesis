@@ -29,6 +29,7 @@ export type Mutation = {
   createUser: User;
   deleteAllStocks: Scalars['Boolean']['output'];
   deletePortfolio: Scalars['Boolean']['output'];
+  deletePortfolioReport: Scalars['Boolean']['output'];
   deletePortfolioStock: Scalars['Boolean']['output'];
   deleteStock: Scalars['Boolean']['output'];
   deleteUser: Scalars['Boolean']['output'];
@@ -76,6 +77,11 @@ export type MutationCreateUserArgs = {
 
 export type MutationDeletePortfolioArgs = {
   portfolioId: Scalars['Int']['input'];
+};
+
+
+export type MutationDeletePortfolioReportArgs = {
+  reportId: Scalars['String']['input'];
 };
 
 
@@ -199,7 +205,7 @@ export type QueryGetPortfolioReportArgs = {
 
 
 export type QueryGetPortfolioReportsArgs = {
-  portfolioId: Scalars['Float']['input'];
+  portfolioId: Scalars['Int']['input'];
 };
 
 
@@ -335,6 +341,27 @@ export type DeletePortfolioStockMutationVariables = Exact<{
 
 
 export type DeletePortfolioStockMutation = { __typename?: 'Mutation', deletePortfolioStock: boolean };
+
+export type DeletePortfolioReportMutationVariables = Exact<{
+  reportId: Scalars['String']['input'];
+}>;
+
+
+export type DeletePortfolioReportMutation = { __typename?: 'Mutation', deletePortfolioReport: boolean };
+
+export type GetPortfolioReportQueryVariables = Exact<{
+  reportId: Scalars['String']['input'];
+}>;
+
+
+export type GetPortfolioReportQuery = { __typename?: 'Query', getPortfolioReport?: { __typename?: 'PortfolioReport', id: string, reportType: string, createdAt: any, data?: any | null } | null };
+
+export type GetPortfolioReportsQueryVariables = Exact<{
+  portfolioId: Scalars['Int']['input'];
+}>;
+
+
+export type GetPortfolioReportsQuery = { __typename?: 'Query', getPortfolioReports: Array<{ __typename?: 'PortfolioReport', id: string, reportType: string, status: string, errorMessage?: string | null, createdAt: any }> };
 
 export type GetPortfolioStocksQueryVariables = Exact<{
   portfolioId: Scalars['Int']['input'];
@@ -635,6 +662,124 @@ export function useDeletePortfolioStockMutation(baseOptions?: ApolloReactHooks.M
 export type DeletePortfolioStockMutationHookResult = ReturnType<typeof useDeletePortfolioStockMutation>;
 export type DeletePortfolioStockMutationResult = Apollo.MutationResult<DeletePortfolioStockMutation>;
 export type DeletePortfolioStockMutationOptions = Apollo.BaseMutationOptions<DeletePortfolioStockMutation, DeletePortfolioStockMutationVariables>;
+export const DeletePortfolioReportDocument = gql`
+    mutation DeletePortfolioReport($reportId: String!) {
+  deletePortfolioReport(reportId: $reportId)
+}
+    `;
+export type DeletePortfolioReportMutationFn = Apollo.MutationFunction<DeletePortfolioReportMutation, DeletePortfolioReportMutationVariables>;
+
+/**
+ * __useDeletePortfolioReportMutation__
+ *
+ * To run a mutation, you first call `useDeletePortfolioReportMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeletePortfolioReportMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deletePortfolioReportMutation, { data, loading, error }] = useDeletePortfolioReportMutation({
+ *   variables: {
+ *      reportId: // value for 'reportId'
+ *   },
+ * });
+ */
+export function useDeletePortfolioReportMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<DeletePortfolioReportMutation, DeletePortfolioReportMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useMutation<DeletePortfolioReportMutation, DeletePortfolioReportMutationVariables>(DeletePortfolioReportDocument, options);
+      }
+export type DeletePortfolioReportMutationHookResult = ReturnType<typeof useDeletePortfolioReportMutation>;
+export type DeletePortfolioReportMutationResult = Apollo.MutationResult<DeletePortfolioReportMutation>;
+export type DeletePortfolioReportMutationOptions = Apollo.BaseMutationOptions<DeletePortfolioReportMutation, DeletePortfolioReportMutationVariables>;
+export const GetPortfolioReportDocument = gql`
+    query GetPortfolioReport($reportId: String!) {
+  getPortfolioReport(reportId: $reportId) {
+    id
+    reportType
+    createdAt
+    data
+  }
+}
+    `;
+
+/**
+ * __useGetPortfolioReportQuery__
+ *
+ * To run a query within a React component, call `useGetPortfolioReportQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetPortfolioReportQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetPortfolioReportQuery({
+ *   variables: {
+ *      reportId: // value for 'reportId'
+ *   },
+ * });
+ */
+export function useGetPortfolioReportQuery(baseOptions: ApolloReactHooks.QueryHookOptions<GetPortfolioReportQuery, GetPortfolioReportQueryVariables> & ({ variables: GetPortfolioReportQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useQuery<GetPortfolioReportQuery, GetPortfolioReportQueryVariables>(GetPortfolioReportDocument, options);
+      }
+export function useGetPortfolioReportLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetPortfolioReportQuery, GetPortfolioReportQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useLazyQuery<GetPortfolioReportQuery, GetPortfolioReportQueryVariables>(GetPortfolioReportDocument, options);
+        }
+export function useGetPortfolioReportSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<GetPortfolioReportQuery, GetPortfolioReportQueryVariables>) {
+          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useSuspenseQuery<GetPortfolioReportQuery, GetPortfolioReportQueryVariables>(GetPortfolioReportDocument, options);
+        }
+export type GetPortfolioReportQueryHookResult = ReturnType<typeof useGetPortfolioReportQuery>;
+export type GetPortfolioReportLazyQueryHookResult = ReturnType<typeof useGetPortfolioReportLazyQuery>;
+export type GetPortfolioReportSuspenseQueryHookResult = ReturnType<typeof useGetPortfolioReportSuspenseQuery>;
+export type GetPortfolioReportQueryResult = Apollo.QueryResult<GetPortfolioReportQuery, GetPortfolioReportQueryVariables>;
+export const GetPortfolioReportsDocument = gql`
+    query GetPortfolioReports($portfolioId: Int!) {
+  getPortfolioReports(portfolioId: $portfolioId) {
+    id
+    reportType
+    status
+    errorMessage
+    createdAt
+  }
+}
+    `;
+
+/**
+ * __useGetPortfolioReportsQuery__
+ *
+ * To run a query within a React component, call `useGetPortfolioReportsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetPortfolioReportsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetPortfolioReportsQuery({
+ *   variables: {
+ *      portfolioId: // value for 'portfolioId'
+ *   },
+ * });
+ */
+export function useGetPortfolioReportsQuery(baseOptions: ApolloReactHooks.QueryHookOptions<GetPortfolioReportsQuery, GetPortfolioReportsQueryVariables> & ({ variables: GetPortfolioReportsQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useQuery<GetPortfolioReportsQuery, GetPortfolioReportsQueryVariables>(GetPortfolioReportsDocument, options);
+      }
+export function useGetPortfolioReportsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetPortfolioReportsQuery, GetPortfolioReportsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useLazyQuery<GetPortfolioReportsQuery, GetPortfolioReportsQueryVariables>(GetPortfolioReportsDocument, options);
+        }
+export function useGetPortfolioReportsSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<GetPortfolioReportsQuery, GetPortfolioReportsQueryVariables>) {
+          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useSuspenseQuery<GetPortfolioReportsQuery, GetPortfolioReportsQueryVariables>(GetPortfolioReportsDocument, options);
+        }
+export type GetPortfolioReportsQueryHookResult = ReturnType<typeof useGetPortfolioReportsQuery>;
+export type GetPortfolioReportsLazyQueryHookResult = ReturnType<typeof useGetPortfolioReportsLazyQuery>;
+export type GetPortfolioReportsSuspenseQueryHookResult = ReturnType<typeof useGetPortfolioReportsSuspenseQuery>;
+export type GetPortfolioReportsQueryResult = Apollo.QueryResult<GetPortfolioReportsQuery, GetPortfolioReportsQueryVariables>;
 export const GetPortfolioStocksDocument = gql`
     query GetPortfolioStocks($portfolioId: Int!) {
   getPortfolioStocks(portfolioId: $portfolioId) {

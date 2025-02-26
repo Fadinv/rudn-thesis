@@ -24,7 +24,13 @@ export class PortfolioReportResolver {
 
 	// Получение всех отчетов по портфелю
 	@Query(() => [PortfolioReport])
-	async getPortfolioReports(@Args('portfolioId') portfolioId: number): Promise<PortfolioReport[]> {
+	async getPortfolioReports(@Args('portfolioId', {type: () => Int}) portfolioId: number): Promise<PortfolioReport[]> {
 		return this.portfolioReportService.getReportsByPortfolio(portfolioId);
+	}
+
+	// Удаление отчета
+	@Mutation(() => Boolean)
+	async deletePortfolioReport(@Args('reportId') reportId: string): Promise<boolean> {
+		return this.portfolioReportService.deleteReport(reportId);
 	}
 }

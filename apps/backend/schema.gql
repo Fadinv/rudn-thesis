@@ -88,7 +88,7 @@ type Query {
   getPortfolioStocks(portfolioId: Int!): [PortfolioStock!]!
   getStockPrices(ticker: String!, from: Float, to: Float): [StockPrice!]!
   getPortfolioReport(reportId: String!): PortfolioReport
-  getPortfolioReports(portfolioId: Float!): [PortfolioReport!]!
+  getPortfolioReports(portfolioId: Int!): [PortfolioReport!]!
 }
 
 type Mutation {
@@ -110,6 +110,7 @@ type Mutation {
   deletePortfolio(portfolioId: Int!): Boolean!
   updatePortfolio(portfolioId: Int!, newName: String!): Portfolio!
   createPortfolioReport(portfolioId: Int!, reportType: String!, additionalTickers: [String!]): PortfolioReport!
+  deletePortfolioReport(reportId: String!): Boolean!
 }
 
 input StockInput {

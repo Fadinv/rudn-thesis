@@ -70,6 +70,13 @@ export class PortfolioReportService {
 		return this.reportRepository.findOne({where: {id: reportId}});
 	}
 
+	async deleteReport(reportId: string): Promise<boolean> {
+		const report = await this.reportRepository.findOne({where: {id: reportId}});
+		if (!report) return false;
+		await this.reportRepository.remove(report);
+		return true;
+	}
+
 	async analyzePortfolio(reportId: string, additionalTickers: string[] = []): Promise<void> {
 		const report = await this.reportRepository.findOne({
 			where: {id: reportId},
@@ -104,7 +111,7 @@ export class PortfolioReportService {
 		const ANALYZER_URL = process.env.ANALYZER_URL || 'http://analyzer:8001';
 
 		try {
-			await axios.post(`${ANALYZER_URL}/optimize`, { reportId });
+			await axios.post(`${ANALYZER_URL}/optimize`, {reportId});
 			console.log(`✅ Python принял отчёт ${reportId}, ожидаем расчёта`);
 		} catch (error) {
 			console.error('❌ Ошибка при отправке в Python:', error);

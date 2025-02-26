@@ -1,0 +1,9 @@
+query GetPortfolioReports($portfolioId: Int!) {
+    getPortfolioReports(portfolioId: $portfolioId) {
+        id
+        reportType
+        status
+        errorMessage
+        createdAt
+    }
+}

@@ -1,0 +1,3 @@
+mutation DeletePortfolioReport($reportId: String!) {
+    deletePortfolioReport(reportId: $reportId)
+}

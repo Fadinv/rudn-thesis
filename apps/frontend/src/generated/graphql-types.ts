@@ -27,6 +27,7 @@ export type Mutation = {
   createUser: User;
   deleteAllStocks: Scalars['Boolean']['output'];
   deletePortfolio: Scalars['Boolean']['output'];
+  deletePortfolioReport: Scalars['Boolean']['output'];
   deletePortfolioStock: Scalars['Boolean']['output'];
   deleteStock: Scalars['Boolean']['output'];
   deleteUser: Scalars['Boolean']['output'];
@@ -74,6 +75,11 @@ export type MutationCreateUserArgs = {
 
 export type MutationDeletePortfolioArgs = {
   portfolioId: Scalars['Int']['input'];
+};
+
+
+export type MutationDeletePortfolioReportArgs = {
+  reportId: Scalars['String']['input'];
 };
 
 
@@ -197,7 +203,7 @@ export type QueryGetPortfolioReportArgs = {
 
 
 export type QueryGetPortfolioReportsArgs = {
-  portfolioId: Scalars['Float']['input'];
+  portfolioId: Scalars['Int']['input'];
 };
 
 
@@ -414,6 +420,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   createUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'email' | 'password'>>;
   deleteAllStocks?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   deletePortfolio?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeletePortfolioArgs, 'portfolioId'>>;
+  deletePortfolioReport?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeletePortfolioReportArgs, 'reportId'>>;
   deletePortfolioStock?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeletePortfolioStockArgs, 'portfolioStockId'>>;
   deleteStock?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteStockArgs, 'id'>>;
   deleteUser?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteUserArgs, 'id'>>;

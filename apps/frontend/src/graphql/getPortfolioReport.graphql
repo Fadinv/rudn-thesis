@@ -1,0 +1,8 @@
+query GetPortfolioReport($reportId: String!) {
+    getPortfolioReport(reportId: $reportId) {
+        id
+        reportType
+        createdAt
+        data
+    }
+}

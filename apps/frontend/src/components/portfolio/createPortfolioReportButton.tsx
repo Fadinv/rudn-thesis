@@ -72,7 +72,7 @@ const CreatePortfolioReportButton: React.FC<CreatePortfolioReportButtonProps> = 
 
 	return (
 		<>
-			<Button colorScheme="blue" onClick={() => setOpen(true)}>
+			<Button colorScheme="blue" onClick={() => setOpen(true)} size="sm">
 				<FaFileAlt/> Создать отчет
 			</Button>
 
