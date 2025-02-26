@@ -5,6 +5,7 @@ import {PortfolioStock} from '../portfolio/portfolioStock.entity';
 import {StockPrice} from '../stockPrice/stockPrice.entity';
 import {PortfolioReport} from './portfolioReport.entity';
 import {Portfolio} from '../portfolio/portfolio.entity';
+import axios from 'axios';
 
 @Injectable()
 export class PortfolioReportService {
@@ -19,8 +20,8 @@ export class PortfolioReportService {
 		private readonly portfolioStockRepository: Repository<PortfolioStock>,
 	) {}
 
-	// 🔹 Создать отчет с изначальным статусом "calculating"
-	async createReport(portfolioId: number, reportType: 'markowitz' | 'growth_forecast' | 'value_at_risk'): Promise<PortfolioReport> {
+	// Создать отчет с изначальным статусом "calculating"
+	async createReport(portfolioId: number, reportType: 'markowitz' | 'growth_forecast' | 'value_at_risk', additionalTickers: string[] = []): Promise<PortfolioReport> {
 		const portfolio = await this.portfolioRepository.findOne({where: {id: portfolioId}});
 		if (!portfolio) throw new Error('Портфель не найден');
 
@@ -33,7 +34,7 @@ export class PortfolioReportService {
 		const savedReport = await this.reportRepository.save(report);
 
 		// Запускаем анализ асинхронно
-		this.analyzePortfolio(savedReport.id).catch(async (error) => {
+		this.analyzePortfolio(savedReport.id, additionalTickers).catch(async (error) => {
 			console.error('Ошибка при анализе портфеля:', error);
 			await this.reportRepository.update(savedReport.id, {
 				status: 'error',
@@ -44,7 +45,7 @@ export class PortfolioReportService {
 		return savedReport;
 	}
 
-	// 🔹 Обновить отчет (данные + статус)
+	// Обновить отчет (данные + статус)
 	async updateReport(reportId: string, data: any, status: 'ready' | 'error', errorMessage?: string): Promise<PortfolioReport> {
 		const report = await this.reportRepository.findOne({where: {id: reportId}});
 		if (!report) throw new Error('Отчет не найден');
@@ -56,7 +57,7 @@ export class PortfolioReportService {
 		return this.reportRepository.save(report);
 	}
 
-	// 🔹 Получить все отчеты по портфелю
+	// Получить все отчеты по портфелю
 	async getReportsByPortfolio(portfolioId: number): Promise<PortfolioReport[]> {
 		return this.reportRepository.find({
 			where: {portfolio: {id: portfolioId}},
@@ -64,15 +65,15 @@ export class PortfolioReportService {
 		});
 	}
 
-	// 🔹 Получить конкретный отчет
+	// Получить конкретный отчет
 	async getReport(reportId: string): Promise<PortfolioReport | null> {
 		return this.reportRepository.findOne({where: {id: reportId}});
 	}
 
-	async analyzePortfolio(reportId: string): Promise<void> {
+	async analyzePortfolio(reportId: string, additionalTickers: string[] = []): Promise<void> {
 		const report = await this.reportRepository.findOne({
 			where: {id: reportId},
-			relations: ['portfolio'], // Загружаем взаимосвязь с портфелем
+			relations: ['portfolio'],
 		});
 
 		if (!report || !report.portfolio) {
@@ -85,57 +86,33 @@ export class PortfolioReportService {
 
 		const portfolioId = report.portfolio.id;
 
-		// Получаем список акций в портфеле
+		// Получаем акции портфеля
 		const portfolioStocks = await this.portfolioStockRepository.find({
 			where: {portfolio: {id: portfolioId}},
-			relations: ['stock'], // Загружаем связь с акциями
+			relations: ['stock'],
 		});
 
-		if (portfolioStocks.length === 0) {
+		if (portfolioStocks.length === 0 && additionalTickers.length === 0) {
 			await this.reportRepository.update(reportId, {
 				status: 'error',
-				errorMessage: 'No stocks in portfolio',
+				errorMessage: 'No stocks in portfolio or additional stocks',
 			});
 			return;
 		}
 
-		const tickers = portfolioStocks.map(stock => stock.stock.ticker);
+		console.log(`📡 Отправляем запрос в Python для отчёта ${reportId}`);
+		const ANALYZER_URL = process.env.ANALYZER_URL || 'http://analyzer:8001';
 
-		// Получаем котировки за последние 3 года
-		const stockPrices = await this.stockPriceRepository
-			.createQueryBuilder('stock_price')
-			.where('stock_price.ticker IN (:...tickers)', {tickers})
-			.andWhere('stock_price.date >= NOW() - INTERVAL \'3 years\'')
-			.orderBy('stock_price.date', 'ASC')
-			.getMany();
-
-		if (stockPrices.length === 0) {
+		try {
+			await axios.post(`${ANALYZER_URL}/optimize`, { reportId });
+			console.log(`✅ Python принял отчёт ${reportId}, ожидаем расчёта`);
+		} catch (error) {
+			console.error('❌ Ошибка при отправке в Python:', error);
 			await this.reportRepository.update(reportId, {
 				status: 'error',
-				errorMessage: 'No stock price data available',
+				errorMessage: 'Ошибка при вызове Python-сервиса',
 			});
-			return;
 		}
-
-		// Рассчитываем показатели
-		const analysisResult = this.calculateMarkowitzPortfolio(stockPrices, portfolioStocks);
-
-		// Обновляем отчет
-		await this.reportRepository.update(reportId, {
-			status: 'ready',
-			data: analysisResult,
-			updatedAt: new Date(),
-		});
 	}
 
-	private calculateMarkowitzPortfolio(stockPrices: StockPrice[], portfolioStocks: PortfolioStock[]) {
-		// 🔢 Тут будет расчет модели Марковица (доходность, ковариация, оптимальный портфель)
-		// Временная заглушка:
-		return {
-			meanReturns: {},
-			covarianceMatrix: {},
-			optimalWeights: {},
-			efficientFrontier: {},
-		};
-	}
 }

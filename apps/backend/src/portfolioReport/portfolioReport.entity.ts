@@ -8,7 +8,7 @@ import {GraphQLJSON} from 'graphql-type-json';
 export class PortfolioReport {
 	@Field()
 	@PrimaryGeneratedColumn('uuid')
-	id: string; // 🔹 Уникальный идентификатор отчета
+	id: string; // Уникальный идентификатор отчета
 
 	@Field(() => Portfolio)
 	@ManyToOne(() => Portfolio, (portfolio) => portfolio.reports, {onDelete: 'CASCADE'})

@@ -1,0 +1,13 @@
+mutation CreatePortfolioReport($portfolioId: Int!, $reportType: String!, $additionalTickers: [String!]) {
+    createPortfolioReport(
+        portfolioId: $portfolioId
+        reportType: $reportType
+        additionalTickers: $additionalTickers
+    ) {
+        id
+        reportType
+        status
+        data
+        updatedAt
+    }
+}

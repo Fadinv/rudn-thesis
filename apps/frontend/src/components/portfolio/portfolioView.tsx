@@ -1,4 +1,5 @@
 import AddStockToPortfolioButton from '@/components/portfolio/addStockToPortfolioButton';
+import CreatePortfolioReportButton from '@/components/portfolio/createPortfolioReportButton';
 import DeletePortfolioStockButton from '@/components/portfolio/deletePortfolioStockButton';
 import EditPortfolioStockButton from '@/components/portfolio/editPortfolioStockButton';
 import {useGetPortfolioStocksQuery} from '@/generated/graphql-hooks';
@@ -18,10 +19,15 @@ const PortfolioView: React.FC<PortfolioViewProps> = ({portfolioId, onAddStock, o
 	return (
 		<Box>
 			{portfolioId && (
-				<AddStockToPortfolioButton
-					portfolioId={portfolioId}
-					onStockAdded={() => refetch()}
-				/>
+				<Flex gap={4}>
+					<AddStockToPortfolioButton
+						portfolioId={portfolioId}
+						onStockAdded={() => refetch()}
+					/>
+					<CreatePortfolioReportButton
+						portfolioId={portfolioId}
+					/>
+				</Flex>
 			)}
 
 			{error && <Text color="red.500">{error.message}</Text>}

@@ -53,5 +53,14 @@ services:
       - ./apps/ticker-updater:/app
     command: sh -c "npm install && npm run start"
 
+  analyzer:
+    build: ./apps/analyzer
+    ports:
+      - "8001:8001"
+    environment:
+      - UVICORN_CMD=uvicorn main:app --host 0.0.0.0 --port 8001 --limit-max-request-size 100000000
+    volumes:
+      - ./apps/analyzer:/app
+
 volumes:
   postgres-data:

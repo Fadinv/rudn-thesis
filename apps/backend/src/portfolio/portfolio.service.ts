@@ -66,6 +66,7 @@ export class PortfolioService {
 	): Promise<PortfolioStock> {
 		const portfolioStock = await this.portfolioStockRepository.findOne({
 			where: {id: portfolioStockId, portfolio: {user}},
+			relations: ['portfolio'],
 		});
 
 		if (!portfolioStock) throw new NotFoundException('Акция в портфеле не найдена');
@@ -88,8 +89,7 @@ export class PortfolioService {
 	async deletePortfolioStock(user: User, portfolioStockId: number): Promise<boolean> {
 		const portfolioStock = await this.portfolioStockRepository.findOne({
 			where: {id: portfolioStockId},
-			// relations: ['portfolio', 'portfolio.user'],
-			relations: ['portfolio'],
+			relations: ['portfolio', 'portfolio.user'],
 		});
 
 		if (!portfolioStock) {

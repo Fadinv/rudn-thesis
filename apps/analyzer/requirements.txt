@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+numpy
+pandas
+scipy
+scikit-learn
+sqlalchemy
+asyncpg
+psycopg2

@@ -109,7 +109,7 @@ type Mutation {
   updatePortfolioStocks(updates: [PortfolioStockUpdateInput!]!): [PortfolioStock!]!
   deletePortfolio(portfolioId: Int!): Boolean!
   updatePortfolio(portfolioId: Int!, newName: String!): Portfolio!
-  createPortfolioReport(portfolioId: Float!, reportType: String!): PortfolioReport!
+  createPortfolioReport(portfolioId: Int!, reportType: String!, additionalTickers: [String!]): PortfolioReport!
 }
 
 input StockInput {

@@ -17,12 +17,14 @@ export type Scalars = {
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
   DateTime: { input: any; output: any; }
+  JSON: { input: any; output: any; }
 };
 
 export type Mutation = {
   __typename?: 'Mutation';
   addStockToPortfolio: PortfolioStock;
   createPortfolio: Portfolio;
+  createPortfolioReport: PortfolioReport;
   createStock: Stock;
   createUser: User;
   deleteAllStocks: Scalars['Boolean']['output'];
@@ -51,6 +53,13 @@ export type MutationAddStockToPortfolioArgs = {
 
 export type MutationCreatePortfolioArgs = {
   name: Scalars['String']['input'];
+};
+
+
+export type MutationCreatePortfolioReportArgs = {
+  additionalTickers?: InputMaybe<Array<Scalars['String']['input']>>;
+  portfolioId: Scalars['Int']['input'];
+  reportType: Scalars['String']['input'];
 };
 
 
@@ -133,9 +142,22 @@ export type Portfolio = {
   id: Scalars['Int']['output'];
   isReadyForAnalysis: Scalars['Boolean']['output'];
   name: Scalars['String']['output'];
+  reports: Array<PortfolioReport>;
   stocks: Array<PortfolioStock>;
   updatedAt: Scalars['DateTime']['output'];
   user: User;
+};
+
+export type PortfolioReport = {
+  __typename?: 'PortfolioReport';
+  createdAt: Scalars['DateTime']['output'];
+  data?: Maybe<Scalars['JSON']['output']>;
+  errorMessage?: Maybe<Scalars['String']['output']>;
+  id: Scalars['String']['output'];
+  portfolio: Portfolio;
+  reportType: Scalars['String']['output'];
+  status: Scalars['String']['output'];
+  updatedAt: Scalars['DateTime']['output'];
 };
 
 export type PortfolioStock = {
@@ -156,15 +178,28 @@ export type PortfolioStockUpdateInput = {
 export type Query = {
   __typename?: 'Query';
   currentUser?: Maybe<User>;
+  getPortfolioReport?: Maybe<PortfolioReport>;
+  getPortfolioReports: Array<PortfolioReport>;
   getPortfolioStocks: Array<PortfolioStock>;
   getStockById?: Maybe<Stock>;
   getStockByTicker?: Maybe<Stock>;
+  getStockPrices: Array<StockPrice>;
   getStocks: Array<Stock>;
   getUserByEmail?: Maybe<User>;
   getUserById?: Maybe<User>;
   getUserPortfolios: Array<Portfolio>;
   getUsers: Array<User>;
   searchStocks: Array<Stock>;
+};
+
+
+export type QueryGetPortfolioReportArgs = {
+  reportId: Scalars['String']['input'];
+};
+
+
+export type QueryGetPortfolioReportsArgs = {
+  portfolioId: Scalars['Float']['input'];
 };
 
 
@@ -180,6 +215,13 @@ export type QueryGetStockByIdArgs = {
 
 export type QueryGetStockByTickerArgs = {
   ticker: Scalars['String']['input'];
+};
+
+
+export type QueryGetStockPricesArgs = {
+  from?: InputMaybe<Scalars['Float']['input']>;
+  ticker: Scalars['String']['input'];
+  to?: InputMaybe<Scalars['Float']['input']>;
 };
 
 
@@ -231,6 +273,17 @@ export type StockInput = {
   type: Scalars['String']['input'];
 };
 
+export type StockPrice = {
+  __typename?: 'StockPrice';
+  close: Scalars['Float']['output'];
+  date: Scalars['String']['output'];
+  high: Scalars['Float']['output'];
+  low: Scalars['Float']['output'];
+  open: Scalars['Float']['output'];
+  ticker: Scalars['String']['output'];
+  volume: Scalars['Float']['output'];
+};
+
 export type User = {
   __typename?: 'User';
   email: Scalars['String']['output'];
@@ -254,6 +307,15 @@ export type CreatePortfolioMutationVariables = Exact<{
 
 
 export type CreatePortfolioMutation = { __typename?: 'Mutation', createPortfolio: { __typename?: 'Portfolio', id: number, name: string, createdAt: any } };
+
+export type CreatePortfolioReportMutationVariables = Exact<{
+  portfolioId: Scalars['Int']['input'];
+  reportType: Scalars['String']['input'];
+  additionalTickers?: InputMaybe<Array<Scalars['String']['input']> | Scalars['String']['input']>;
+}>;
+
+
+export type CreatePortfolioReportMutation = { __typename?: 'Mutation', createPortfolioReport: { __typename?: 'PortfolioReport', id: string, reportType: string, status: string, data?: any | null, updatedAt: any } };
 
 export type CurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -428,6 +490,49 @@ export function useCreatePortfolioMutation(baseOptions?: ApolloReactHooks.Mutati
 export type CreatePortfolioMutationHookResult = ReturnType<typeof useCreatePortfolioMutation>;
 export type CreatePortfolioMutationResult = Apollo.MutationResult<CreatePortfolioMutation>;
 export type CreatePortfolioMutationOptions = Apollo.BaseMutationOptions<CreatePortfolioMutation, CreatePortfolioMutationVariables>;
+export const CreatePortfolioReportDocument = gql`
+    mutation CreatePortfolioReport($portfolioId: Int!, $reportType: String!, $additionalTickers: [String!]) {
+  createPortfolioReport(
+    portfolioId: $portfolioId
+    reportType: $reportType
+    additionalTickers: $additionalTickers
+  ) {
+    id
+    reportType
+    status
+    data
+    updatedAt
+  }
+}
+    `;
+export type CreatePortfolioReportMutationFn = Apollo.MutationFunction<CreatePortfolioReportMutation, CreatePortfolioReportMutationVariables>;
+
+/**
+ * __useCreatePortfolioReportMutation__
+ *
+ * To run a mutation, you first call `useCreatePortfolioReportMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreatePortfolioReportMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createPortfolioReportMutation, { data, loading, error }] = useCreatePortfolioReportMutation({
+ *   variables: {
+ *      portfolioId: // value for 'portfolioId'
+ *      reportType: // value for 'reportType'
+ *      additionalTickers: // value for 'additionalTickers'
+ *   },
+ * });
+ */
+export function useCreatePortfolioReportMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<CreatePortfolioReportMutation, CreatePortfolioReportMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useMutation<CreatePortfolioReportMutation, CreatePortfolioReportMutationVariables>(CreatePortfolioReportDocument, options);
+      }
+export type CreatePortfolioReportMutationHookResult = ReturnType<typeof useCreatePortfolioReportMutation>;
+export type CreatePortfolioReportMutationResult = Apollo.MutationResult<CreatePortfolioReportMutation>;
+export type CreatePortfolioReportMutationOptions = Apollo.BaseMutationOptions<CreatePortfolioReportMutation, CreatePortfolioReportMutationVariables>;
 export const CurrentUserDocument = gql`
     query CurrentUser {
   currentUser {

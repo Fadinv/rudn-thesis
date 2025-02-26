@@ -15,12 +15,14 @@ export type Scalars = {
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
   DateTime: { input: any; output: any; }
+  JSON: { input: any; output: any; }
 };
 
 export type Mutation = {
   __typename?: 'Mutation';
   addStockToPortfolio: PortfolioStock;
   createPortfolio: Portfolio;
+  createPortfolioReport: PortfolioReport;
   createStock: Stock;
   createUser: User;
   deleteAllStocks: Scalars['Boolean']['output'];
@@ -49,6 +51,13 @@ export type MutationAddStockToPortfolioArgs = {
 
 export type MutationCreatePortfolioArgs = {
   name: Scalars['String']['input'];
+};
+
+
+export type MutationCreatePortfolioReportArgs = {
+  additionalTickers?: InputMaybe<Array<Scalars['String']['input']>>;
+  portfolioId: Scalars['Int']['input'];
+  reportType: Scalars['String']['input'];
 };
 
 
@@ -131,9 +140,22 @@ export type Portfolio = {
   id: Scalars['Int']['output'];
   isReadyForAnalysis: Scalars['Boolean']['output'];
   name: Scalars['String']['output'];
+  reports: Array<PortfolioReport>;
   stocks: Array<PortfolioStock>;
   updatedAt: Scalars['DateTime']['output'];
   user: User;
+};
+
+export type PortfolioReport = {
+  __typename?: 'PortfolioReport';
+  createdAt: Scalars['DateTime']['output'];
+  data?: Maybe<Scalars['JSON']['output']>;
+  errorMessage?: Maybe<Scalars['String']['output']>;
+  id: Scalars['String']['output'];
+  portfolio: Portfolio;
+  reportType: Scalars['String']['output'];
+  status: Scalars['String']['output'];
+  updatedAt: Scalars['DateTime']['output'];
 };
 
 export type PortfolioStock = {
@@ -154,15 +176,28 @@ export type PortfolioStockUpdateInput = {
 export type Query = {
   __typename?: 'Query';
   currentUser?: Maybe<User>;
+  getPortfolioReport?: Maybe<PortfolioReport>;
+  getPortfolioReports: Array<PortfolioReport>;
   getPortfolioStocks: Array<PortfolioStock>;
   getStockById?: Maybe<Stock>;
   getStockByTicker?: Maybe<Stock>;
+  getStockPrices: Array<StockPrice>;
   getStocks: Array<Stock>;
   getUserByEmail?: Maybe<User>;
   getUserById?: Maybe<User>;
   getUserPortfolios: Array<Portfolio>;
   getUsers: Array<User>;
   searchStocks: Array<Stock>;
+};
+
+
+export type QueryGetPortfolioReportArgs = {
+  reportId: Scalars['String']['input'];
+};
+
+
+export type QueryGetPortfolioReportsArgs = {
+  portfolioId: Scalars['Float']['input'];
 };
 
 
@@ -178,6 +213,13 @@ export type QueryGetStockByIdArgs = {
 
 export type QueryGetStockByTickerArgs = {
   ticker: Scalars['String']['input'];
+};
+
+
+export type QueryGetStockPricesArgs = {
+  from?: InputMaybe<Scalars['Float']['input']>;
+  ticker: Scalars['String']['input'];
+  to?: InputMaybe<Scalars['Float']['input']>;
 };
 
 
@@ -227,6 +269,17 @@ export type StockInput = {
   shareClassFigi?: InputMaybe<Scalars['String']['input']>;
   ticker: Scalars['String']['input'];
   type: Scalars['String']['input'];
+};
+
+export type StockPrice = {
+  __typename?: 'StockPrice';
+  close: Scalars['Float']['output'];
+  date: Scalars['String']['output'];
+  high: Scalars['Float']['output'];
+  low: Scalars['Float']['output'];
+  open: Scalars['Float']['output'];
+  ticker: Scalars['String']['output'];
+  volume: Scalars['Float']['output'];
 };
 
 export type User = {
@@ -311,13 +364,16 @@ export type ResolversTypes = {
   DateTime: ResolverTypeWrapper<Scalars['DateTime']['output']>;
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
+  JSON: ResolverTypeWrapper<Scalars['JSON']['output']>;
   Mutation: ResolverTypeWrapper<{}>;
   Portfolio: ResolverTypeWrapper<Portfolio>;
+  PortfolioReport: ResolverTypeWrapper<PortfolioReport>;
   PortfolioStock: ResolverTypeWrapper<PortfolioStock>;
   PortfolioStockUpdateInput: PortfolioStockUpdateInput;
   Query: ResolverTypeWrapper<{}>;
   Stock: ResolverTypeWrapper<Stock>;
   StockInput: StockInput;
+  StockPrice: ResolverTypeWrapper<StockPrice>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
   User: ResolverTypeWrapper<User>;
 };
@@ -328,13 +384,16 @@ export type ResolversParentTypes = {
   DateTime: Scalars['DateTime']['output'];
   Float: Scalars['Float']['output'];
   Int: Scalars['Int']['output'];
+  JSON: Scalars['JSON']['output'];
   Mutation: {};
   Portfolio: Portfolio;
+  PortfolioReport: PortfolioReport;
   PortfolioStock: PortfolioStock;
   PortfolioStockUpdateInput: PortfolioStockUpdateInput;
   Query: {};
   Stock: Stock;
   StockInput: StockInput;
+  StockPrice: StockPrice;
   String: Scalars['String']['output'];
   User: User;
 };
@@ -343,9 +402,14 @@ export interface DateTimeScalarConfig extends GraphQLScalarTypeConfig<ResolversT
   name: 'DateTime';
 }
 
+export interface JsonScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['JSON'], any> {
+  name: 'JSON';
+}
+
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   addStockToPortfolio?: Resolver<ResolversTypes['PortfolioStock'], ParentType, ContextType, RequireFields<MutationAddStockToPortfolioArgs, 'averagePrice' | 'portfolioId' | 'quantity' | 'stockId'>>;
   createPortfolio?: Resolver<ResolversTypes['Portfolio'], ParentType, ContextType, RequireFields<MutationCreatePortfolioArgs, 'name'>>;
+  createPortfolioReport?: Resolver<ResolversTypes['PortfolioReport'], ParentType, ContextType, RequireFields<MutationCreatePortfolioReportArgs, 'portfolioId' | 'reportType'>>;
   createStock?: Resolver<ResolversTypes['Stock'], ParentType, ContextType, RequireFields<MutationCreateStockArgs, 'data'>>;
   createUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'email' | 'password'>>;
   deleteAllStocks?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
@@ -368,9 +432,22 @@ export type PortfolioResolvers<ContextType = any, ParentType extends ResolversPa
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   isReadyForAnalysis?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  reports?: Resolver<Array<ResolversTypes['PortfolioReport']>, ParentType, ContextType>;
   stocks?: Resolver<Array<ResolversTypes['PortfolioStock']>, ParentType, ContextType>;
   updatedAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   user?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type PortfolioReportResolvers<ContextType = any, ParentType extends ResolversParentTypes['PortfolioReport'] = ResolversParentTypes['PortfolioReport']> = {
+  createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  data?: Resolver<Maybe<ResolversTypes['JSON']>, ParentType, ContextType>;
+  errorMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  portfolio?: Resolver<ResolversTypes['Portfolio'], ParentType, ContextType>;
+  reportType?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  status?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  updatedAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -385,9 +462,12 @@ export type PortfolioStockResolvers<ContextType = any, ParentType extends Resolv
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   currentUser?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
+  getPortfolioReport?: Resolver<Maybe<ResolversTypes['PortfolioReport']>, ParentType, ContextType, RequireFields<QueryGetPortfolioReportArgs, 'reportId'>>;
+  getPortfolioReports?: Resolver<Array<ResolversTypes['PortfolioReport']>, ParentType, ContextType, RequireFields<QueryGetPortfolioReportsArgs, 'portfolioId'>>;
   getPortfolioStocks?: Resolver<Array<ResolversTypes['PortfolioStock']>, ParentType, ContextType, RequireFields<QueryGetPortfolioStocksArgs, 'portfolioId'>>;
   getStockById?: Resolver<Maybe<ResolversTypes['Stock']>, ParentType, ContextType, RequireFields<QueryGetStockByIdArgs, 'id'>>;
   getStockByTicker?: Resolver<Maybe<ResolversTypes['Stock']>, ParentType, ContextType, RequireFields<QueryGetStockByTickerArgs, 'ticker'>>;
+  getStockPrices?: Resolver<Array<ResolversTypes['StockPrice']>, ParentType, ContextType, RequireFields<QueryGetStockPricesArgs, 'ticker'>>;
   getStocks?: Resolver<Array<ResolversTypes['Stock']>, ParentType, ContextType>;
   getUserByEmail?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryGetUserByEmailArgs, 'email'>>;
   getUserById?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryGetUserByIdArgs, 'id'>>;
@@ -414,6 +494,17 @@ export type StockResolvers<ContextType = any, ParentType extends ResolversParent
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type StockPriceResolvers<ContextType = any, ParentType extends ResolversParentTypes['StockPrice'] = ResolversParentTypes['StockPrice']> = {
+  close?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  date?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  high?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  low?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  open?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  ticker?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  volume?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
@@ -423,11 +514,14 @@ export type UserResolvers<ContextType = any, ParentType extends ResolversParentT
 
 export type Resolvers<ContextType = any> = {
   DateTime?: GraphQLScalarType;
+  JSON?: GraphQLScalarType;
   Mutation?: MutationResolvers<ContextType>;
   Portfolio?: PortfolioResolvers<ContextType>;
+  PortfolioReport?: PortfolioReportResolvers<ContextType>;
   PortfolioStock?: PortfolioStockResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   Stock?: StockResolvers<ContextType>;
+  StockPrice?: StockPriceResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
 };
 

@@ -9,12 +9,13 @@ import {
 	DrawerCloseTrigger,
 } from '@/components/ui/drawer';
 import {GetStockByIdQuery, useSearchStocksLazyQuery} from '@/generated/graphql-hooks';
+import {Stock} from '@/generated/graphql-types';
 import React, {useEffect, useState} from 'react';
 import {Input, Box, IconButton, Icon, Button, Stack, Flex, Spinner, Text} from '@chakra-ui/react';
 import {FaSearch, FaPlus} from 'react-icons/fa';
 
 interface StockSearchProps {
-	onSelectStock: (stockId: number) => void;
+	onSelectStock: (stockId: number, stockName: string, stockTicker: string) => void;
 	stockData?: GetStockByIdQuery;
 }
 
@@ -36,8 +37,8 @@ const StockSearch: React.FC<StockSearchProps> = ({onSelectStock, stockData}) => 
 
 	const doSearch = () => search({variables: {search: searchTerm}});
 
-	const handleSelectStock = (stockId: number) => {
-		onSelectStock(stockId);
+	const handleSelectStock = (stockId: number, stockName: string, stockTicker: string) => {
+		onSelectStock(stockId, stockName, stockTicker);
 		setOpen(false); // Закрываем модалку после выбора акции
 	};
 
@@ -76,12 +77,12 @@ const StockSearch: React.FC<StockSearchProps> = ({onSelectStock, stockData}) => 
 						{error && <Text color="red.500">Ошибка загрузки</Text>}
 
 						<Stack mt={4}>
-							{data?.searchStocks?.slice(0, 10).map((stock: any) => (
+							{data?.searchStocks?.slice(0, 10).map((stock) => (
 								<Button
 									key={stock.id}
 									variant="outline"
 									justifyContent="start"
-									onClick={() => handleSelectStock(stock.id)}
+									onClick={() => handleSelectStock(stock.id, stock.name, stock.ticker)}
 								>
 									{stock.ticker} - {stock.name}
 								</Button>

@@ -81,6 +81,12 @@ async function updateStockPrices(client: Client, ticker: string) {
 
 		const toDate = new Date().toISOString().split('T')[0]; // 📅 Сегодняшняя дата
 
+		// Проверяем, чтобы `fromDate` ≤ `toDate`
+		if (new Date(fromDate) >= new Date(toDate)) {
+			console.log(`⏭️ Пропускаем ${ticker}, актуальные котировки уже загружены.`);
+			return;
+		}
+
 		console.log(`📊 Догружаем котировки для ${ticker} с ${fromDate} по ${toDate}`);
 
 		const response = await fetchWithRetry(
