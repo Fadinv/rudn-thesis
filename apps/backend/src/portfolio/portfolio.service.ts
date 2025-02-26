@@ -96,7 +96,6 @@ export class PortfolioService {
 			throw new NotFoundException('Акция в портфеле не найдена');
 		}
 
-		console.log('portfolioStock.portfolio', portfolioStock.portfolio);
 		if (portfolioStock.portfolio.user.id !== user.id) {
 			throw new ForbiddenException('Вы не владеете этим портфелем');
 		}
