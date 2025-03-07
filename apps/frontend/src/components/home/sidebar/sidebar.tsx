@@ -9,8 +9,6 @@ import {
 	Button,
 	Stack,
 	Text,
-	IconButton,
-	Icon,
 	Flex,
 } from '@chakra-ui/react';
 import CreatePortfolioButton from '@/components/portfolio/createPortfolioButton';
@@ -27,15 +25,16 @@ const Sidebar: React.FC<SidebarProps> = ({
 	                                         selectedPortfolioId,
                                          }) => {
 	// Цвета для темной и светлой темы
-	const bgHover = useColorModeValue('gray.100', 'gray.700');
-	const boxBg = useColorModeValue('white', 'gray.800');
-	const activeBorder = useColorModeValue('blue.500', 'blue.300');
+	const bgColor = useColorModeValue('white', 'gray.900');
+	const hoverBgColor = useColorModeValue('gray.100', 'gray.700');
+	const activeBgColor = useColorModeValue('blue.100', 'blue.900');
+	const activeBorderColor = useColorModeValue('blue.500', 'blue.300');
 	const textColor = useColorModeValue('gray.800', 'gray.200');
 
 	const {refetch: refetchGetUserPortfolio} = useGetUserPortfoliosQuery({initialFetchPolicy: 'cache-only'});
 
 	return (
-		<Box w="350px" p={4} bg={boxBg} borderRadius="md" boxShadow="lg">
+		<Box w="350px" p={4} bg={bgColor} borderRadius="md" boxShadow="lg">
 			{/* Кнопка создания портфеля */}
 			<Box w="100%" pb={4}>
 				<CreatePortfolioButton onSave={() => refetchGetUserPortfolio()}/>
@@ -55,10 +54,11 @@ const Sidebar: React.FC<SidebarProps> = ({
 							cursor="pointer"
 							justify="space-between"
 							align="center"
-							bg={isSelected ? 'blue.100' : boxBg}
-							boxShadow={isSelected ? `2px solid ${activeBorder}` : '1px solid transparent'}
+							bg={isSelected ? activeBgColor : bgColor}
+							border="2px solid"
+							borderColor={isSelected ? activeBorderColor : 'transparent'}
 							transition="all 0.2s ease-in-out"
-							_hover={isSelected ? undefined : {bg: bgHover}} // Отключаем hover для активного
+							_hover={isSelected ? {} : {bg: hoverBgColor}} // Отключаем hover для активного элемента
 							onClick={() => onSelectPortfolio(portfolio.id)}
 						>
 							<Text fontWeight="medium" color={textColor}>{portfolio.name}</Text>
