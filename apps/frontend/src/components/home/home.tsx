@@ -5,32 +5,23 @@ import Sidebar from './sidebar/sidebar';
 import PortfolioView from '@/components/portfolio/portfolioView';
 
 interface HomeProps {
-	onCreatePortfolio: () => void;
-	onEditPortfolio: (id: number) => void;
-	onDeletePortfolio: (id: number) => void;
+	// onCreatePortfolio: () => void;
+	// onEditPortfolio: (id: number) => void;
+	// onDeletePortfolio: (id: number) => void;
 	onAddStock: (portfolioId: number) => void;
 	onUpdateStock: (portfolioId: number, stockId: number) => void;
 }
 
-const Home: React.FC<HomeProps> = ({
-	                                   onCreatePortfolio,
-	                                   onEditPortfolio,
-	                                   onDeletePortfolio,
-	                                   onAddStock,
-	                                   onUpdateStock,
-                                   }) => {
+const Home: React.FC<HomeProps> = ({onAddStock, onUpdateStock}) => {
 	const [selectedPortfolioId, setSelectedPortfolioId] = useState<number | null>(null);
 	const {data, error, loading} = useGetUserPortfoliosQuery();
 
 	return (
-		<Flex>
+		<Flex style={{flex: 1}}>
 			<Sidebar
 				portfolios={data?.getUserPortfolios}
 				onSelectPortfolio={setSelectedPortfolioId}
 				selectedPortfolioId={selectedPortfolioId}
-				onCreatePortfolio={onCreatePortfolio}
-				onEditPortfolio={onEditPortfolio}
-				onDeletePortfolio={onDeletePortfolio}
 			/>
 			<Box flex="1" p={4}>
 				{selectedPortfolioId ? (

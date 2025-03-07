@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {MouseEventHandler, useState} from 'react';
 import {Button, Field, Icon, IconButton, Text} from '@chakra-ui/react';
 import {FaTrash, FaTimes} from 'react-icons/fa';
 import {useDeletePortfolioMutation, useDeletePortfolioReportMutation} from '@/generated/graphql-hooks';
@@ -20,14 +20,16 @@ interface DeletePortfolioButtonProps {
 }
 
 const DeletePortfolioReportButton: React.FC<DeletePortfolioButtonProps> = ({
-	                                                                     reportId,
-	                                                                     portfolioReportName,
-	                                                                     onDelete,
-                                                                     }) => {
+	                                                                           reportId,
+	                                                                           portfolioReportName,
+	                                                                           onDelete,
+                                                                           }) => {
 	const [open, setOpen] = useState(false);
 	const [deletePortfolio, {loading, error}] = useDeletePortfolioReportMutation();
 
-	const handleDelete = async () => {
+	const handleDelete: React.MouseEventHandler = async (e) => {
+		e.stopPropagation();
+		e.preventDefault();
 		try {
 			await deletePortfolio({variables: {reportId}});
 			setOpen(false);
@@ -40,7 +42,11 @@ const DeletePortfolioReportButton: React.FC<DeletePortfolioButtonProps> = ({
 	return (
 		<DialogRoot open={open} onOpenChange={(e) => setOpen(e.open)}>
 			<DialogTrigger asChild>
-				<IconButton size="xs" colorScheme="red" colorPalette="red" variant="solid">
+				<IconButton onClick={(e) => {
+					e.stopPropagation();
+					e.preventDefault();
+					setOpen(true);
+				}} size="xs" colorPalette="cyan" variant="solid">
 					<Icon as={FaTrash}/>
 				</IconButton>
 			</DialogTrigger>
@@ -52,7 +58,7 @@ const DeletePortfolioReportButton: React.FC<DeletePortfolioButtonProps> = ({
 					<Text pl={8} pr={8}>Вы уверены, что хотите удалить отчет <b>{portfolioReportName}</b>?</Text>
 				</DialogDescription>
 				<DialogFooter>
-					<Button colorScheme="red" colorPalette="red" onClick={handleDelete} loading={loading}>
+					<Button colorScheme="red" colorPalette="red" onClickCapture={handleDelete} loading={loading}>
 						Удалить
 					</Button>
 				</DialogFooter>

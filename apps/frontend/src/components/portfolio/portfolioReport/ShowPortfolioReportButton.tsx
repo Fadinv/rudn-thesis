@@ -1,6 +1,6 @@
-import DeletePortfolioReportButton from '@/components/portfolio/portfolioReport/deletePortfolioReportButton';
 import MarkovitzViewer from '@/components/portfolio/portfolioReport/MarkovitzViewer';
-import React from 'react';
+import PortfolioReportCard from '@/components/portfolio/portfolioReport/PortfolioReportCard';
+import React, {useEffect, useState} from 'react';
 import {
 	DrawerRoot,
 	DrawerContent,
@@ -10,21 +10,19 @@ import {
 	DrawerTitle,
 	DrawerCloseTrigger,
 } from '@/components/ui/drawer';
-import {useState} from 'react';
 import {
 	useGetPortfolioReportsQuery,
 } from '@/generated/graphql-hooks';
 import {
 	Button,
-	IconButton,
-	Icon,
-	Stack,
 	Box,
 	Text,
 	Flex,
+	Stack,
 	createListCollection,
 } from '@chakra-ui/react';
-import {FaFileAlt} from 'react-icons/fa';
+import {FaCheckCircle, FaFileAlt, FaHourglassHalf, FaTimesCircle} from 'react-icons/fa';
+import {useColorModeValue} from '@/components/ui/color-mode';
 
 interface CreatePortfolioReportButtonProps {
 	portfolioId: number;
@@ -36,13 +34,17 @@ const ShowPortfolioReportButton: React.FC<CreatePortfolioReportButtonProps> = ({
 	const {data, refetch} = useGetPortfolioReportsQuery({variables: {portfolioId}});
 	const portfolioReports = data?.getPortfolioReports;
 
+	useEffect(() => {
+		if (open) void refetch();
+	}, [open]);
+
 	const openedReport = portfolioReports?.find((r) => r.id === openedReportId);
 
 	const handleOpenReport = async (reportId: string) => {
 		try {
 			setOpenedReportId(reportId);
 		} catch (error) {
-			console.error('Ошибка создания отчета:', error);
+			console.error('Ошибка открытия отчета:', error);
 		}
 	};
 
@@ -53,6 +55,12 @@ const ShowPortfolioReportButton: React.FC<CreatePortfolioReportButtonProps> = ({
 			{label: 'Оценка риска (VaR)', value: 'value_at_risk'},
 		],
 	});
+
+	const totalReady = (portfolioReports || []).filter(r => r.status === 'ready').length;
+	const totalError = (portfolioReports || []).filter(r => r.status === 'error').length;
+	const totalCalculating = (portfolioReports || []).filter(r => r.status === 'calculating').length;
+
+	const countBg = useColorModeValue('gray.100', 'gray.700');
 
 	return (
 		<>
@@ -67,32 +75,49 @@ const ShowPortfolioReportButton: React.FC<CreatePortfolioReportButtonProps> = ({
 					</DrawerHeader>
 					<DrawerBody>
 						<Stack>
-							<Box>
-								<Text mb={2}>Отчеты</Text>
+							<Box mb={4}>
+								<Flex
+									justify="space-between"
+									align="center"
+									p={3}
+									borderRadius="md"
+									bg={countBg}
+								>
+									<Text fontWeight="semibold" fontSize="sm">
+										Всего отчетов: {(portfolioReports || []).length}
+									</Text>
+									<Flex>
+										<Flex align="center" mr={4} color="green.600" opacity={0.85}>
+											<FaCheckCircle size={14} style={{marginRight: '6px'}}/>
+											<Text fontSize="sm">Завершено: {totalReady}</Text>
+										</Flex>
+										<Flex align="center" mr={4} color="red.500" opacity={0.85}>
+											<FaTimesCircle size={14} style={{marginRight: '6px'}}/>
+											<Text fontSize="sm">Ошибок: {totalError}</Text>
+										</Flex>
+										<Flex align="center" color="blue.500" opacity={0.85}>
+											<FaHourglassHalf size={14} style={{marginRight: '6px'}}/>
+											<Text fontSize="sm">В процессе: {totalCalculating}</Text>
+										</Flex>
+									</Flex>
+								</Flex>
 							</Box>
-
 							{portfolioReports && portfolioReports.length > 0 && (
 								<Box>
-									<Stack>
-										{portfolioReports.map((report) => (
-											<Flex
-												key={report.id} justify="space-between" align="center" p={2}
-												border={`3px solid ${report.status === 'ready' ? 'green' : report.status === 'error' ? 'red' : 'gray'}`}
-												borderRadius="md"
-												_hover={report.status === 'ready' ? {bg: 'green.300', cursor: 'pointer'} : undefined}
-												onClick={() => handleOpenReport(report.id)}
-											>
-												<Text
-													colorPalette={report.status === 'ready' ? 'green' : report.status === 'error' ? 'red' : 'gray'}>
-													{reportTypes.find(report.reportType)?.label} - {report.status}
-												</Text>
-												<DeletePortfolioReportButton
-													portfolioReportName={reportTypes.find(report.reportType)?.label || report.reportType}
-													reportId={report.id}
-													onDelete={() => refetch()}
+									<Stack gap={3}>
+										{portfolioReports.map((report) => {
+											const reportLabel = reportTypes.find(report.reportType)?.label || report.reportType;
+
+											return (
+												<PortfolioReportCard
+													key={report.id}
+													report={report}
+													reportLabel={reportLabel}
+													onOpen={handleOpenReport}
+													onDelete={refetch}
 												/>
-											</Flex>
-										))}
+											);
+										})}
 									</Stack>
 								</Box>
 							)}
@@ -105,6 +130,8 @@ const ShowPortfolioReportButton: React.FC<CreatePortfolioReportButtonProps> = ({
 					</DrawerFooter>
 				</DrawerContent>
 			</DrawerRoot>
+
+			{/* Отображение отчета */}
 			<DrawerRoot size="full" open={!!openedReport} onOpenChange={() => setOpenedReportId('')}>
 				<DrawerContent>
 					<DrawerHeader>
@@ -112,9 +139,7 @@ const ShowPortfolioReportButton: React.FC<CreatePortfolioReportButtonProps> = ({
 					</DrawerHeader>
 					<DrawerBody>
 						{openedReport && (
-							<MarkovitzViewer
-								reportId={openedReport.id}
-							/>
+							<MarkovitzViewer reportId={openedReport.id}/>
 						)}
 					</DrawerBody>
 					<DrawerFooter>

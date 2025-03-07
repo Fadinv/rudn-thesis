@@ -1,63 +1,68 @@
+import {useColorModeValue} from '@/components/ui/color-mode';
+import React from 'react';
 import DeletePortfolioButton from '@/components/portfolio/deletePortfolioButton';
 import EditPortfolioButton from '@/components/portfolio/editPortfolioButton';
 import {useGetUserPortfoliosQuery} from '@/generated/graphql-hooks';
 import {Portfolio} from '@/generated/graphql-types';
-import React, {useState} from 'react';
 import {
 	Box,
 	Button,
 	Stack,
 	Text,
 	IconButton,
-	Icon, Flex,
+	Icon,
+	Flex,
 } from '@chakra-ui/react';
-import {useColorModeValue} from '@/components/ui/color-mode';
-import {FaEdit, FaTrash} from 'react-icons/fa';
 import CreatePortfolioButton from '@/components/portfolio/createPortfolioButton';
 
 interface SidebarProps {
 	portfolios?: Pick<Portfolio, 'id' | 'name'>[];
 	onSelectPortfolio: (id: number) => void;
 	selectedPortfolioId: number | null;
-	onCreatePortfolio: (name: string) => void;
-	onEditPortfolio: (id: number) => void;
-	onDeletePortfolio: (id: number) => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
 	                                         portfolios,
 	                                         onSelectPortfolio,
-	                                         onCreatePortfolio,
-	                                         onEditPortfolio,
-	                                         onDeletePortfolio,
 	                                         selectedPortfolioId,
                                          }) => {
-	const bgHover = useColorModeValue('gray.200', 'gray.700');
+	// Цвета для темной и светлой темы
+	const bgHover = useColorModeValue('gray.100', 'gray.700');
 	const boxBg = useColorModeValue('white', 'gray.800');
+	const activeBorder = useColorModeValue('blue.500', 'blue.300');
+	const textColor = useColorModeValue('gray.800', 'gray.200');
 
 	const {refetch: refetchGetUserPortfolio} = useGetUserPortfoliosQuery({initialFetchPolicy: 'cache-only'});
 
 	return (
-		<>
-			<Box w="400px" p={4}>
-				<Box w="100%" pb={4}>
-					<CreatePortfolioButton onSave={() => refetchGetUserPortfolio()}/>
-				</Box>
-				<Stack align="stretch" gap={3}>
-					{portfolios?.map((portfolio) => (
+		<Box w="350px" p={4} bg={boxBg} borderRadius="md" boxShadow="lg">
+			{/* Кнопка создания портфеля */}
+			<Box w="100%" pb={4}>
+				<CreatePortfolioButton onSave={() => refetchGetUserPortfolio()}/>
+			</Box>
+
+			{/* Список портфелей */}
+			<Stack align="stretch" gap={2}>
+				{portfolios?.map((portfolio) => {
+					const isSelected = portfolio.id === selectedPortfolioId;
+
+					return (
 						<Flex
 							key={portfolio.id}
 							p={3}
 							shadow="md"
-							borderRadius="md"
+							borderRadius="lg"
 							cursor="pointer"
 							justify="space-between"
-							bg={portfolio.id === selectedPortfolioId ? bgHover : boxBg}
-							_hover={{bg: bgHover}}
+							align="center"
+							bg={isSelected ? 'blue.100' : boxBg}
+							boxShadow={isSelected ? `2px solid ${activeBorder}` : '1px solid transparent'}
+							transition="all 0.2s ease-in-out"
+							_hover={isSelected ? undefined : {bg: bgHover}} // Отключаем hover для активного
 							onClick={() => onSelectPortfolio(portfolio.id)}
 						>
-							<Text fontWeight="bold">{portfolio.name}</Text>
-							<Flex gap={2}>
+							<Text fontWeight="medium" color={textColor}>{portfolio.name}</Text>
+							<Flex gap={1}>
 								<EditPortfolioButton
 									portfolioId={portfolio.id}
 									currentName={portfolio.name}
@@ -70,10 +75,10 @@ const Sidebar: React.FC<SidebarProps> = ({
 								/>
 							</Flex>
 						</Flex>
-					))}
-				</Stack>
-			</Box>
-		</>
+					);
+				})}
+			</Stack>
+		</Box>
 	);
 };
 
