@@ -57,6 +57,8 @@ services:
     build: ./apps/analyzer
     ports:
       - "8001:8001"
+    env_file:
+      - ./.env.shared
     environment:
       - UVICORN_CMD=uvicorn main:app --host 0.0.0.0 --port 8001 --limit-max-request-size 100000000
     volumes:

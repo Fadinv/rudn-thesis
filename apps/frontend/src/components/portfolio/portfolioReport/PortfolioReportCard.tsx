@@ -47,7 +47,7 @@ const PortfolioReportCard: React.FC<PortfolioReportCardProps> = ({report, report
 			transition="background-color 0.3s ease-out"
 			bg={bgColor}
 			_hover={isReady ? {bg: hoverBgColor, cursor: 'pointer'} : undefined}
-			onClick={() => onOpen(report.id)}
+			onClick={() => isReady && onOpen(report.id)}
 		>
 			{/* Заголовок отчета и дата */}
 			<Flex justify="space-between" align="center">
