@@ -22,6 +22,14 @@ export class PortfolioReportService {
 
 	// Создать отчет с изначальным статусом "calculating"
 	async createReport(portfolioId: number, reportType: 'markowitz' | 'growth_forecast' | 'value_at_risk', additionalTickers: string[] = []): Promise<PortfolioReport> {
+		const supported: Partial<Record<'markowitz' | 'growth_forecast' | 'value_at_risk', boolean>> = {
+			'markowitz': true,
+		};
+
+		if (!supported[reportType]) {
+			throw new Error(`Данный тип анализа не поддерживается (reportType: ${reportType})`);
+		}
+
 		const portfolio = await this.portfolioRepository.findOne({where: {id: portfolioId}});
 		if (!portfolio) throw new Error('Портфель не найден');
 
@@ -33,14 +41,16 @@ export class PortfolioReportService {
 
 		const savedReport = await this.reportRepository.save(report);
 
-		// Запускаем анализ асинхронно
-		this.analyzePortfolio(savedReport.id, additionalTickers).catch(async (error) => {
-			console.error('Ошибка при анализе портфеля:', error);
-			await this.reportRepository.update(savedReport.id, {
-				status: 'error',
-				errorMessage: 'Ошибка при анализе портфеля',
+		if (reportType === 'markowitz') {
+			// Запускаем анализ асинхронно
+			this.analyzeMarkovitzPortfolio(savedReport.id, additionalTickers).catch(async (error) => {
+				console.error('Ошибка при анализе портфеля:', error);
+				await this.reportRepository.update(savedReport.id, {
+					status: 'error',
+					errorMessage: 'Ошибка при анализе портфеля',
+				});
 			});
-		});
+		}
 
 		return savedReport;
 	}
@@ -77,7 +87,7 @@ export class PortfolioReportService {
 		return true;
 	}
 
-	async analyzePortfolio(reportId: string, additionalTickers: string[] = []): Promise<void> {
+	async analyzeMarkovitzPortfolio(reportId: string, additionalTickers: string[] = []): Promise<void> {
 		const report = await this.reportRepository.findOne({
 			where: {id: reportId},
 			relations: ['portfolio'],
@@ -111,7 +121,7 @@ export class PortfolioReportService {
 		const ANALYZER_URL = process.env.ANALYZER_URL || 'http://analyzer:8001';
 
 		try {
-			await axios.post(`${ANALYZER_URL}/optimize`, {reportId});
+			await axios.post(`${ANALYZER_URL}/markovitz`, {reportId});
 			console.log(`✅ Python принял отчёт ${reportId}, ожидаем расчёта`);
 		} catch (error) {
 			console.error('❌ Ошибка при отправке в Python:', error);

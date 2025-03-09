@@ -1,5 +1,6 @@
 # Используем легковесный образ Python
 FROM python:3.10
+ENV PYTHONPATH="/app"
 
 # Устанавливаем рабочую директорию
 WORKDIR /app
