@@ -24,14 +24,13 @@ import {
 import {
 	Button,
 	IconButton,
-	Icon,
 	Stack,
 	Box,
 	Text,
 	Flex,
 	createListCollection,
 } from '@chakra-ui/react';
-import {FaPlus, FaTrash, FaFileAlt} from 'react-icons/fa';
+import {FaTrash, FaFileAlt} from 'react-icons/fa';
 import StockSearch from './StocksSearch';
 
 interface CreatePortfolioReportButtonProps {
@@ -44,8 +43,6 @@ const CreatePortfolioReportButton: React.FC<CreatePortfolioReportButtonProps> = 
 	const [additionalStocks, setAdditionalStocks] = useState<{ id: number; name: string; ticker: string }[]>([]);
 	const [createMarkovitzReport, {loading: createMarkovitzReportIsLoading}] = useCreateMarkovitzReportMutation();
 	const [createFutureReturnForecastReport, {loading: createFutureReturnForecastReportIsLoading}] = useCreateFutureReturnForecastGbmReportMutation();
-
-	const [modelType, setModelType] = useState<'linear_regression' | 'lstm' | 'arima'>('linear_regression');
 
 	useEffect(() => {
 		setAdditionalStocks([]);
@@ -75,6 +72,7 @@ const CreatePortfolioReportButton: React.FC<CreatePortfolioReportButtonProps> = 
 							},
 						},
 					});
+					break;
 				}
 				case 'future_returns_forecast_gbm': {
 					await createFutureReturnForecastReport({
@@ -86,6 +84,7 @@ const CreatePortfolioReportButton: React.FC<CreatePortfolioReportButtonProps> = 
 							},
 						},
 					});
+					break;
 				}
 				default: {
 					console.error('Ошибка создания отчета:', reportType);
