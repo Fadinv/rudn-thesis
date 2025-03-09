@@ -109,7 +109,8 @@ type Mutation {
   updatePortfolioStocks(updates: [PortfolioStockUpdateInput!]!): [PortfolioStock!]!
   deletePortfolio(portfolioId: Int!): Boolean!
   updatePortfolio(portfolioId: Int!, newName: String!): Portfolio!
-  createPortfolioReport(portfolioId: Int!, reportType: String!, additionalTickers: [String!]): PortfolioReport!
+  createMarkovitzReport(portfolioId: Int!, input: MarkovitzReportInput!): PortfolioReport!
+  createFutureReturnForecastGBMReport(portfolioId: Int!, input: FutureReturnForecastInput!): PortfolioReport!
   deletePortfolioReport(reportId: String!): Boolean!
 }
 
@@ -133,4 +134,13 @@ input PortfolioStockUpdateInput {
   portfolioStockId: Int!
   quantity: Int
   averagePrice: Float
+}
+
+input MarkovitzReportInput {
+  additionalTickers: [String!]
+}
+
+input FutureReturnForecastInput {
+  selectedPercentiles: [Float!]!
+  forecastHorizons: [Float!]!
 }

@@ -1,3 +1,4 @@
+import ForecastGBMViewer from '@/components/portfolio/portfolioReport/ForecastGBMViewer';
 import MarkovitzViewer from '@/components/portfolio/portfolioReport/MarkovitzViewer';
 import PortfolioReportCard from '@/components/portfolio/portfolioReport/PortfolioReportCard';
 import React, {useEffect, useState} from 'react';
@@ -51,7 +52,7 @@ const ShowPortfolioReportButton: React.FC<CreatePortfolioReportButtonProps> = ({
 	const reportTypes = createListCollection({
 		items: [
 			{label: 'Оптимальный портфель (Марковиц)', value: 'markowitz'},
-			{label: 'Прогноз роста', value: 'growth_forecast'},
+			{label: 'Прогноз будущей стоимости (GBM)', value: 'future_returns_forecast_gbm'},
 			{label: 'Оценка риска (VaR)', value: 'value_at_risk'},
 		],
 	});
@@ -138,8 +139,11 @@ const ShowPortfolioReportButton: React.FC<CreatePortfolioReportButtonProps> = ({
 						<DrawerTitle>Отчет {reportTypes.find(openedReport?.reportType)?.label || openedReport?.reportType}</DrawerTitle>
 					</DrawerHeader>
 					<DrawerBody>
-						{openedReport && (
+						{openedReport && openedReport.reportType === 'markowitz' && (
 							<MarkovitzViewer reportId={openedReport.id}/>
+						)}
+						{openedReport && openedReport.reportType === 'future_returns_forecast_gbm' && (
+							<ForecastGBMViewer reportId={openedReport.id}/>
 						)}
 					</DrawerBody>
 					<DrawerFooter>

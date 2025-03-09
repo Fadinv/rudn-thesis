@@ -20,11 +20,21 @@ export type Scalars = {
   JSON: { input: any; output: any; }
 };
 
+export type FutureReturnForecastInput = {
+  forecastHorizons: Array<Scalars['Float']['input']>;
+  selectedPercentiles: Array<Scalars['Float']['input']>;
+};
+
+export type MarkovitzReportInput = {
+  additionalTickers?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   addStockToPortfolio: PortfolioStock;
+  createFutureReturnForecastGBMReport: PortfolioReport;
+  createMarkovitzReport: PortfolioReport;
   createPortfolio: Portfolio;
-  createPortfolioReport: PortfolioReport;
   createStock: Stock;
   createUser: User;
   deleteAllStocks: Scalars['Boolean']['output'];
@@ -52,15 +62,20 @@ export type MutationAddStockToPortfolioArgs = {
 };
 
 
-export type MutationCreatePortfolioArgs = {
-  name: Scalars['String']['input'];
+export type MutationCreateFutureReturnForecastGbmReportArgs = {
+  input: FutureReturnForecastInput;
+  portfolioId: Scalars['Int']['input'];
 };
 
 
-export type MutationCreatePortfolioReportArgs = {
-  additionalTickers?: InputMaybe<Array<Scalars['String']['input']>>;
+export type MutationCreateMarkovitzReportArgs = {
+  input: MarkovitzReportInput;
   portfolioId: Scalars['Int']['input'];
-  reportType: Scalars['String']['input'];
+};
+
+
+export type MutationCreatePortfolioArgs = {
+  name: Scalars['String']['input'];
 };
 
 
@@ -307,21 +322,28 @@ export type AddStockToPortfolioMutationVariables = Exact<{
 
 export type AddStockToPortfolioMutation = { __typename?: 'Mutation', addStockToPortfolio: { __typename?: 'PortfolioStock', id: number, quantity?: number | null, averagePrice?: number | null, stock: { __typename?: 'Stock', id: number, ticker: string, name: string } } };
 
+export type CreateFutureReturnForecastGbmReportMutationVariables = Exact<{
+  portfolioId: Scalars['Int']['input'];
+  input: FutureReturnForecastInput;
+}>;
+
+
+export type CreateFutureReturnForecastGbmReportMutation = { __typename?: 'Mutation', createFutureReturnForecastGBMReport: { __typename?: 'PortfolioReport', id: string, reportType: string, status: string, createdAt: any, updatedAt: any } };
+
+export type CreateMarkovitzReportMutationVariables = Exact<{
+  portfolioId: Scalars['Int']['input'];
+  input: MarkovitzReportInput;
+}>;
+
+
+export type CreateMarkovitzReportMutation = { __typename?: 'Mutation', createMarkovitzReport: { __typename?: 'PortfolioReport', id: string, reportType: string, status: string, createdAt: any, updatedAt: any } };
+
 export type CreatePortfolioMutationVariables = Exact<{
   name: Scalars['String']['input'];
 }>;
 
 
 export type CreatePortfolioMutation = { __typename?: 'Mutation', createPortfolio: { __typename?: 'Portfolio', id: number, name: string, createdAt: any } };
-
-export type CreatePortfolioReportMutationVariables = Exact<{
-  portfolioId: Scalars['Int']['input'];
-  reportType: Scalars['String']['input'];
-  additionalTickers?: InputMaybe<Array<Scalars['String']['input']> | Scalars['String']['input']>;
-}>;
-
-
-export type CreatePortfolioReportMutation = { __typename?: 'Mutation', createPortfolioReport: { __typename?: 'PortfolioReport', id: string, reportType: string, status: string, data?: any | null, updatedAt: any } };
 
 export type CurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -482,6 +504,82 @@ export function useAddStockToPortfolioMutation(baseOptions?: ApolloReactHooks.Mu
 export type AddStockToPortfolioMutationHookResult = ReturnType<typeof useAddStockToPortfolioMutation>;
 export type AddStockToPortfolioMutationResult = Apollo.MutationResult<AddStockToPortfolioMutation>;
 export type AddStockToPortfolioMutationOptions = Apollo.BaseMutationOptions<AddStockToPortfolioMutation, AddStockToPortfolioMutationVariables>;
+export const CreateFutureReturnForecastGbmReportDocument = gql`
+    mutation createFutureReturnForecastGBMReport($portfolioId: Int!, $input: FutureReturnForecastInput!) {
+  createFutureReturnForecastGBMReport(portfolioId: $portfolioId, input: $input) {
+    id
+    reportType
+    status
+    createdAt
+    updatedAt
+  }
+}
+    `;
+export type CreateFutureReturnForecastGbmReportMutationFn = Apollo.MutationFunction<CreateFutureReturnForecastGbmReportMutation, CreateFutureReturnForecastGbmReportMutationVariables>;
+
+/**
+ * __useCreateFutureReturnForecastGbmReportMutation__
+ *
+ * To run a mutation, you first call `useCreateFutureReturnForecastGbmReportMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateFutureReturnForecastGbmReportMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createFutureReturnForecastGbmReportMutation, { data, loading, error }] = useCreateFutureReturnForecastGbmReportMutation({
+ *   variables: {
+ *      portfolioId: // value for 'portfolioId'
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateFutureReturnForecastGbmReportMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<CreateFutureReturnForecastGbmReportMutation, CreateFutureReturnForecastGbmReportMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useMutation<CreateFutureReturnForecastGbmReportMutation, CreateFutureReturnForecastGbmReportMutationVariables>(CreateFutureReturnForecastGbmReportDocument, options);
+      }
+export type CreateFutureReturnForecastGbmReportMutationHookResult = ReturnType<typeof useCreateFutureReturnForecastGbmReportMutation>;
+export type CreateFutureReturnForecastGbmReportMutationResult = Apollo.MutationResult<CreateFutureReturnForecastGbmReportMutation>;
+export type CreateFutureReturnForecastGbmReportMutationOptions = Apollo.BaseMutationOptions<CreateFutureReturnForecastGbmReportMutation, CreateFutureReturnForecastGbmReportMutationVariables>;
+export const CreateMarkovitzReportDocument = gql`
+    mutation CreateMarkovitzReport($portfolioId: Int!, $input: MarkovitzReportInput!) {
+  createMarkovitzReport(portfolioId: $portfolioId, input: $input) {
+    id
+    reportType
+    status
+    createdAt
+    updatedAt
+  }
+}
+    `;
+export type CreateMarkovitzReportMutationFn = Apollo.MutationFunction<CreateMarkovitzReportMutation, CreateMarkovitzReportMutationVariables>;
+
+/**
+ * __useCreateMarkovitzReportMutation__
+ *
+ * To run a mutation, you first call `useCreateMarkovitzReportMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateMarkovitzReportMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createMarkovitzReportMutation, { data, loading, error }] = useCreateMarkovitzReportMutation({
+ *   variables: {
+ *      portfolioId: // value for 'portfolioId'
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateMarkovitzReportMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<CreateMarkovitzReportMutation, CreateMarkovitzReportMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useMutation<CreateMarkovitzReportMutation, CreateMarkovitzReportMutationVariables>(CreateMarkovitzReportDocument, options);
+      }
+export type CreateMarkovitzReportMutationHookResult = ReturnType<typeof useCreateMarkovitzReportMutation>;
+export type CreateMarkovitzReportMutationResult = Apollo.MutationResult<CreateMarkovitzReportMutation>;
+export type CreateMarkovitzReportMutationOptions = Apollo.BaseMutationOptions<CreateMarkovitzReportMutation, CreateMarkovitzReportMutationVariables>;
 export const CreatePortfolioDocument = gql`
     mutation CreatePortfolio($name: String!) {
   createPortfolio(name: $name) {
@@ -517,49 +615,6 @@ export function useCreatePortfolioMutation(baseOptions?: ApolloReactHooks.Mutati
 export type CreatePortfolioMutationHookResult = ReturnType<typeof useCreatePortfolioMutation>;
 export type CreatePortfolioMutationResult = Apollo.MutationResult<CreatePortfolioMutation>;
 export type CreatePortfolioMutationOptions = Apollo.BaseMutationOptions<CreatePortfolioMutation, CreatePortfolioMutationVariables>;
-export const CreatePortfolioReportDocument = gql`
-    mutation CreatePortfolioReport($portfolioId: Int!, $reportType: String!, $additionalTickers: [String!]) {
-  createPortfolioReport(
-    portfolioId: $portfolioId
-    reportType: $reportType
-    additionalTickers: $additionalTickers
-  ) {
-    id
-    reportType
-    status
-    data
-    updatedAt
-  }
-}
-    `;
-export type CreatePortfolioReportMutationFn = Apollo.MutationFunction<CreatePortfolioReportMutation, CreatePortfolioReportMutationVariables>;
-
-/**
- * __useCreatePortfolioReportMutation__
- *
- * To run a mutation, you first call `useCreatePortfolioReportMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCreatePortfolioReportMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [createPortfolioReportMutation, { data, loading, error }] = useCreatePortfolioReportMutation({
- *   variables: {
- *      portfolioId: // value for 'portfolioId'
- *      reportType: // value for 'reportType'
- *      additionalTickers: // value for 'additionalTickers'
- *   },
- * });
- */
-export function useCreatePortfolioReportMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<CreatePortfolioReportMutation, CreatePortfolioReportMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return ApolloReactHooks.useMutation<CreatePortfolioReportMutation, CreatePortfolioReportMutationVariables>(CreatePortfolioReportDocument, options);
-      }
-export type CreatePortfolioReportMutationHookResult = ReturnType<typeof useCreatePortfolioReportMutation>;
-export type CreatePortfolioReportMutationResult = Apollo.MutationResult<CreatePortfolioReportMutation>;
-export type CreatePortfolioReportMutationOptions = Apollo.BaseMutationOptions<CreatePortfolioReportMutation, CreatePortfolioReportMutationVariables>;
 export const CurrentUserDocument = gql`
     query CurrentUser {
   currentUser {

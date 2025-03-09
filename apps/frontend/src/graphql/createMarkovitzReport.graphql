@@ -1,0 +1,9 @@
+mutation CreateMarkovitzReport($portfolioId: Int!, $input: MarkovitzReportInput!) {
+    createMarkovitzReport(portfolioId: $portfolioId, input: $input) {
+        id
+        reportType
+        status
+        createdAt
+        updatedAt
+    }
+}

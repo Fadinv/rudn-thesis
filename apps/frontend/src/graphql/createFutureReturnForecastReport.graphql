@@ -1,0 +1,9 @@
+mutation createFutureReturnForecastGBMReport($portfolioId: Int!, $input: FutureReturnForecastInput!) {
+    createFutureReturnForecastGBMReport(portfolioId: $portfolioId, input: $input) {
+        id
+        reportType
+        status
+        createdAt
+        updatedAt
+    }
+}

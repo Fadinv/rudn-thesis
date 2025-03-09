@@ -16,7 +16,7 @@ export class PortfolioReport {
 
 	@Field()
 	@Column({type: 'text'})
-	reportType: 'markowitz' | 'growth_forecast' | 'value_at_risk'; // Тип отчета
+	reportType: 'markowitz' | 'future_returns_forecast_gbm' | 'value_at_risk'; // Тип отчета
 
 	@Field(() => GraphQLJSON, {nullable: true})
 	@Column({type: 'jsonb', nullable: true})

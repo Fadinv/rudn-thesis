@@ -1,4 +1,12 @@
-import React from 'react';
+import {
+	SelectContent,
+	SelectItem,
+	SelectLabel,
+	SelectRoot,
+	SelectTrigger,
+	SelectValueText,
+} from '@/components/ui/select';
+import React, {useEffect} from 'react';
 import {
 	DrawerRoot,
 	DrawerContent,
@@ -8,8 +16,11 @@ import {
 	DrawerTitle,
 	DrawerCloseTrigger,
 } from '@/components/ui/drawer';
-import {useMemo, useState} from 'react';
-import {useCreatePortfolioReportMutation} from '@/generated/graphql-hooks';
+import {useState} from 'react';
+import {
+	useCreateFutureReturnForecastGbmReportMutation,
+	useCreateMarkovitzReportMutation,
+} from '@/generated/graphql-hooks';
 import {
 	Button,
 	IconButton,
@@ -18,10 +29,7 @@ import {
 	Box,
 	Text,
 	Flex,
-	Select,
-	SelectRoot,
-	SelectLabel,
-	SelectTrigger, SelectValueText, SelectContent, SelectItem, createListCollection,
+	createListCollection,
 } from '@chakra-ui/react';
 import {FaPlus, FaTrash, FaFileAlt} from 'react-icons/fa';
 import StockSearch from './StocksSearch';
@@ -32,9 +40,17 @@ interface CreatePortfolioReportButtonProps {
 
 const CreatePortfolioReportButton: React.FC<CreatePortfolioReportButtonProps> = ({portfolioId}) => {
 	const [open, setOpen] = useState(false);
-	const [reportType, setReportType] = useState<'markowitz' | 'growth_forecast' | 'value_at_risk'>('markowitz');
+	const [reportType, setReportType] = useState<'markowitz' | 'future_returns_forecast_gbm' | 'value_at_risk'>('markowitz');
 	const [additionalStocks, setAdditionalStocks] = useState<{ id: number; name: string; ticker: string }[]>([]);
-	const [createReport, {loading}] = useCreatePortfolioReportMutation();
+	const [createMarkovitzReport, {loading: createMarkovitzReportIsLoading}] = useCreateMarkovitzReportMutation();
+	const [createFutureReturnForecastReport, {loading: createFutureReturnForecastReportIsLoading}] = useCreateFutureReturnForecastGbmReportMutation();
+
+	const [modelType, setModelType] = useState<'linear_regression' | 'lstm' | 'arima'>('linear_regression');
+
+	useEffect(() => {
+		setAdditionalStocks([]);
+		setReportType('markowitz');
+	}, [open]);
 
 	const handleSelectStock = (stockId: number, stockName: string, stockTicker: string) => {
 		// Добавляем только уникальные акции
@@ -49,13 +65,32 @@ const CreatePortfolioReportButton: React.FC<CreatePortfolioReportButtonProps> = 
 
 	const handleCreateReport = async () => {
 		try {
-			await createReport({
-				variables: {
-					portfolioId,
-					reportType,
-					additionalTickers: additionalStocks.map((s) => s.ticker),
-				},
-			});
+			switch (reportType) {
+				case 'markowitz': {
+					await createMarkovitzReport({
+						variables: {
+							portfolioId,
+							input: {
+								additionalTickers: additionalStocks.map((s) => s.ticker),
+							},
+						},
+					});
+				}
+				case 'future_returns_forecast_gbm': {
+					await createFutureReturnForecastReport({
+						variables: {
+							portfolioId,
+							input: {
+								selectedPercentiles: [10, 50, 90],
+								forecastHorizons: [30, 60, 90, 180, 365, 730, 1095],
+							},
+						},
+					});
+				}
+				default: {
+					console.error('Ошибка создания отчета:', reportType);
+				}
+			}
 			setOpen(false);
 		} catch (error) {
 			console.error('Ошибка создания отчета:', error);
@@ -65,10 +100,12 @@ const CreatePortfolioReportButton: React.FC<CreatePortfolioReportButtonProps> = 
 	const reportTypes = createListCollection({
 		items: [
 			{label: 'Оптимальный портфель (Марковиц)', value: 'markowitz'},
-			{label: 'Прогноз роста', value: 'growth_forecast'},
+			{label: 'Прогноз будущей стоимости (GBM)', value: 'future_returns_forecast_gbm'},
 			{label: 'Оценка риска (VaR)', value: 'value_at_risk'},
 		],
 	});
+
+	const loading = createMarkovitzReportIsLoading || createFutureReturnForecastReportIsLoading;
 
 	return (
 		<>
@@ -86,12 +123,12 @@ const CreatePortfolioReportButton: React.FC<CreatePortfolioReportButtonProps> = 
 							<Box>
 								<Text mb={2}>Выберите тип отчета:</Text>
 								<SelectRoot
+									defaultValue={['markowitz']}
 									onValueChange={(e) => {
-										setReportType(e.value[0] as 'markowitz' | 'growth_forecast' | 'value_at_risk');
+										setReportType(e.value[0] as 'markowitz' | 'future_returns_forecast_gbm' | 'value_at_risk');
 									}}
 									collection={reportTypes}
 									size="sm"
-									width="320px"
 								>
 									<SelectLabel>Вид анализа</SelectLabel>
 									<SelectTrigger>
@@ -105,23 +142,20 @@ const CreatePortfolioReportButton: React.FC<CreatePortfolioReportButtonProps> = 
 										))}
 									</SelectContent>
 								</SelectRoot>
-								{/*<Select value={reportType} onChange={(e) => setReportType(e.target.value as any)}>*/}
-								{/*	<option value="markowitz">Оптимальный портфель (Марковиц)</option>*/}
-								{/*	<option value="growth_forecast">Прогноз роста</option>*/}
-								{/*	<option value="value_at_risk">Оценка риска (VaR)</option>*/}
-								{/*</Select>*/}
 							</Box>
 
-							<Box>
-								<Text mb={2}>Добавить акции в анализ:</Text>
-								<StockSearch
-									onSelectStock={(stockId, stockName, stockTicker) =>
-										handleSelectStock(stockId, stockName, stockTicker)
-									}
-								/>
-							</Box>
+							{reportType === 'markowitz' && (
+								<Box>
+									<Text mb={2}>Добавить акции в анализ:</Text>
+									<StockSearch
+										onSelectStock={(stockId, stockName, stockTicker) =>
+											handleSelectStock(stockId, stockName, stockTicker)
+										}
+									/>
+								</Box>
+							)}
 
-							{additionalStocks.length > 0 && (
+							{reportType === 'markowitz' && additionalStocks.length > 0 && (
 								<Box>
 									<Text mb={2}>Дополнительные акции:</Text>
 									<Stack>

@@ -1,4 +1,5 @@
 import numpy as np
+import pandas_market_calendars as mcal
 
 def calculate_returns_matrix(stock_prices, tickers):
     """
@@ -52,3 +53,10 @@ def classify_risk_levels(sortino_ratios):
     balanced_threshold = mean_sortino + 0.5 * std_sortino
 
     return conservative_threshold, balanced_threshold
+
+
+def get_trading_days(start_date, num_days):
+    """Конвертирует календарные дни в торговые дни"""
+    nyse = mcal.get_calendar('NYSE')  # Можно заменить на нужную биржу
+    trading_days = nyse.valid_days(start_date=start_date, end_date=start_date + timedelta(days=num_days*2))
+    return trading_days[:num_days]  # Берем только нужное количество дней

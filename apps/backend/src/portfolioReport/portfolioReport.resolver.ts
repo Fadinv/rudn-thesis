@@ -2,18 +2,33 @@ import {Resolver, Query, Mutation, Args, Int} from '@nestjs/graphql';
 import {PortfolioReportService} from './portfolioReport.service';
 import {PortfolioReport} from './portfolioReport.entity';
 
+// DTOs
+import {MarkovitzReportInput} from './dto/markovitz-report.input';
+import {FutureReturnForecastInput} from './dto/future-return-forecast.input';
+
 @Resolver(() => PortfolioReport)
 export class PortfolioReportResolver {
 	constructor(private readonly portfolioReportService: PortfolioReportService) {}
 
-	// Создание отчета
+	// Создание отчета Марковица
 	@Mutation(() => PortfolioReport)
-	async createPortfolioReport(
+	async createMarkovitzReport(
 		@Args('portfolioId', {type: () => Int}) portfolioId: number,
-		@Args('reportType') reportType: 'markowitz' | 'growth_forecast' | 'value_at_risk',
-		@Args({name: 'additionalTickers', type: () => [String], nullable: true}) additionalTickers?: string[],
+		@Args('input') input: MarkovitzReportInput,
 	): Promise<PortfolioReport> {
-		return this.portfolioReportService.createReport(portfolioId, reportType, additionalTickers || []);
+		return this.portfolioReportService.createMarkovitzReport(portfolioId, input);
+	}
+
+	// Создание отчета "Прогнозирование будущей доходности"
+	@Mutation(() => PortfolioReport)
+	async createFutureReturnForecastGBMReport(
+		@Args('portfolioId', {type: () => Int}) portfolioId: number,
+		@Args('input') input: FutureReturnForecastInput,
+	): Promise<PortfolioReport> {
+		return this.portfolioReportService.createFutureReturnForecastGBMReport(
+			portfolioId,
+			input,
+		);
 	}
 
 	// Получение отчета по ID

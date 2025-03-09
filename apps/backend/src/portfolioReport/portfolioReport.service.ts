@@ -1,11 +1,15 @@
 import {Injectable} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
+import {FutureReturnForecastInput} from 'src/portfolioReport/dto/future-return-forecast.input';
+import {MarkovitzReportInput} from 'src/portfolioReport/dto/markovitz-report.input';
 import {Repository} from 'typeorm';
 import {PortfolioStock} from '../portfolio/portfolioStock.entity';
 import {StockPrice} from '../stockPrice/stockPrice.entity';
 import {PortfolioReport} from './portfolioReport.entity';
 import {Portfolio} from '../portfolio/portfolio.entity';
 import axios from 'axios';
+
+export type ReportType = 'markowitz' | 'future_returns_forecast_gbm' | 'value_at_risk';
 
 @Injectable()
 export class PortfolioReportService {
@@ -20,13 +24,16 @@ export class PortfolioReportService {
 		private readonly portfolioStockRepository: Repository<PortfolioStock>,
 	) {}
 
-	// Создать отчет с изначальным статусом "calculating"
-	async createReport(portfolioId: number, reportType: 'markowitz' | 'growth_forecast' | 'value_at_risk', additionalTickers: string[] = []): Promise<PortfolioReport> {
-		const supported: Partial<Record<'markowitz' | 'growth_forecast' | 'value_at_risk', boolean>> = {
-			'markowitz': true,
-		};
+	private _supportedReports: Partial<Record<ReportType, boolean>> = {
+		'markowitz': true,
+		'future_returns_forecast_gbm': true,
+	};
 
-		if (!supported[reportType]) {
+	async createDefaultReport(
+		portfolioId: number,
+		reportType: ReportType,
+	) {
+		if (!this._supportedReports[reportType]) {
 			throw new Error(`Данный тип анализа не поддерживается (reportType: ${reportType})`);
 		}
 
@@ -41,16 +48,37 @@ export class PortfolioReportService {
 
 		const savedReport = await this.reportRepository.save(report);
 
-		if (reportType === 'markowitz') {
-			// Запускаем анализ асинхронно
-			this.analyzeMarkovitzPortfolio(savedReport.id, additionalTickers).catch(async (error) => {
-				console.error('Ошибка при анализе портфеля:', error);
-				await this.reportRepository.update(savedReport.id, {
-					status: 'error',
-					errorMessage: 'Ошибка при анализе портфеля',
-				});
+		if (!savedReport) throw new Error(`Ошибка при создании портфеля (reportType: "markowitz"`);
+
+		return savedReport;
+	}
+
+	// Создать отчет с изначальным статусом "calculating"
+	async createMarkovitzReport(portfolioId: number, input: MarkovitzReportInput): Promise<PortfolioReport> {
+		const savedReport = await this.createDefaultReport(portfolioId, 'markowitz');
+
+		this.analyzeMarkovitzPortfolio(savedReport.id, input).catch(async (error) => {
+			console.error('Ошибка при анализе портфеля:', error);
+			await this.reportRepository.update(savedReport.id, {
+				status: 'error',
+				errorMessage: 'Ошибка при анализе портфеля',
 			});
-		}
+		});
+
+		return savedReport;
+	}
+
+	// Создать отчет с изначальным статусом "calculating"
+	async createFutureReturnForecastGBMReport(portfolioId: number, input: FutureReturnForecastInput): Promise<PortfolioReport> {
+		const savedReport = await this.createDefaultReport(portfolioId, 'future_returns_forecast_gbm');
+
+		this.analyzeFutureReturnsForecastGBM(savedReport.id, input).catch(async (error) => {
+			console.error('Ошибка при анализе портфеля:', error);
+			await this.reportRepository.update(savedReport.id, {
+				status: 'error',
+				errorMessage: 'Ошибка при анализе портфеля',
+			});
+		});
 
 		return savedReport;
 	}
@@ -87,7 +115,7 @@ export class PortfolioReportService {
 		return true;
 	}
 
-	async analyzeMarkovitzPortfolio(reportId: string, additionalTickers: string[] = []): Promise<void> {
+	async analyzeMarkovitzPortfolio(reportId: string, input: MarkovitzReportInput): Promise<void> {
 		const report = await this.reportRepository.findOne({
 			where: {id: reportId},
 			relations: ['portfolio'],
@@ -109,7 +137,7 @@ export class PortfolioReportService {
 			relations: ['stock'],
 		});
 
-		if (portfolioStocks.length === 0 && additionalTickers.length === 0) {
+		if (portfolioStocks.length === 0 && input.additionalTickers?.length === 0) {
 			await this.reportRepository.update(reportId, {
 				status: 'error',
 				errorMessage: 'No stocks in portfolio or additional stocks',
@@ -121,7 +149,10 @@ export class PortfolioReportService {
 		const ANALYZER_URL = process.env.ANALYZER_URL || 'http://analyzer:8001';
 
 		try {
-			await axios.post(`${ANALYZER_URL}/markovitz`, {reportId});
+			await axios.post(`${ANALYZER_URL}/markovitz`, {
+				reportId,
+				additionalTickers: input?.additionalTickers || [],
+			});
 			console.log(`✅ Python принял отчёт ${reportId}, ожидаем расчёта`);
 		} catch (error) {
 			console.error('❌ Ошибка при отправке в Python:', error);
@@ -132,4 +163,23 @@ export class PortfolioReportService {
 		}
 	}
 
+	async analyzeFutureReturnsForecastGBM(reportId: string, input: FutureReturnForecastInput): Promise<void> {
+		console.log(`📡 Отправляем запрос в Python для отчёта ${reportId}`);
+		const ANALYZER_URL = process.env.ANALYZER_URL || 'http://analyzer:8001';
+
+		try {
+			await axios.post(`${ANALYZER_URL}/future_value_gbm`, {
+				reportId,
+				selectedPercentiles: input.selectedPercentiles,
+				forecastHorizons: input.forecastHorizons,
+			});
+			console.log(`✅ Python принял отчёт ${reportId}, ожидаем расчёта`);
+		} catch (error) {
+			console.error('❌ Ошибка при отправке в Python:', error);
+			await this.reportRepository.update(reportId, {
+				status: 'error',
+				errorMessage: 'Ошибка при вызове Python-сервиса',
+			});
+		}
+	}
 }

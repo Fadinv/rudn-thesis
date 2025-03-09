@@ -18,11 +18,21 @@ export type Scalars = {
   JSON: { input: any; output: any; }
 };
 
+export type FutureReturnForecastInput = {
+  forecastHorizons: Array<Scalars['Float']['input']>;
+  selectedPercentiles: Array<Scalars['Float']['input']>;
+};
+
+export type MarkovitzReportInput = {
+  additionalTickers?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   addStockToPortfolio: PortfolioStock;
+  createFutureReturnForecastGBMReport: PortfolioReport;
+  createMarkovitzReport: PortfolioReport;
   createPortfolio: Portfolio;
-  createPortfolioReport: PortfolioReport;
   createStock: Stock;
   createUser: User;
   deleteAllStocks: Scalars['Boolean']['output'];
@@ -50,15 +60,20 @@ export type MutationAddStockToPortfolioArgs = {
 };
 
 
-export type MutationCreatePortfolioArgs = {
-  name: Scalars['String']['input'];
+export type MutationCreateFutureReturnForecastGbmReportArgs = {
+  input: FutureReturnForecastInput;
+  portfolioId: Scalars['Int']['input'];
 };
 
 
-export type MutationCreatePortfolioReportArgs = {
-  additionalTickers?: InputMaybe<Array<Scalars['String']['input']>>;
+export type MutationCreateMarkovitzReportArgs = {
+  input: MarkovitzReportInput;
   portfolioId: Scalars['Int']['input'];
-  reportType: Scalars['String']['input'];
+};
+
+
+export type MutationCreatePortfolioArgs = {
+  name: Scalars['String']['input'];
 };
 
 
@@ -369,8 +384,10 @@ export type ResolversTypes = {
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   DateTime: ResolverTypeWrapper<Scalars['DateTime']['output']>;
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
+  FutureReturnForecastInput: FutureReturnForecastInput;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   JSON: ResolverTypeWrapper<Scalars['JSON']['output']>;
+  MarkovitzReportInput: MarkovitzReportInput;
   Mutation: ResolverTypeWrapper<{}>;
   Portfolio: ResolverTypeWrapper<Portfolio>;
   PortfolioReport: ResolverTypeWrapper<PortfolioReport>;
@@ -389,8 +406,10 @@ export type ResolversParentTypes = {
   Boolean: Scalars['Boolean']['output'];
   DateTime: Scalars['DateTime']['output'];
   Float: Scalars['Float']['output'];
+  FutureReturnForecastInput: FutureReturnForecastInput;
   Int: Scalars['Int']['output'];
   JSON: Scalars['JSON']['output'];
+  MarkovitzReportInput: MarkovitzReportInput;
   Mutation: {};
   Portfolio: Portfolio;
   PortfolioReport: PortfolioReport;
@@ -414,8 +433,9 @@ export interface JsonScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   addStockToPortfolio?: Resolver<ResolversTypes['PortfolioStock'], ParentType, ContextType, RequireFields<MutationAddStockToPortfolioArgs, 'averagePrice' | 'portfolioId' | 'quantity' | 'stockId'>>;
+  createFutureReturnForecastGBMReport?: Resolver<ResolversTypes['PortfolioReport'], ParentType, ContextType, RequireFields<MutationCreateFutureReturnForecastGbmReportArgs, 'input' | 'portfolioId'>>;
+  createMarkovitzReport?: Resolver<ResolversTypes['PortfolioReport'], ParentType, ContextType, RequireFields<MutationCreateMarkovitzReportArgs, 'input' | 'portfolioId'>>;
   createPortfolio?: Resolver<ResolversTypes['Portfolio'], ParentType, ContextType, RequireFields<MutationCreatePortfolioArgs, 'name'>>;
-  createPortfolioReport?: Resolver<ResolversTypes['PortfolioReport'], ParentType, ContextType, RequireFields<MutationCreatePortfolioReportArgs, 'portfolioId' | 'reportType'>>;
   createStock?: Resolver<ResolversTypes['Stock'], ParentType, ContextType, RequireFields<MutationCreateStockArgs, 'data'>>;
   createUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'email' | 'password'>>;
   deleteAllStocks?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;

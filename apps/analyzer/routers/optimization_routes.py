@@ -1,8 +1,9 @@
 from fastapi import APIRouter, HTTPException
 from database import engine
-from nest_api.nest_api import get_portfolio_data, get_market_returns
+from nest_api.nest_api import get_portfolio_data, get_market_returns, get_portfolio_data_with_history
 from reports.markovitz.optimizer import calculate_markowitz_efficient_frontier
 from reports.markovitz.risk_metrics import calculate_sortino_ratio, calculate_beta
+from reports.gbm.forecast import generate_gbm_forecast
 from reports.utils.utils import classify_risk_levels
 import numpy as np
 import json
@@ -10,6 +11,7 @@ from sqlalchemy import text
 from datetime import datetime, timedelta
 
 router = APIRouter()
+
 
 @router.post("/markovitz")
 async def create_markovitz_report(request: dict):
@@ -85,8 +87,6 @@ async def create_markovitz_report(request: dict):
     # 1️⃣ **Вычисляем границы категорий риска**
     conservative_threshold, balanced_threshold = classify_risk_levels(sortino_ratios_list)
 
-
-
     # 2️⃣ **Добавляем код категории риска**
     for portfolio in corrected_result:
         sortino_ratio = portfolio["sortino_ratio_annual"]
@@ -109,3 +109,48 @@ async def create_markovitz_report(request: dict):
 
     print(f"✅ Отчёт {report_id} обновлён с Beta и Treynor Ratio!")
     return {"status": "ready", "message": "Report updated with Beta and Treynor Ratio"}
+
+
+@router.post("/future_value_gbm")
+async def create_gbm_report(request: dict):
+    try:
+        report_id = request["reportId"]
+        selected_percentiles = request.get("selectedPercentiles", [10, 50, 90])
+        forecast_horizons = request.get("forecastHorizons", [30, 60, 90, 180, 365, 730, 1095])  # Дни
+
+        print(f"🔍 Запускаем GBM прогноз для отчёта {report_id}")
+
+        start_date = (datetime.today() - timedelta(days=365 * 3)).strftime("%Y-%m-%d")
+        end_date = datetime.today().strftime("%Y-%m-%d")
+
+        portfolio_data = get_portfolio_data_with_history(report_id, [], start_date, end_date)
+        if not portfolio_data:
+            raise HTTPException(status_code=404, detail="Report not found")
+
+        forecast_result = generate_gbm_forecast(
+            portfolio_data["tickers"],
+            portfolio_data["returns"],
+            portfolio_data["quantities"],
+            portfolio_data["last_prices"],  # ✅ Теперь передаем последние цены акций
+            selected_percentiles,
+            forecast_horizons
+        )
+
+        # Добавляем историческую стоимость портфеля в отчет
+        forecast_result["portfolioHistory"] = portfolio_data["portfolio_history"]
+
+        with engine.connect() as conn:
+            conn.execute(text("""
+                UPDATE portfolio_reports
+                SET data = :data, status = 'ready'
+                WHERE id = :report_id
+            """), {"data": json.dumps(forecast_result), "report_id": report_id})
+            conn.commit()
+
+        print(f"✅ Отчёт {report_id} обновлён с GBM прогнозом и историей портфеля!")
+        return {"status": "ready", "message": "Report updated with GBM forecast and portfolio history"}
+
+    except Exception as e:
+        print(f"❌ Ошибка при создании GBM отчёта: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+

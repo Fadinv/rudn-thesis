@@ -7,3 +7,4 @@ scikit-learn
 sqlalchemy
 asyncpg
 psycopg2
+pandas-market-calendars
