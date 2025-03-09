@@ -272,11 +272,11 @@ const MarkovitzViewer: FC<MarkovitzViewerProps> = ({reportId}) => {
 											value={report.treynor_ratio_annual.toFixed(2)}
 											metricKey="treynor_ratio_annual"
 										/>
-										<MetricRow
-											label="Коэффициент Трейнора (ежедневный)"
-											value={report.treynor_ratio_daily.toFixed(2)}
-											metricKey="sortino_ratio_daily"
-										/>
+										{/*<MetricRow*/}
+										{/*	label="Коэффициент Трейнора (ежедневный)"*/}
+										{/*	value={report.treynor_ratio_daily.toFixed(2)}*/}
+										{/*	metricKey="sortino_ratio_daily"*/}
+										{/*/>*/}
 										<Table.Row>
 											<Table.Cell>Категория риска</Table.Cell>
 											<Table.Cell>{getRiskCategoryLabel(report.risk_category)}</Table.Cell>

@@ -66,9 +66,6 @@ async def create_markovitz_report(request: dict):
             portfolio_data["returns"], weights_array
         )
 
-        # Добавляем Sortino Ratio в список для расчета границ
-        sortino_ratios_list.append(sortino_ratio_annual)
-
         corrected_result.append({
             "risk_daily": daily_risk,
             "return_daily": daily_return,
@@ -84,12 +81,13 @@ async def create_markovitz_report(request: dict):
             "weights": portfolio["weights"]
         })
 
-    # 1️⃣ **Вычисляем границы категорий риска**
-    conservative_threshold, balanced_threshold = classify_risk_levels(sortino_ratios_list)
+    #⃣ Вычисляем границы категорий риска
+    risk_annual_list = [portfolio["risk_annual"] for portfolio in corrected_result]
+    conservative_threshold, balanced_threshold = classify_risk_levels(risk_annual_list)
 
-    # 2️⃣ **Добавляем код категории риска**
+    # Добавляем код категории риска
     for portfolio in corrected_result:
-        sortino_ratio = portfolio["sortino_ratio_annual"]
+        sortino_ratio = portfolio["risk_annual"]
 
         if sortino_ratio < conservative_threshold:
             portfolio["risk_category"] = 'conservative'  # Консервативный

@@ -39,18 +39,18 @@ def calculate_returns_matrix(stock_prices, tickers):
     return returns_matrix.T  # Транспонируем в формат (N дней, M активов)
 
 
-def classify_risk_levels(sortino_ratios):
+def classify_risk_levels(risks):
     """
-    Определяет границы для классификации портфелей на Консервативные, Сбалансированные и Агрессивные.
+    Определяет границы для классификации портфелей по уровню риска.
 
-    :param sortino_ratios: Список значений Sortino Ratio по портфелям.
+    :param risks: Список значений годового риска (волатильности) по портфелям.
     :return: Границы для разделения.
     """
-    mean_sortino = np.mean(sortino_ratios)
-    std_sortino = np.std(sortino_ratios)
+    mean_risk = np.mean(risks)
+    std_risk = np.std(risks)
 
-    conservative_threshold = mean_sortino - 0.5 * std_sortino
-    balanced_threshold = mean_sortino + 0.5 * std_sortino
+    conservative_threshold = mean_risk - 0.5 * std_risk
+    balanced_threshold = mean_risk + 0.5 * std_risk
 
     return conservative_threshold, balanced_threshold
 
