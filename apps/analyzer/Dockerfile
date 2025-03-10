@@ -9,7 +9,7 @@ WORKDIR /app
 COPY requirements.txt requirements.txt
 
 # Устанавливаем зависимости (если они не менялись, Docker кеширует этот слой)
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt -i https://mirror.yandex.ru/mirrors/pypi/simple
 
 # Теперь копируем код после установки зависимостей
 COPY . /app
