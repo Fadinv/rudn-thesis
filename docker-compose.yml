@@ -55,8 +55,6 @@ services:
 
   analyzer:
     build: ./apps/analyzer
-    networks:
-      - rudn-thesis_default
     ports:
       - "8001:8001"
     env_file:
