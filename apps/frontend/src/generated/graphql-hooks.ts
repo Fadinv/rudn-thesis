@@ -76,6 +76,7 @@ export type MutationCreateMarkovitzReportArgs = {
 
 export type MutationCreatePortfolioArgs = {
   name: Scalars['String']['input'];
+  stocks?: InputMaybe<Array<StocksWhileCreatingPortfolio>>;
 };
 
 
@@ -169,6 +170,14 @@ export type Portfolio = {
   user: User;
 };
 
+export type PortfolioDistribution = {
+  __typename?: 'PortfolioDistribution';
+  averagePrices: Array<Scalars['Float']['output']>;
+  quantities: Array<Scalars['Int']['output']>;
+  remainingCapital: Scalars['Float']['output'];
+  stocks: Array<Scalars['String']['output']>;
+};
+
 export type PortfolioReport = {
   __typename?: 'PortfolioReport';
   createdAt: Scalars['DateTime']['output'];
@@ -199,6 +208,7 @@ export type PortfolioStockUpdateInput = {
 export type Query = {
   __typename?: 'Query';
   currentUser?: Maybe<User>;
+  getDistributedPortfolioAssets: PortfolioDistribution;
   getPortfolioReport?: Maybe<PortfolioReport>;
   getPortfolioReports: Array<PortfolioReport>;
   getPortfolioStocks: Array<PortfolioStock>;
@@ -211,6 +221,13 @@ export type Query = {
   getUserPortfolios: Array<Portfolio>;
   getUsers: Array<User>;
   searchStocks: Array<Stock>;
+};
+
+
+export type QueryGetDistributedPortfolioAssetsArgs = {
+  capital: Scalars['Float']['input'];
+  stockTickerList: Array<Scalars['String']['input']>;
+  weights: Array<Scalars['Float']['input']>;
 };
 
 
@@ -305,6 +322,12 @@ export type StockPrice = {
   volume: Scalars['Float']['output'];
 };
 
+export type StocksWhileCreatingPortfolio = {
+  averagePrice: Scalars['Float']['input'];
+  quantity: Scalars['Int']['input'];
+  stockTicker: Scalars['String']['input'];
+};
+
 export type User = {
   __typename?: 'User';
   email: Scalars['String']['output'];
@@ -340,6 +363,7 @@ export type CreateMarkovitzReportMutation = { __typename?: 'Mutation', createMar
 
 export type CreatePortfolioMutationVariables = Exact<{
   name: Scalars['String']['input'];
+  stocks?: InputMaybe<Array<StocksWhileCreatingPortfolio> | StocksWhileCreatingPortfolio>;
 }>;
 
 
@@ -370,6 +394,15 @@ export type DeletePortfolioReportMutationVariables = Exact<{
 
 
 export type DeletePortfolioReportMutation = { __typename?: 'Mutation', deletePortfolioReport: boolean };
+
+export type GetDistributedPortfolioAssetsQueryVariables = Exact<{
+  capital: Scalars['Float']['input'];
+  stockTickerList: Array<Scalars['String']['input']> | Scalars['String']['input'];
+  weights: Array<Scalars['Float']['input']> | Scalars['Float']['input'];
+}>;
+
+
+export type GetDistributedPortfolioAssetsQuery = { __typename?: 'Query', getDistributedPortfolioAssets: { __typename?: 'PortfolioDistribution', stocks: Array<string>, quantities: Array<number>, remainingCapital: number, averagePrices: Array<number> } };
 
 export type GetPortfolioReportQueryVariables = Exact<{
   reportId: Scalars['String']['input'];
@@ -581,8 +614,8 @@ export type CreateMarkovitzReportMutationHookResult = ReturnType<typeof useCreat
 export type CreateMarkovitzReportMutationResult = Apollo.MutationResult<CreateMarkovitzReportMutation>;
 export type CreateMarkovitzReportMutationOptions = Apollo.BaseMutationOptions<CreateMarkovitzReportMutation, CreateMarkovitzReportMutationVariables>;
 export const CreatePortfolioDocument = gql`
-    mutation CreatePortfolio($name: String!) {
-  createPortfolio(name: $name) {
+    mutation CreatePortfolio($name: String!, $stocks: [StocksWhileCreatingPortfolio!]) {
+  createPortfolio(name: $name, stocks: $stocks) {
     id
     name
     createdAt
@@ -605,6 +638,7 @@ export type CreatePortfolioMutationFn = Apollo.MutationFunction<CreatePortfolioM
  * const [createPortfolioMutation, { data, loading, error }] = useCreatePortfolioMutation({
  *   variables: {
  *      name: // value for 'name'
+ *      stocks: // value for 'stocks'
  *   },
  * });
  */
@@ -748,6 +782,55 @@ export function useDeletePortfolioReportMutation(baseOptions?: ApolloReactHooks.
 export type DeletePortfolioReportMutationHookResult = ReturnType<typeof useDeletePortfolioReportMutation>;
 export type DeletePortfolioReportMutationResult = Apollo.MutationResult<DeletePortfolioReportMutation>;
 export type DeletePortfolioReportMutationOptions = Apollo.BaseMutationOptions<DeletePortfolioReportMutation, DeletePortfolioReportMutationVariables>;
+export const GetDistributedPortfolioAssetsDocument = gql`
+    query getDistributedPortfolioAssets($capital: Float!, $stockTickerList: [String!]!, $weights: [Float!]!) {
+  getDistributedPortfolioAssets(
+    capital: $capital
+    stockTickerList: $stockTickerList
+    weights: $weights
+  ) {
+    stocks
+    quantities
+    remainingCapital
+    averagePrices
+  }
+}
+    `;
+
+/**
+ * __useGetDistributedPortfolioAssetsQuery__
+ *
+ * To run a query within a React component, call `useGetDistributedPortfolioAssetsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetDistributedPortfolioAssetsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetDistributedPortfolioAssetsQuery({
+ *   variables: {
+ *      capital: // value for 'capital'
+ *      stockTickerList: // value for 'stockTickerList'
+ *      weights: // value for 'weights'
+ *   },
+ * });
+ */
+export function useGetDistributedPortfolioAssetsQuery(baseOptions: ApolloReactHooks.QueryHookOptions<GetDistributedPortfolioAssetsQuery, GetDistributedPortfolioAssetsQueryVariables> & ({ variables: GetDistributedPortfolioAssetsQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useQuery<GetDistributedPortfolioAssetsQuery, GetDistributedPortfolioAssetsQueryVariables>(GetDistributedPortfolioAssetsDocument, options);
+      }
+export function useGetDistributedPortfolioAssetsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetDistributedPortfolioAssetsQuery, GetDistributedPortfolioAssetsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useLazyQuery<GetDistributedPortfolioAssetsQuery, GetDistributedPortfolioAssetsQueryVariables>(GetDistributedPortfolioAssetsDocument, options);
+        }
+export function useGetDistributedPortfolioAssetsSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<GetDistributedPortfolioAssetsQuery, GetDistributedPortfolioAssetsQueryVariables>) {
+          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useSuspenseQuery<GetDistributedPortfolioAssetsQuery, GetDistributedPortfolioAssetsQueryVariables>(GetDistributedPortfolioAssetsDocument, options);
+        }
+export type GetDistributedPortfolioAssetsQueryHookResult = ReturnType<typeof useGetDistributedPortfolioAssetsQuery>;
+export type GetDistributedPortfolioAssetsLazyQueryHookResult = ReturnType<typeof useGetDistributedPortfolioAssetsLazyQuery>;
+export type GetDistributedPortfolioAssetsSuspenseQueryHookResult = ReturnType<typeof useGetDistributedPortfolioAssetsSuspenseQuery>;
+export type GetDistributedPortfolioAssetsQueryResult = Apollo.QueryResult<GetDistributedPortfolioAssetsQuery, GetDistributedPortfolioAssetsQueryVariables>;
 export const GetPortfolioReportDocument = gql`
     query GetPortfolioReport($reportId: String!) {
   getPortfolioReport(reportId: $reportId) {

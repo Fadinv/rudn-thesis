@@ -1,4 +1,9 @@
-import {useGetPortfolioReportQuery} from '@/generated/graphql-hooks';
+import CopyPortfolioButton from '@/components/portfolio/portfolioReport/CopyPortfolioButton';
+import {
+	useGetDistributedPortfolioAssetsLazyQuery,
+	useGetDistributedPortfolioAssetsQuery,
+	useGetPortfolioReportQuery, useGetUserPortfoliosQuery,
+} from '@/generated/graphql-hooks';
 import React, {FC, JSX, useState} from 'react';
 import {LuFolder, LuSquareCheck, LuUser} from 'react-icons/lu';
 import {PieChart, Pie, Cell, Legend, Tooltip as RechartsTooltip} from 'recharts';
@@ -43,10 +48,13 @@ interface MarkovitzViewerProps {
 const MarkovitzViewer: FC<MarkovitzViewerProps> = ({reportId}) => {
 	const [selectedPortfolio, setSelectedPortfolio] = useState(0);
 	const {data, loading} = useGetPortfolioReportQuery({variables: {reportId}});
+	const {refetch} = useGetUserPortfoliosQuery({fetchPolicy: 'cache-only'});
 
 	const reports = data?.getPortfolioReport?.data as MarkovitzData | undefined;
 	const totalPortfolios = reports?.length ?? 0;
 	const report = reports?.[selectedPortfolio];
+
+	const [getDistributedPortfolioAssets, {loading: getDistributedPortfolioAssetsIsLoading}] = useGetDistributedPortfolioAssetsLazyQuery();
 
 	if (!reportId) return null;
 
@@ -56,6 +64,9 @@ const MarkovitzViewer: FC<MarkovitzViewerProps> = ({reportId}) => {
 			value: +(report?.weights[key].toFixed(2) ?? 0),
 		}))
 		.filter((al) => al.value > 0);
+
+	const weights = allocation.map((al) => al.value);
+	const stockTickers = allocation.map((al) => al.name);
 
 	// Функции для переключения портфелей
 	const prevPortfolio = () => {
@@ -171,11 +182,17 @@ const MarkovitzViewer: FC<MarkovitzViewerProps> = ({reportId}) => {
 								Метрика
 							</Tabs.Trigger>
 							<Tabs.Indicator rounded="l2"/>
+							<CopyPortfolioButton
+								stockTickerList={stockTickers}
+								weights={weights}
+								onSave={() => refetch()}
+							/>
 						</Tabs.List>
 						<Tabs.Content value="portfolio">
 							{/* Pie Chart */}
 							<PieChart width={400} height={250} style={{width: '100%', height: 400}}>
-								<Pie data={allocation} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label>
+								<Pie data={allocation} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80}
+								     label>
 									{allocation.map((_, index) => (
 										<Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]}/>
 									))}

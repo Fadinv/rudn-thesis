@@ -75,6 +75,13 @@ type StockPrice {
   volume: Float!
 }
 
+type PortfolioDistribution {
+  stocks: [String!]!
+  quantities: [Int!]!
+  averagePrices: [Float!]!
+  remainingCapital: Float!
+}
+
 type Query {
   currentUser: User
   getUsers: [User!]!
@@ -87,6 +94,7 @@ type Query {
   getUserPortfolios: [Portfolio!]!
   getPortfolioStocks(portfolioId: Int!): [PortfolioStock!]!
   getStockPrices(ticker: String!, from: Float, to: Float): [StockPrice!]!
+  getDistributedPortfolioAssets(capital: Float!, stockTickerList: [String!]!, weights: [Float!]!): PortfolioDistribution!
   getPortfolioReport(reportId: String!): PortfolioReport
   getPortfolioReports(portfolioId: Int!): [PortfolioReport!]!
 }
@@ -102,7 +110,7 @@ type Mutation {
   updateStock(id: Float!, data: StockInput!): Stock!
   deleteStock(id: Float!): Boolean!
   deleteAllStocks: Boolean!
-  createPortfolio(name: String!): Portfolio!
+  createPortfolio(name: String!, stocks: [StocksWhileCreatingPortfolio!]): Portfolio!
   addStockToPortfolio(portfolioId: Int!, stockId: Int!, quantity: Int!, averagePrice: Float!): PortfolioStock!
   updatePortfolioStock(portfolioStockId: Int!, quantity: Int, averagePrice: Float): PortfolioStock!
   deletePortfolioStock(portfolioStockId: Int!): Boolean!
@@ -128,6 +136,12 @@ input StockInput {
   shareClassFigi: String
   lastUpdatedUtc: String!
   logoUrl: String
+}
+
+input StocksWhileCreatingPortfolio {
+  stockTicker: String!
+  quantity: Int!
+  averagePrice: Float!
 }
 
 input PortfolioStockUpdateInput {

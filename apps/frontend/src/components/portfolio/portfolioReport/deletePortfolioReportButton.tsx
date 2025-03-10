@@ -1,7 +1,7 @@
-import React, {MouseEventHandler, useState} from 'react';
-import {Button, Field, Icon, IconButton, Text} from '@chakra-ui/react';
-import {FaTrash, FaTimes} from 'react-icons/fa';
-import {useDeletePortfolioMutation, useDeletePortfolioReportMutation} from '@/generated/graphql-hooks';
+import React, { useState} from 'react';
+import {Button, Icon, IconButton, Text} from '@chakra-ui/react';
+import {FaTrash} from 'react-icons/fa';
+import {useDeletePortfolioReportMutation} from '@/generated/graphql-hooks';
 import {
 	DialogRoot,
 	DialogTrigger,

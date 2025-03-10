@@ -1,0 +1,16 @@
+query getDistributedPortfolioAssets(
+    $capital: Float!,
+    $stockTickerList: [String!]!,
+    $weights: [Float!]!
+) {
+    getDistributedPortfolioAssets(
+        capital: $capital,
+        stockTickerList: $stockTickerList,
+        weights: $weights
+    ) {
+        stocks
+        quantities
+        remainingCapital
+        averagePrices
+    }
+}

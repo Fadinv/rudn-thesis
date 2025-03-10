@@ -1,4 +1,7 @@
 import {Resolver, Query, Mutation, Args, Int} from '@nestjs/graphql';
+import {
+	StocksWhileCreatingPortfolio,
+} from 'src/portfolio/dto/stocks-while-creatings-portfolio.input';
 import {AuthUser} from '../auth/auth-user.decorator';
 import {PortfolioStockUpdateInput} from './portfolio.inputs';
 import {PortfolioService} from './portfolio.service';
@@ -11,8 +14,25 @@ export class PortfolioResolver {
 	constructor(private readonly portfolioService: PortfolioService) {}
 
 	@Mutation(() => Portfolio)
-	async createPortfolio(@AuthUser() user: User, @Args('name') name: string): Promise<Portfolio> {
-		return this.portfolioService.createPortfolio(user, name);
+	async createPortfolio(
+		@AuthUser() user: User,
+		@Args('name') name: string,
+		@Args('stocks', {
+			type: () => [StocksWhileCreatingPortfolio],
+			nullable: true,
+		}) stocks: StocksWhileCreatingPortfolio[],
+	): Promise<Portfolio> {
+		const portFolio = await this.portfolioService.createPortfolio(user, name);
+		for (const stock of (stocks || [])) {
+			await this.portfolioService.addStockToPortfolioByTicker(
+				user,
+				portFolio.id,
+				stock.stockTicker,
+				stock.quantity,
+				stock.averagePrice,
+			);
+		}
+		return portFolio;
 	}
 
 	@Mutation(() => PortfolioStock)
@@ -39,11 +59,10 @@ export class PortfolioResolver {
 	@Mutation(() => Boolean)
 	async deletePortfolioStock(
 		@AuthUser() user: User,
-		@Args('portfolioStockId', { type: () => Int }) portfolioStockId: number,
+		@Args('portfolioStockId', {type: () => Int}) portfolioStockId: number,
 	): Promise<boolean> {
 		return this.portfolioService.deletePortfolioStock(user, portfolioStockId);
 	}
-
 
 	@Mutation(() => [PortfolioStock])
 	async updatePortfolioStocks(

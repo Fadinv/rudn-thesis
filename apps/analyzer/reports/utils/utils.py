@@ -60,3 +60,37 @@ def get_trading_days(start_date, num_days):
     nyse = mcal.get_calendar('NYSE')  # Можно заменить на нужную биржу
     trading_days = nyse.valid_days(start_date=start_date, end_date=start_date + timedelta(days=num_days*2))
     return trading_days[:num_days]  # Берем только нужное количество дней
+
+
+def allocate_capital(capital, prices, weights):
+    """
+    Распределяет капитал по акциям, учитывая их цены и заданные веса.
+
+    :param capital: Общая сумма капитала (float)
+    :param prices: Словарь {тикер: цена акции} (dict)
+    :param weights: Словарь {тикер: вес в портфеле} (dict)
+    :return: Объект {тикер: {"quantity": int, "price": float}}, остаток капитала (float)
+    """
+
+    # Рассчитываем доступные средства для каждого актива согласно весам
+    allocated_funds = {ticker: capital * weight for ticker, weight in weights.items()}
+
+    # Рассчитываем начальное количество акций (округляем вниз, чтобы не выйти за бюджет)
+    portfolio = {
+        ticker: {"quantity": int(allocated_funds[ticker] // prices[ticker]), "price": prices[ticker]}
+        for ticker in prices
+    }
+
+    # Рассчитываем оставшиеся средства
+    remaining_capital = capital - sum(portfolio[t]["quantity"] * portfolio[t]["price"] for t in portfolio)
+
+    # Сортируем активы по весу, чтобы перераспределять остаток приоритезированно
+    sorted_tickers = sorted(weights.keys(), key=lambda x: weights[x], reverse=True)
+
+    # Перераспределяем оставшиеся средства, покупая дополнительные акции при возможности
+    for ticker in sorted_tickers:
+        while remaining_capital >= portfolio[ticker]["price"]:
+            portfolio[ticker]["quantity"] += 1
+            remaining_capital -= portfolio[ticker]["price"]
+
+    return portfolio, remaining_capital

@@ -1,5 +1,8 @@
-mutation CreatePortfolio($name: String!) {
-    createPortfolio(name: $name) {
+mutation CreatePortfolio(
+    $name: String!
+    $stocks: [StocksWhileCreatingPortfolio!]
+) {
+    createPortfolio(name: $name, stocks: $stocks) {
         id
         name
         createdAt

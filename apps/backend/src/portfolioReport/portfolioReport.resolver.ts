@@ -1,4 +1,5 @@
-import {Resolver, Query, Mutation, Args, Int} from '@nestjs/graphql';
+import {Resolver, Query, Mutation, Args, Int, Float} from '@nestjs/graphql';
+import {PortfolioDistribution} from 'src/portfolioReport/dto/portfolio-distribution.response';
 import {PortfolioReportService} from './portfolioReport.service';
 import {PortfolioReport} from './portfolioReport.entity';
 
@@ -28,6 +29,20 @@ export class PortfolioReportResolver {
 		return this.portfolioReportService.createFutureReturnForecastGBMReport(
 			portfolioId,
 			input,
+		);
+	}
+
+	// Получение оптимального распределения активов в зависимости от капитала и весов
+	@Query(() => PortfolioDistribution)
+	async getDistributedPortfolioAssets(
+		@Args('capital', {type: () => Float}) capital: number,
+		@Args('stockTickerList', {type: () => [String]}) stockTickerList: string[],
+		@Args('weights', {type: () => [Float], nullable: false}) weights: number[],
+	): Promise<PortfolioDistribution> {
+		return this.portfolioReportService.getDistributedPortfolioAssets(
+			capital,
+			stockTickerList,
+			weights,
 		);
 	}
 

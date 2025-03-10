@@ -4,7 +4,7 @@ from nest_api.nest_api import get_portfolio_data, get_market_returns, get_portfo
 from reports.markovitz.optimizer import calculate_markowitz_efficient_frontier
 from reports.markovitz.risk_metrics import calculate_sortino_ratio, calculate_beta
 from reports.gbm.forecast import generate_gbm_forecast
-from reports.utils.utils import classify_risk_levels
+from reports.utils.utils import classify_risk_levels, allocate_capital
 import numpy as np
 import json
 from sqlalchemy import text
@@ -152,3 +152,24 @@ async def create_gbm_report(request: dict):
         print(f"❌ Ошибка при создании GBM отчёта: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
+@router.post("/allocate_assets")
+async def allocate_assets(request: dict):
+    """
+    Эндпоинт для расчета распределения капитала по активам.
+    """
+    try:
+        capital = request["capital"]
+        prices = request["prices"]
+        weights = request["weights"]
+
+        if not capital or not prices or not weights:
+            raise HTTPException(status_code=400, detail="Missing required parameters")
+
+        allocation = allocate_capital(capital, prices, weights)
+
+        return {"allocation": allocation}
+
+    except Exception as e:
+        print(f"❌ Ошибка при распределении капитала по активам: {e}")
+        raise HTTPException(status_code=500, detail=str(e))

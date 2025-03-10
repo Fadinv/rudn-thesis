@@ -57,6 +57,39 @@ export class PortfolioService {
 		return portfolioStock;
 	}
 
+	// Добавление акции в портфель (сразу передаем среднюю цену)
+	async addStockToPortfolioByTicker(
+		user: User,
+		portfolioId: number,
+		stockTicker: string,
+		quantity?: number,
+		averagePrice?: number,
+	): Promise<PortfolioStock> {
+		const portfolio = await this.portfolioRepository.findOne({
+			where: {id: portfolioId, user},
+		});
+
+		if (!portfolio) throw new ForbiddenException('Портфель не найден');
+
+		const stock = await this.stockRepository.findOne({where: {ticker: stockTicker}});
+
+		if (!stock) throw new NotFoundException('Акция не найдена');
+
+		// Всегда создаем новую запись, даже если такая акция уже есть
+		const portfolioStock = this.portfolioStockRepository.create({
+			portfolio,
+			stock,
+			quantity,
+			averagePrice,
+		});
+
+		await this.portfolioStockRepository.save(portfolioStock);
+		// Пересчитываем `isReadyForAnalysis`
+		await this.updatePortfolioAnalysisStatus(portfolioId);
+
+		return portfolioStock;
+	}
+
 	// Обновление акции в портфеле (например, изменение количества или средней цены)
 	async updatePortfolioStock(
 		user: User,

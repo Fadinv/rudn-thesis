@@ -74,6 +74,7 @@ export type MutationCreateMarkovitzReportArgs = {
 
 export type MutationCreatePortfolioArgs = {
   name: Scalars['String']['input'];
+  stocks?: InputMaybe<Array<StocksWhileCreatingPortfolio>>;
 };
 
 
@@ -167,6 +168,14 @@ export type Portfolio = {
   user: User;
 };
 
+export type PortfolioDistribution = {
+  __typename?: 'PortfolioDistribution';
+  averagePrices: Array<Scalars['Float']['output']>;
+  quantities: Array<Scalars['Int']['output']>;
+  remainingCapital: Scalars['Float']['output'];
+  stocks: Array<Scalars['String']['output']>;
+};
+
 export type PortfolioReport = {
   __typename?: 'PortfolioReport';
   createdAt: Scalars['DateTime']['output'];
@@ -197,6 +206,7 @@ export type PortfolioStockUpdateInput = {
 export type Query = {
   __typename?: 'Query';
   currentUser?: Maybe<User>;
+  getDistributedPortfolioAssets: PortfolioDistribution;
   getPortfolioReport?: Maybe<PortfolioReport>;
   getPortfolioReports: Array<PortfolioReport>;
   getPortfolioStocks: Array<PortfolioStock>;
@@ -209,6 +219,13 @@ export type Query = {
   getUserPortfolios: Array<Portfolio>;
   getUsers: Array<User>;
   searchStocks: Array<Stock>;
+};
+
+
+export type QueryGetDistributedPortfolioAssetsArgs = {
+  capital: Scalars['Float']['input'];
+  stockTickerList: Array<Scalars['String']['input']>;
+  weights: Array<Scalars['Float']['input']>;
 };
 
 
@@ -303,6 +320,12 @@ export type StockPrice = {
   volume: Scalars['Float']['output'];
 };
 
+export type StocksWhileCreatingPortfolio = {
+  averagePrice: Scalars['Float']['input'];
+  quantity: Scalars['Int']['input'];
+  stockTicker: Scalars['String']['input'];
+};
+
 export type User = {
   __typename?: 'User';
   email: Scalars['String']['output'];
@@ -390,6 +413,7 @@ export type ResolversTypes = {
   MarkovitzReportInput: MarkovitzReportInput;
   Mutation: ResolverTypeWrapper<{}>;
   Portfolio: ResolverTypeWrapper<Portfolio>;
+  PortfolioDistribution: ResolverTypeWrapper<PortfolioDistribution>;
   PortfolioReport: ResolverTypeWrapper<PortfolioReport>;
   PortfolioStock: ResolverTypeWrapper<PortfolioStock>;
   PortfolioStockUpdateInput: PortfolioStockUpdateInput;
@@ -397,6 +421,7 @@ export type ResolversTypes = {
   Stock: ResolverTypeWrapper<Stock>;
   StockInput: StockInput;
   StockPrice: ResolverTypeWrapper<StockPrice>;
+  StocksWhileCreatingPortfolio: StocksWhileCreatingPortfolio;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
   User: ResolverTypeWrapper<User>;
 };
@@ -412,6 +437,7 @@ export type ResolversParentTypes = {
   MarkovitzReportInput: MarkovitzReportInput;
   Mutation: {};
   Portfolio: Portfolio;
+  PortfolioDistribution: PortfolioDistribution;
   PortfolioReport: PortfolioReport;
   PortfolioStock: PortfolioStock;
   PortfolioStockUpdateInput: PortfolioStockUpdateInput;
@@ -419,6 +445,7 @@ export type ResolversParentTypes = {
   Stock: Stock;
   StockInput: StockInput;
   StockPrice: StockPrice;
+  StocksWhileCreatingPortfolio: StocksWhileCreatingPortfolio;
   String: Scalars['String']['output'];
   User: User;
 };
@@ -466,6 +493,14 @@ export type PortfolioResolvers<ContextType = any, ParentType extends ResolversPa
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type PortfolioDistributionResolvers<ContextType = any, ParentType extends ResolversParentTypes['PortfolioDistribution'] = ResolversParentTypes['PortfolioDistribution']> = {
+  averagePrices?: Resolver<Array<ResolversTypes['Float']>, ParentType, ContextType>;
+  quantities?: Resolver<Array<ResolversTypes['Int']>, ParentType, ContextType>;
+  remainingCapital?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  stocks?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type PortfolioReportResolvers<ContextType = any, ParentType extends ResolversParentTypes['PortfolioReport'] = ResolversParentTypes['PortfolioReport']> = {
   createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   data?: Resolver<Maybe<ResolversTypes['JSON']>, ParentType, ContextType>;
@@ -489,6 +524,7 @@ export type PortfolioStockResolvers<ContextType = any, ParentType extends Resolv
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   currentUser?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
+  getDistributedPortfolioAssets?: Resolver<ResolversTypes['PortfolioDistribution'], ParentType, ContextType, RequireFields<QueryGetDistributedPortfolioAssetsArgs, 'capital' | 'stockTickerList' | 'weights'>>;
   getPortfolioReport?: Resolver<Maybe<ResolversTypes['PortfolioReport']>, ParentType, ContextType, RequireFields<QueryGetPortfolioReportArgs, 'reportId'>>;
   getPortfolioReports?: Resolver<Array<ResolversTypes['PortfolioReport']>, ParentType, ContextType, RequireFields<QueryGetPortfolioReportsArgs, 'portfolioId'>>;
   getPortfolioStocks?: Resolver<Array<ResolversTypes['PortfolioStock']>, ParentType, ContextType, RequireFields<QueryGetPortfolioStocksArgs, 'portfolioId'>>;
@@ -544,6 +580,7 @@ export type Resolvers<ContextType = any> = {
   JSON?: GraphQLScalarType;
   Mutation?: MutationResolvers<ContextType>;
   Portfolio?: PortfolioResolvers<ContextType>;
+  PortfolioDistribution?: PortfolioDistributionResolvers<ContextType>;
   PortfolioReport?: PortfolioReportResolvers<ContextType>;
   PortfolioStock?: PortfolioStockResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;

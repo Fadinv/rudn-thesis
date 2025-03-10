@@ -1,4 +1,5 @@
 import {Injectable} from '@nestjs/common';
+import {Field, Float, Int} from '@nestjs/graphql';
 import {InjectRepository} from '@nestjs/typeorm';
 import {FutureReturnForecastInput} from 'src/portfolioReport/dto/future-return-forecast.input';
 import {MarkovitzReportInput} from 'src/portfolioReport/dto/markovitz-report.input';
@@ -13,6 +14,8 @@ export type ReportType = 'markowitz' | 'future_returns_forecast_gbm' | 'value_at
 
 @Injectable()
 export class PortfolioReportService {
+	private ANALYZER_URL = process.env.ANALYZER_URL || 'http://analyzer:8001';
+
 	constructor(
 		@InjectRepository(PortfolioReport)
 		private readonly reportRepository: Repository<PortfolioReport>,
@@ -23,6 +26,7 @@ export class PortfolioReportService {
 		@InjectRepository(PortfolioStock)
 		private readonly portfolioStockRepository: Repository<PortfolioStock>,
 	) {}
+
 
 	private _supportedReports: Partial<Record<ReportType, boolean>> = {
 		'markowitz': true,
@@ -115,6 +119,69 @@ export class PortfolioReportService {
 		return true;
 	}
 
+	async getDistributedPortfolioAssets(
+		capital: number,
+		stockTickerList: string[],
+		weights: number[],
+	) {
+		try {
+			// Формируем объект запроса
+			const requestData = {
+				capital,
+				prices: {},
+				weights: {},
+			};
+
+			// Заполняем данные цен и весов
+			for (let i = 0; i < stockTickerList.length; i++) {
+				const stockTicker = stockTickerList[i];
+
+				// Получаем текущую цену акции
+				const stockPriceEntity = await this.stockPriceRepository.findOne({
+					where: {ticker: stockTicker},
+					order: {date: 'DESC'}, // Берем последнюю цену
+				});
+
+				if (!stockPriceEntity) {
+					throw new Error(`Цена для акции ${stockTicker} не найдена`);
+				}
+
+				// Заполняем данные
+				requestData.prices[stockTicker] = stockPriceEntity.close;
+				requestData.weights[stockTicker] = weights[i];
+			}
+
+			// Отправляем запрос в Python
+			const response = await axios.post(`${this.ANALYZER_URL}/allocate_assets`, requestData);
+
+			const remainingCapital = response.data.allocation[1];
+			const data: {
+				stocks: string[];
+				quantities: number[];
+				averagePrices: number[];
+				remainingCapital: number; // Остаток капитала после покупки акций
+			} = {
+				stocks: [],
+				averagePrices: [],
+				quantities: [],
+				remainingCapital,
+			};
+			const stocks = response.data.allocation[0];
+
+			Object.keys(stocks).forEach((key) => {
+				data.stocks.push(key);
+				data.quantities.push(stocks[key].quantity);
+				data.averagePrices.push(stocks[key].price);
+			});
+
+			// Возвращаем результат
+			return data;
+		} catch (error) {
+			console.error('❌ Ошибка при распределении активов:', error);
+			throw new Error('Ошибка при распределении активов');
+		}
+	}
+
 	async analyzeMarkovitzPortfolio(reportId: string, input: MarkovitzReportInput): Promise<void> {
 		const report = await this.reportRepository.findOne({
 			where: {id: reportId},
@@ -146,10 +213,9 @@ export class PortfolioReportService {
 		}
 
 		console.log(`📡 Отправляем запрос в Python для отчёта ${reportId}`);
-		const ANALYZER_URL = process.env.ANALYZER_URL || 'http://analyzer:8001';
 
 		try {
-			await axios.post(`${ANALYZER_URL}/markovitz`, {
+			await axios.post(`${this.ANALYZER_URL}/markovitz`, {
 				reportId,
 				additionalTickers: input?.additionalTickers || [],
 			});
@@ -165,10 +231,9 @@ export class PortfolioReportService {
 
 	async analyzeFutureReturnsForecastGBM(reportId: string, input: FutureReturnForecastInput): Promise<void> {
 		console.log(`📡 Отправляем запрос в Python для отчёта ${reportId}`);
-		const ANALYZER_URL = process.env.ANALYZER_URL || 'http://analyzer:8001';
 
 		try {
-			await axios.post(`${ANALYZER_URL}/future_value_gbm`, {
+			await axios.post(`${this.ANALYZER_URL}/future_value_gbm`, {
 				reportId,
 				selectedPercentiles: input.selectedPercentiles,
 				forecastHorizons: input.forecastHorizons,
