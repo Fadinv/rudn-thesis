@@ -12,8 +12,6 @@ services:
       - "5432:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
-    networks:
-      - rudn-thesis_default
 
   backend:
     build:
@@ -32,8 +30,6 @@ services:
     volumes:
       - ./apps/backend:/app
     command: sh -c "npm install && npm run start:dev"
-    networks:
-      - rudn-thesis_default
 
   ticker-updater:
     build:
@@ -48,8 +44,6 @@ services:
     volumes:
       - ./apps/ticker-updater:/app
     command: sh -c "npm install && npm run start"
-    networks:
-      - rudn-thesis_default
 
   analyzer:
     build:
@@ -62,11 +56,6 @@ services:
       - UVICORN_CMD=uvicorn main:app --host 0.0.0.0 --port 8001 --limit-max-request-size 100000000
     volumes:
       - ./apps/analyzer:/app
-    networks:
-      - rudn-thesis_default
-    dns:
-      - 8.8.8.8
-      - 8.8.4.4
 
 volumes:
   postgres-data:
