@@ -1,0 +1,56 @@
+services:
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: portfolio_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: .
+      dockerfile: apps/backend/Dockerfile
+    env_file:
+      - ./.env.shared
+      - ./apps/backend/.env
+    ports:
+      - "4000:4000"
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgres://postgres:password@postgres:5432/portfolio_db
+    volumes:
+      - ./apps/backend:/app
+    command: sh -c "npm install && npm run start:dev"
+
+  ticker-updater:
+    build:
+      context: .
+      dockerfile: apps/ticker-updater/Dockerfile
+    env_file:
+      - ./.env.shared
+      - ./apps/ticker-updater/.env
+    depends_on:
+      - postgres
+    volumes:
+      - ./apps/ticker-updater:/app
+    command: sh -c "npm install && npm run start"
+
+  analyzer:
+    build: ./apps/analyzer
+    ports:
+      - "8001:8001"
+    env_file:
+      - ./.env.shared
+    environment:
+      - UVICORN_CMD=uvicorn main:app --host 0.0.0.0 --port 8001 --limit-max-request-size 100000000
+    volumes:
+      - ./apps/analyzer:/app
+
+volumes:
+  postgres-data:
