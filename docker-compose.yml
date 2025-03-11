@@ -55,9 +55,6 @@ services:
 
   analyzer:
     build: ./apps/analyzer
-    dns:
-      - 8.8.8.8
-      - 8.8.4.4
     ports:
       - "8001:8001"
     env_file:
