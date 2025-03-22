@@ -13,7 +13,10 @@
     "clean:all": "npm run clean && npm run clean:docker",
     "reinstall": "npm run clean && npm install",
     "restart:docker": "npm run clean:docker && docker compose down && docker compose build --no-cache && docker compose up",
-    "generate:types": "npx graphql-codegen --config apps/backend/codegen.yml"
+    "generate:types": "npx graphql-codegen --config apps/backend/codegen.yml",
+    "test:analyzer": "docker compose exec analyzer pytest -v --maxfail=1 --disable-warnings --tb=short",
+    "test:analyzer": "docker compose exec analyzer pytest -v --maxfail=1 --disable-warnings --tb=short",
+    "test:analyzer:cov": "docker compose exec analyzer pytest -v --cov=reports --cov-report=term-missing"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^5.0.5",

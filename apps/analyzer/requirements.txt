@@ -8,3 +8,6 @@ sqlalchemy
 asyncpg
 psycopg2
 pandas-market-calendars
+pytest
+pytest-cov
+matplotlib
