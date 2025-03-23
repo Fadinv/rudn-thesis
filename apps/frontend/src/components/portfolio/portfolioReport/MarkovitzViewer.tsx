@@ -51,8 +51,6 @@ const MarkovitzViewer: FC<MarkovitzViewerProps> = ({reportId}) => {
 	const [tabValue, setTabValue] = useState<'frontier' | 'portfolio' | 'metrics'>('frontier');
 	const {refetch} = useGetUserPortfoliosQuery({fetchPolicy: 'cache-only'});
 
-	const [version, setVersion] = useState(0);
-
 	const reports = data?.getPortfolioReport?.data as MarkovitzData | undefined;
 	const totalPortfolios = reports?.length ?? 0;
 	const report = reports?.[selectedPortfolio];
@@ -179,9 +177,6 @@ const MarkovitzViewer: FC<MarkovitzViewerProps> = ({reportId}) => {
 						value={tabValue}
 						onValueChange={(val) => {
 							setTabValue(val.value as 'frontier' | 'portfolio' | 'metrics');
-							window.setTimeout(() => {
-								setVersion(prev => prev + 1);
-							})
 						}}
 						variant="plain"
 					>
