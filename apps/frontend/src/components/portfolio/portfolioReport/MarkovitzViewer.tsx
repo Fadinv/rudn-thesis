@@ -1,7 +1,7 @@
 import CopyPortfolioButton from '@/components/portfolio/portfolioReport/CopyPortfolioButton';
+import EfficientFrontierChart from '@/components/portfolio/portfolioReport/efficientFrontierChart';
 import {
 	useGetDistributedPortfolioAssetsLazyQuery,
-	useGetDistributedPortfolioAssetsQuery,
 	useGetPortfolioReportQuery, useGetUserPortfoliosQuery,
 } from '@/generated/graphql-hooks';
 import React, {FC, JSX, useState} from 'react';
@@ -19,7 +19,7 @@ import {
 } from 'react-icons/fa';
 import {Tooltip} from '@/components/ui/tooltip';
 
-type MarkovitzData = {
+export type MarkovitzData = {
 	risk_annual: number;
 	risk_daily: number;
 	return_annual: number;
@@ -48,7 +48,10 @@ interface MarkovitzViewerProps {
 const MarkovitzViewer: FC<MarkovitzViewerProps> = ({reportId}) => {
 	const [selectedPortfolio, setSelectedPortfolio] = useState(0);
 	const {data, loading} = useGetPortfolioReportQuery({variables: {reportId}});
+	const [tabValue, setTabValue] = useState<'frontier' | 'portfolio' | 'metrics'>('frontier');
 	const {refetch} = useGetUserPortfoliosQuery({fetchPolicy: 'cache-only'});
+
+	const [version, setVersion] = useState(0);
 
 	const reports = data?.getPortfolioReport?.data as MarkovitzData | undefined;
 	const totalPortfolios = reports?.length ?? 0;
@@ -171,8 +174,22 @@ const MarkovitzViewer: FC<MarkovitzViewerProps> = ({reportId}) => {
 						</Button>
 					</Flex>
 
-					<Tabs.Root defaultValue="portfolio" variant="plain">
+					<Tabs.Root
+						unmountOnExit
+						value={tabValue}
+						onValueChange={(val) => {
+							setTabValue(val.value as 'frontier' | 'portfolio' | 'metrics');
+							window.setTimeout(() => {
+								setVersion(prev => prev + 1);
+							})
+						}}
+						variant="plain"
+					>
 						<Tabs.List bg="bg.muted" rounded="l3" p="1">
+							<Tabs.Trigger value="frontier">
+								<LuFolder/>
+								Граница
+							</Tabs.Trigger>
 							<Tabs.Trigger value="portfolio">
 								<LuFolder/>
 								Портфель
@@ -188,6 +205,16 @@ const MarkovitzViewer: FC<MarkovitzViewerProps> = ({reportId}) => {
 								onSave={() => refetch()}
 							/>
 						</Tabs.List>
+						<Tabs.Content value={'frontier'}>
+							<EfficientFrontierChart
+								onSelect={(index) => {
+									setTabValue('portfolio');
+									setSelectedPortfolio(index);
+								}}
+								portfolios={reports!}
+								selected={selectedPortfolio}
+							/>
+						</Tabs.Content>
 						<Tabs.Content value="portfolio">
 							{/* Pie Chart */}
 							<PieChart width={400} height={250} style={{width: '100%', height: 400}}>
@@ -289,11 +316,6 @@ const MarkovitzViewer: FC<MarkovitzViewerProps> = ({reportId}) => {
 											value={report.treynor_ratio_annual.toFixed(2)}
 											metricKey="treynor_ratio_annual"
 										/>
-										{/*<MetricRow*/}
-										{/*	label="Коэффициент Трейнора (ежедневный)"*/}
-										{/*	value={report.treynor_ratio_daily.toFixed(2)}*/}
-										{/*	metricKey="sortino_ratio_daily"*/}
-										{/*/>*/}
 										<Table.Row>
 											<Table.Cell>Категория риска</Table.Cell>
 											<Table.Cell>{getRiskCategoryLabel(report.risk_category)}</Table.Cell>
