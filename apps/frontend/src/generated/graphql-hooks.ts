@@ -21,12 +21,17 @@ export type Scalars = {
 };
 
 export type FutureReturnForecastInput = {
+  dateRange?: InputMaybe<Scalars['String']['input']>;
   forecastHorizons: Array<Scalars['Float']['input']>;
   selectedPercentiles: Array<Scalars['Float']['input']>;
 };
 
 export type MarkovitzReportInput = {
   additionalTickers?: InputMaybe<Array<Scalars['String']['input']>>;
+  covMethod?: InputMaybe<Scalars['String']['input']>;
+  dateRange?: InputMaybe<Scalars['String']['input']>;
+  numPortfolios?: InputMaybe<Scalars['Int']['input']>;
+  riskFreeRate?: InputMaybe<Scalars['Float']['input']>;
 };
 
 export type Mutation = {

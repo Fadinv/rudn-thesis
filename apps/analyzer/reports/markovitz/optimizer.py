@@ -87,17 +87,30 @@ def generate_efficient_frontier(mean_returns, cov_matrix, tickers, risk_free_rat
     efficient_frontier.sort(key=lambda x: x["return"])
     return efficient_frontier
 
+
 def calculate_markowitz_efficient_frontier(
     returns: np.ndarray,
-    tickers: list,
+    tickers: list[str],
     risk_free_rate: float,
-    num_portfolios: int = 20
-):
-    """Полная реализация эффективной границы с крайними портфелями"""
-    mean_returns = np.mean(returns, axis=0)
-    cov_matrix = calculate_covariance_matrix(returns)
+    num_portfolios: int = 20,
+    cov_method: Literal["standard", "ledoit"] = "ledoit"
+) -> list[dict]:
+    """
+    Полная реализация эффективной границы с учетом:
+    - Безрисковой ставки
+    - Методики оценки ковариационной матрицы
+    - Количества портфелей
 
-    bounds = tuple((0, 1) for _ in range(len(tickers)))
+    :param returns: np.ndarray — матрица доходностей
+    :param tickers: список тикеров активов
+    :param risk_free_rate: безрисковая ставка (годовая)
+    :param num_portfolios: количество портфелей на границе (включая граничные)
+    :param cov_method: метод оценки ковариации: 'standard' или 'ledoit'
+    """
+    mean_returns = np.mean(returns, axis=0)
+    cov_matrix = calculate_covariance_matrix(returns, method=cov_method)
+
+    bounds = tuple((0, 1) for _ in tickers)
     constraints = [{'type': 'eq', 'fun': lambda w: np.sum(w) - 1}]
 
     # 1. Граничные портфели
@@ -107,17 +120,18 @@ def calculate_markowitz_efficient_frontier(
     min_risk = min_risk_portfolio["risk"]
     max_risk = max_return_portfolio["risk"]
 
-    # 2. Строим промежуточные портфели
+    # 2. Генерация промежуточных портфелей
     intermediate_frontier = generate_efficient_frontier(
-        mean_returns,
-        cov_matrix,
-        tickers,
-        risk_free_rate,
-        min_risk,
-        max_risk,
-        num_portfolios=num_portfolios - 2  # исключаем 2 крайних, которые мы уже посчитали
+        mean_returns=mean_returns,
+        cov_matrix=cov_matrix,
+        tickers=tickers,
+        risk_free_rate=risk_free_rate,
+        min_risk=min_risk,
+        max_risk=max_risk,
+        num_portfolios=num_portfolios - 2  # исключаем крайние
     )
 
-    # 3. Собираем финальный список
+    # 3. Финальный список портфелей
     efficient_frontier = [min_risk_portfolio] + intermediate_frontier + [max_return_portfolio]
+
     return efficient_frontier

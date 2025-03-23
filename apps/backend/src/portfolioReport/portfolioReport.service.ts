@@ -218,6 +218,10 @@ export class PortfolioReportService {
 			await axios.post(`${this.ANALYZER_URL}/markovitz`, {
 				reportId,
 				additionalTickers: input?.additionalTickers || [],
+				date_range: input?.dateRange,
+				risk_free_rate: input?.riskFreeRate,
+				num_portfolios: input?.numPortfolios,
+				cov_method: input?.covMethod,
 			});
 			console.log(`✅ Python принял отчёт ${reportId}, ожидаем расчёта`);
 		} catch (error) {
@@ -237,6 +241,7 @@ export class PortfolioReportService {
 				reportId,
 				selectedPercentiles: input.selectedPercentiles,
 				forecastHorizons: input.forecastHorizons,
+				date_range: input?.dateRange,
 			});
 			console.log(`✅ Python принял отчёт ${reportId}, ожидаем расчёта`);
 		} catch (error) {

@@ -1,5 +1,5 @@
 import {useGetPortfolioReportQuery} from '@/generated/graphql-hooks';
-import React, {FC, useState} from 'react';
+import React, {FC, useEffect, useState} from 'react';
 import {XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Area, AreaChart} from 'recharts';
 import {
 	SelectContent,
@@ -15,33 +15,77 @@ interface ForecastGBMViewerProps {
 	reportId: string;
 }
 
-const COLORS = {
-	p10: '#dc3545', // Красный (pessimistic)
-	p50: '#007bff', // Синий (median)
-	p90: '#28a745', // Зеленый (optimistic)
+const COLORS: { [key: string]: string } = {
+	'0': '#dc3545', // Красный (pessimistic)
+	'1': '#007bff', // Синий (median)
+	'2': '#28a745', // Зеленый (optimistic)
+};
+
+const FILL_COLORS: { [key: string]: string } = {
+	'0': '#dc3545',
+	'1': '#bbd0ff',
+	'2': '#fff',
+};
+
+const OPACITY: { [key: string]: number } = {
+	'0': .5,
+	'1': 1,
+	'2': 1,
 };
 
 const ForecastGBMViewer: FC<ForecastGBMViewerProps> = ({reportId}) => {
 	const {data, loading} = useGetPortfolioReportQuery({variables: {reportId}});
 	const [selectedStock, setSelectedStock] = useState<string | 'portfolio'>('portfolio');
 
-	if (loading) return <Text>Загрузка...</Text>;
+	const [percentiles, setPersentiles] = useState<number[]>([]);
+	const [chartData, setChartData] = useState<{ [key: string]: number }[]>([]);
 
 	const reportData = data?.getPortfolioReport?.data;
-	if (!reportData) return <Text>Нет данных</Text>;
 
 	const forecastData =
 		selectedStock === 'portfolio'
-			? reportData.portfolioForecast
-			: reportData.stocksForecast[selectedStock];
+			? reportData?.portfolioForecast
+			: reportData?.stocksForecast?.[selectedStock];
 
-	// Преобразуем данные: даты переводим в timestamp
-	const chartData = Object.keys(forecastData || {}).map((date) => ({
-		date: new Date(date).getTime(), // ✅ Преобразуем дату в timestamp
-		p10: +forecastData[date]['p10'].toFixed(2),
-		p50: +forecastData[date]['p50'].toFixed(2),
-		p90: +forecastData[date]['p90'].toFixed(2),
-	}));
+	useEffect(() => {
+		const mapData: { [key: string]: { [key: string]: number } } = {};
+		const newPercentiles = new Set<number>();
+
+		Object.keys(forecastData || {}).forEach((date) => {
+			Object.keys(forecastData[date]).forEach(key => {
+				newPercentiles.add(+(+key.replace('p', '')).toFixed(2));
+				if (!mapData[date]) mapData[date] = {
+					date: new Date(date).getTime(),
+				};
+				mapData[date][key] = +forecastData[date][key].toFixed(2);
+			});
+		});
+
+		if (reportData?.portfolioHistory && selectedStock === 'portfolio') {
+			Object.entries(reportData.portfolioHistory).forEach(([date, value], index, list) => {
+				const ts = new Date(date).getTime();
+				if (!mapData[date]) {
+					mapData[date] = {date: ts};
+				}
+				if (!value) return;
+				mapData[date].value = +(value as number).toFixed(2);
+				if (index === list.length - 1) {
+					newPercentiles.forEach(p => {
+						mapData[date][`p${p}`] = +(value as number).toFixed(2);
+					});
+				}
+			});
+		}
+
+		setChartData(Object.keys(mapData).map((key) => {
+			return {...mapData[key]};
+		}).sort((a, b) => a.date - b.date));
+		setPersentiles(Array.from(newPercentiles).reverse());
+
+	}, [data, reportData, selectedStock]);
+
+	if (loading) return <Text>Загрузка...</Text>;
+	if (!reportData) return <Text>Нет данных</Text>;
 
 	// Создаем список доступных активов
 	const stockOptions = createListCollection({
@@ -51,6 +95,7 @@ const ForecastGBMViewer: FC<ForecastGBMViewerProps> = ({reportId}) => {
 		],
 	});
 
+	if (!chartData.length) return null;
 	return (
 		<Flex direction="column" align="center" w="100%">
 			<Text fontSize="lg" fontWeight="bold" mb={4}>
@@ -94,14 +139,26 @@ const ForecastGBMViewer: FC<ForecastGBMViewerProps> = ({reportId}) => {
 						<Tooltip labelFormatter={(label) => new Date(label).toLocaleDateString()}/>
 						<Legend/>
 
-						{/* ✅ Область между p10 и p90 (заполнение) */}
-						<Area type="monotone" dataKey="p90" stroke={COLORS.p90} strokeWidth={2} fill={COLORS.p90}
-						      fillOpacity={.5}/>
-						<Area type="monotone" dataKey="p50" stroke={COLORS.p50} strokeWidth={2} fill={'#bbd0ff'}
-						      fillOpacity={1}/>
-						<Area type="monotone" dataKey="p10" stroke={COLORS.p10} fill={'#fff'} strokeWidth={2}
-						      fillOpacity={1}/>
+						{percentiles.map((el, index) => {
+							return <Area style={{zIndex: Math.abs(-index)}} key={index} type="monotone"
+							             dataKey={`p${el}`} stroke={COLORS[String(index)]}
+							             strokeWidth={2}
+							             fill={FILL_COLORS[String(index)]}
+							             fillOpacity={OPACITY[String(index)]}
+							/>;
+						})}
 
+						{selectedStock === 'portfolio' && (
+							<Area
+								type="monotone"
+								dataKey="value"
+								stroke="#6c757d"
+								strokeWidth={2}
+								fillOpacity={0}
+								fill={FILL_COLORS[String(2)]}
+								name="Исторические данные"
+							/>
+						)}
 					</AreaChart>
 				</ResponsiveContainer>
 			</Box>

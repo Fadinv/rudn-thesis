@@ -5,7 +5,7 @@ import {
 	useGetPortfolioReportQuery, useGetUserPortfoliosQuery,
 } from '@/generated/graphql-hooks';
 import React, {FC, JSX, useState} from 'react';
-import {LuFolder, LuSquareCheck, LuUser} from 'react-icons/lu';
+import {LuFolder, LuSquareCheck, LuChartNoAxesCombined} from 'react-icons/lu';
 import {PieChart, Pie, Cell, Legend, Tooltip as RechartsTooltip} from 'recharts';
 import {Tabs, Box, Button, Icon, Text, Table, Spinner, Flex, Badge} from '@chakra-ui/react';
 import {
@@ -182,7 +182,7 @@ const MarkovitzViewer: FC<MarkovitzViewerProps> = ({reportId}) => {
 					>
 						<Tabs.List bg="bg.muted" rounded="l3" p="1">
 							<Tabs.Trigger value="frontier">
-								<LuFolder/>
+								<LuChartNoAxesCombined/>
 								Граница
 							</Tabs.Trigger>
 							<Tabs.Trigger value="portfolio">

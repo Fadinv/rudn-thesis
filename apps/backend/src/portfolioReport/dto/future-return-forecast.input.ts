@@ -7,4 +7,7 @@ export class FutureReturnForecastInput {
 
 	@Field(() => [Number])
 	forecastHorizons: number[]; // Дни
+
+	@Field(() => String, {nullable: true})
+	dateRange?: string;
 }

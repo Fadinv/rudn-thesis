@@ -1,3 +1,4 @@
+import {NumberInputField, NumberInputRoot} from '@/components/ui/number-input';
 import {
 	SelectContent,
 	SelectItem,
@@ -29,9 +30,11 @@ import {
 	Text,
 	Flex,
 	createListCollection,
+	Field,
 } from '@chakra-ui/react';
 import {FaTrash, FaFileAlt} from 'react-icons/fa';
 import StockSearch from './StocksSearch';
+import {Slider} from '../ui/slider';
 
 interface CreatePortfolioReportButtonProps {
 	portfolioId: number;
@@ -44,9 +47,23 @@ const CreatePortfolioReportButton: React.FC<CreatePortfolioReportButtonProps> = 
 	const [createMarkovitzReport, {loading: createMarkovitzReportIsLoading}] = useCreateMarkovitzReportMutation();
 	const [createFutureReturnForecastReport, {loading: createFutureReturnForecastReportIsLoading}] = useCreateFutureReturnForecastGbmReportMutation();
 
+	const [selectedPercentiles, setSelectedPercentiles] = useState<[number, number, number]>([10, 50, 90]);
+	const [forecastHorizons, setForecastHorizons] = useState([30, 60, 90, 180, 365, 730, 1095]);
+
+	const [dateRange, setDateRange] = useState('3y');
+	const [riskFreeRate, setRiskFreeRate] = useState(0.04);
+	const [numPortfolios, setNumPortfolios] = useState(20);
+	const [covMethod, setCovMethod] = useState('ledoit');
+
 	useEffect(() => {
 		setAdditionalStocks([]);
 		setReportType('markowitz');
+		setDateRange('3y');
+		setRiskFreeRate(0.04);
+		setNumPortfolios(20);
+		setCovMethod('ledoit');
+		setForecastHorizons([30, 60, 90, 180, 365, 730, 1095]);
+		setSelectedPercentiles([10, 50, 90]);
 	}, [open]);
 
 	const handleSelectStock = (stockId: number, stockName: string, stockTicker: string) => {
@@ -69,6 +86,10 @@ const CreatePortfolioReportButton: React.FC<CreatePortfolioReportButtonProps> = 
 							portfolioId,
 							input: {
 								additionalTickers: additionalStocks.map((s) => s.ticker),
+								dateRange,
+								riskFreeRate,
+								numPortfolios,
+								covMethod,
 							},
 						},
 					});
@@ -79,8 +100,9 @@ const CreatePortfolioReportButton: React.FC<CreatePortfolioReportButtonProps> = 
 						variables: {
 							portfolioId,
 							input: {
-								selectedPercentiles: [10, 50, 90],
-								forecastHorizons: [30, 60, 90, 180, 365, 730, 1095],
+								selectedPercentiles,
+								forecastHorizons,
+								dateRange,
 							},
 						},
 					});
@@ -100,7 +122,33 @@ const CreatePortfolioReportButton: React.FC<CreatePortfolioReportButtonProps> = 
 		items: [
 			{label: 'Оптимальный портфель (Марковиц)', value: 'markowitz'},
 			{label: 'Прогноз будущей стоимости (GBM)', value: 'future_returns_forecast_gbm'},
-			{label: 'Оценка риска (VaR)', value: 'value_at_risk'},
+		],
+	});
+
+	const dataRangeCollection = createListCollection({
+		items: [
+			{label: '1 месяц', value: '1m'},
+			{label: '3 месяца', value: '3m'},
+			{label: '6 месяцев', value: '6m'},
+			{label: '1 год', value: '1y'},
+			{label: '2 года', value: '2y'},
+			{label: '3 года', value: '3y'},
+		],
+	});
+
+	const covMethodCollection = createListCollection({
+		items: [
+			{label: 'Ledoit-Wolf (сглаженный)', value: 'ledoit'},
+			{label: 'Классическая оценка', value: 'standard'},
+		],
+	});
+
+	const forecastHorizonsCollection = createListCollection({
+		items: [
+			{label: 'Короткий срок (1-3 мес)', value: 'short'},
+			{label: 'Средний срок (6 мес – 1 год)', value: 'medium'},
+			{label: 'Долгий срок (2–3 года)', value: 'long'},
+			{label: 'Все варианты', value: 'short_medium_long'},
 		],
 	});
 
@@ -121,27 +169,158 @@ const CreatePortfolioReportButton: React.FC<CreatePortfolioReportButtonProps> = 
 						<Stack>
 							<Box>
 								<Text mb={2}>Выберите тип отчета:</Text>
-								<SelectRoot
-									defaultValue={['markowitz']}
-									onValueChange={(e) => {
-										setReportType(e.value[0] as 'markowitz' | 'future_returns_forecast_gbm' | 'value_at_risk');
-									}}
-									collection={reportTypes}
-									size="sm"
-								>
-									<SelectLabel>Вид анализа</SelectLabel>
-									<SelectTrigger>
-										<SelectValueText placeholder="Выберите вид анализа"/>
-									</SelectTrigger>
-									<SelectContent>
-										{reportTypes.items.map((reportType) => (
-											<SelectItem item={reportType} key={reportType.value}>
-												{reportType.label}
-											</SelectItem>
-										))}
-									</SelectContent>
-								</SelectRoot>
+								<Field.Root invalid={!reportType}>
+									<SelectRoot
+										defaultValue={['markowitz']}
+										onValueChange={(e) => {
+											setReportType(e.value[0] as 'markowitz' | 'future_returns_forecast_gbm' | 'value_at_risk');
+										}}
+										collection={reportTypes}
+										size="sm"
+									>
+										<SelectLabel>Вид анализа</SelectLabel>
+										<SelectTrigger>
+											<SelectValueText placeholder="Выберите вид анализа"/>
+										</SelectTrigger>
+										<SelectContent>
+											{reportTypes.items.map((reportType) => (
+												<SelectItem item={reportType} key={reportType.value}>
+													{reportType.label}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</SelectRoot>
+									<Field.ErrorText>Обязательно для заполнения</Field.ErrorText>
+								</Field.Root>
 							</Box>
+
+							{reportType === 'future_returns_forecast_gbm' && (
+								<Stack mt={4}>
+									{/* Диапазон исторических данных */}
+									<Box>
+										<Text mb={1}>Диапазон исторических данных:</Text>
+										<SelectRoot
+											defaultValue={['3y']}
+											onValueChange={(e) => setDateRange(e.value[0])}
+											collection={dataRangeCollection}
+											size="sm"
+										>
+											<SelectLabel>Выберите период</SelectLabel>
+											<SelectTrigger>
+												<SelectValueText placeholder="Выберите период"/>
+											</SelectTrigger>
+											<SelectContent>
+												{dataRangeCollection.items.map((dateRangeItem) => (
+													<SelectItem item={dateRangeItem} key={dateRangeItem.value}>
+														{dateRangeItem.label}
+													</SelectItem>
+												))}
+											</SelectContent>
+										</SelectRoot>
+									</Box>
+
+									{/* Горизонты прогнозирования */}
+									<Box>
+										<Text mb={1}>Горизонты прогнозирования (в днях):</Text>
+										<SelectRoot
+											defaultValue={['short_medium_long']}
+											onValueChange={(e) => {
+												const val = e.value[0];
+												switch (val) {
+													case 'short':
+														setForecastHorizons([30, 60, 90]);
+														break;
+													case 'medium':
+														setForecastHorizons([180, 365]);
+														break;
+													case 'long':
+														setForecastHorizons([730, 1095]);
+														break;
+													default:
+														setForecastHorizons([30, 60, 90, 180, 365, 730, 1095]);
+												}
+											}}
+											collection={forecastHorizonsCollection}
+											size="sm"
+										>
+											<SelectLabel>Выберите горизонты</SelectLabel>
+											<SelectTrigger>
+												<SelectValueText placeholder="Выберите"/>
+											</SelectTrigger>
+											<SelectContent>
+												{forecastHorizonsCollection.items.map((forecastItem) => (
+													<SelectItem item={forecastItem} key={forecastItem.value}>
+														{forecastItem.label}
+													</SelectItem>
+												))}
+											</SelectContent>
+										</SelectRoot>
+									</Box>
+
+									{/* Ползунки перцентилей */}
+									<Box>
+										<Text mb={1}>Выберите перцентили (p10, p50, p90):</Text>
+										<Flex direction="column" gap={3}>
+											<Flex align="center" gap={4}>
+												<Slider
+													step={1}
+													colorPalette={'green'}
+													value={[selectedPercentiles[0]]}
+													min={1}
+													max={89}
+													w={'400px'}
+													onValueChange={(details) => {
+														const p10 = details.value[0];
+														let p50 = Math.max(p10 + 5, selectedPercentiles[1]);
+														let p90 = Math.max(p50 + 5, selectedPercentiles[2]);
+														p50 = Math.min(p50, 94);
+														p90 = Math.min(p90, 99);
+														setSelectedPercentiles([p10, p50, p90]);
+													}}
+												/>
+												<Text>{selectedPercentiles[0]}</Text>
+											</Flex>
+											<Flex align="center" gap={4}>
+												<Slider
+													step={1}
+													colorPalette={'blue'}
+													min={6}
+													max={94}
+													w={'400px'}
+													value={[selectedPercentiles[1]]}
+													onValueChange={(details) => {
+														const v = details.value[0];
+														const p50 = v;
+														let p10 = Math.min(selectedPercentiles[0], p50 - 5);
+														let p90 = Math.max(p50 + 5, selectedPercentiles[2]);
+														p90 = Math.min(p90, 99);
+														setSelectedPercentiles([p10, p50, p90]);
+													}}
+												/>
+												<Text>{selectedPercentiles[1]}</Text>
+											</Flex>
+											<Flex align="center" gap={4}>
+												<Slider
+													step={1}
+													colorPalette={'red'}
+													min={11}
+													max={99}
+													w={'400px'}
+													value={[selectedPercentiles[2]]}
+													onValueChange={(details) => {
+														const p90 = details.value[0];
+														let p50 = Math.min(selectedPercentiles[1], p90 - 5);
+														let p10 = Math.min(selectedPercentiles[0], p50 - 5);
+														setSelectedPercentiles([p10, p50, p90]);
+													}}
+												/>
+												<Text>{selectedPercentiles[2]}</Text>
+											</Flex>
+										</Flex>
+									</Box>
+								</Stack>
+							)}
+
 
 							{reportType === 'markowitz' && (
 								<Box>
@@ -151,6 +330,84 @@ const CreatePortfolioReportButton: React.FC<CreatePortfolioReportButtonProps> = 
 											handleSelectStock(stockId, stockName, stockTicker)
 										}
 									/>
+
+									<Box mt={2}>
+										<SelectRoot
+											defaultValue={['3y']}
+											onValueChange={(e) => setDateRange(e.value[0])}
+											collection={dataRangeCollection}
+											size="sm"
+										>
+											<SelectLabel>Выберите диапазон</SelectLabel>
+											<SelectTrigger>
+												<SelectValueText placeholder="Выберите период"/>
+											</SelectTrigger>
+											<SelectContent>
+												{dataRangeCollection.items.map((dateRangeItem) => (
+													<SelectItem item={dateRangeItem} key={dateRangeItem.value}>
+														{dateRangeItem.label}
+													</SelectItem>
+												))}
+											</SelectContent>
+										</SelectRoot>
+									</Box>
+
+									<Box mt={2}>
+										<Text mb={1}>Безрисковая ставка (%):</Text>
+										<Field.Root
+											invalid={typeof riskFreeRate !== 'number' || riskFreeRate < 0 || riskFreeRate > 100}>
+											<NumberInputRoot w={'100%'}>
+												<NumberInputField
+													min={0}
+													max={100}
+													defaultValue="0.04"
+													step={'0.01'}
+													onChange={(e) => {
+														setRiskFreeRate(e.target.value ? parseFloat((+e.target.value).toFixed(2)) : e.target.value as any);
+													}}
+												/>
+											</NumberInputRoot>
+											<Field.ErrorText>от 0 до 100</Field.ErrorText>
+										</Field.Root>
+									</Box>
+
+									<Box mt={2}>
+										<Text mb={1}>Количество портфелей:</Text>
+										<Field.Root invalid={!numPortfolios || numPortfolios < 3 || numPortfolios > 50}>
+											<NumberInputRoot w={'100%'}>
+												<NumberInputField
+													min={3}
+													max={50}
+													defaultValue="20"
+													step={'1'}
+													onChange={(e) => setNumPortfolios(parseInt(e.target.value ?? 0))}
+												/>
+											</NumberInputRoot>
+											<Field.ErrorText>От 3 до 50</Field.ErrorText>
+										</Field.Root>
+									</Box>
+
+									<Box mt={2}>
+										<Text mb={1}>Метод оценки ковариации:</Text>
+										<SelectRoot
+											defaultValue={['ledoit']}
+											onValueChange={(e) => setCovMethod(e.value[0])}
+											collection={covMethodCollection}
+											size="sm"
+										>
+											<SelectLabel>Метод ковариации</SelectLabel>
+											<SelectTrigger>
+												<SelectValueText placeholder="Выберите метод"/>
+											</SelectTrigger>
+											<SelectContent>
+												{covMethodCollection.items.map((covMethodItem) => (
+													<SelectItem item={covMethodItem} key={covMethodItem.value}>
+														{covMethodItem.label}
+													</SelectItem>
+												))}
+											</SelectContent>
+										</SelectRoot>
+									</Box>
 								</Box>
 							)}
 
@@ -180,7 +437,12 @@ const CreatePortfolioReportButton: React.FC<CreatePortfolioReportButtonProps> = 
 						</Stack>
 					</DrawerBody>
 					<DrawerFooter>
-						<Button colorScheme="blue" onClick={handleCreateReport} loading={loading}>
+						<Button
+							disabled={!numPortfolios || numPortfolios < 3 || numPortfolios > 50 || typeof riskFreeRate !== 'number' || riskFreeRate < 0 || riskFreeRate > 100}
+							colorScheme="blue"
+							onClick={handleCreateReport}
+							loading={loading}
+						>
 							Создать отчет
 						</Button>
 						<DrawerCloseTrigger asChild>

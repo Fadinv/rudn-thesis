@@ -152,9 +152,14 @@ input PortfolioStockUpdateInput {
 
 input MarkovitzReportInput {
   additionalTickers: [String!]
+  dateRange: String
+  riskFreeRate: Float
+  numPortfolios: Int
+  covMethod: String
 }
 
 input FutureReturnForecastInput {
   selectedPercentiles: [Float!]!
   forecastHorizons: [Float!]!
+  dateRange: String
 }

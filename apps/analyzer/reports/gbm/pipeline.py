@@ -1,10 +1,16 @@
 from datetime import datetime, timedelta
 from nest_api.nest_api import get_portfolio_data_with_history
 from reports.gbm.forecast import generate_gbm_forecast
+from reports.utils.utils import get_date_range
 
-def process_gbm_report(report_id: str, selected_percentiles: list[int], forecast_horizons: list[int]) -> dict:
-    start_date = (datetime.today() - timedelta(days=365 * 3)).strftime("%Y-%m-%d")
-    end_date = datetime.today().strftime("%Y-%m-%d")
+def process_gbm_report(
+    report_id: str,
+    selected_percentiles: list[int],
+    forecast_horizons: list[int],
+    date_range: str = "3y",
+) -> dict:
+    # 1. Определяем диапазон дат
+    start_date, end_date = get_date_range(date_range)
 
     portfolio_data = get_portfolio_data_with_history(report_id, [], start_date, end_date)
     if not portfolio_data:

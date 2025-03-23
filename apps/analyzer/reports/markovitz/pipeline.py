@@ -2,14 +2,19 @@ from datetime import datetime, timedelta
 from nest_api.nest_api import get_portfolio_data, get_market_returns
 from reports.markovitz.optimizer import calculate_markowitz_efficient_frontier
 from reports.markovitz.risk_metrics import calculate_sortino_ratio, calculate_beta
-from reports.utils.utils import classify_risk_levels
+from reports.utils.utils import classify_risk_levels, get_date_range
 import numpy as np
 
-
-def process_markovitz_report(report_id: str, additional_tickers: list[str]) -> list[dict]:
+def process_markovitz_report(
+    report_id: str,
+    additional_tickers: list[str],
+    date_range: str = "3y",
+    risk_free_rate: float = 0.04,
+    num_portfolios: int = 20,
+    cov_method: str = "ledoit"  # или 'standard'
+) -> list[dict]:
     # 1. Определяем диапазон дат
-    start_date = (datetime.today() - timedelta(days=365 * 3)).strftime("%Y-%m-%d")
-    end_date = datetime.today().strftime("%Y-%m-%d")
+    start_date, end_date = get_date_range(date_range)
 
     # 2. Получаем данные портфеля
     portfolio_data = get_portfolio_data(report_id, additional_tickers, start_date, end_date)
@@ -21,14 +26,24 @@ def process_markovitz_report(report_id: str, additional_tickers: list[str]) -> l
 
     # 4. Расчёт эффективной границы
     raw_result = calculate_markowitz_efficient_frontier(
-        portfolio_data["returns"], portfolio_data["tickers"], portfolio_data["risk_free_rate"]
+        portfolio_data["returns"],
+        portfolio_data["tickers"],
+        risk_free_rate,
+        num_portfolios=num_portfolios,
+        cov_method=cov_method
     )
 
     # 5. Постобработка результатов
-    return postprocess_markovitz_results(raw_result, portfolio_data, market_returns)
+    portfolio_data["risk_free_rate"] = risk_free_rate
+    return postprocess_markovitz_results(raw_result, portfolio_data, market_returns, date_range)
 
-
-def postprocess_markovitz_results(result: list[dict], portfolio_data: dict, market_returns: np.ndarray) -> list[dict]:
+def postprocess_markovitz_results(
+    result: list[dict],
+    portfolio_data: dict,
+    market_returns: np.ndarray,
+    date_range: str = "3y",
+    cov_method: str = "ledoit",
+) -> list[dict]:
     corrected_result = []
     risk_free_rate = portfolio_data["risk_free_rate"]
     daily_risk_free_rate = risk_free_rate / 252
@@ -63,6 +78,8 @@ def postprocess_markovitz_results(result: list[dict], portfolio_data: dict, mark
             "sharpe_ratio_annual": (annual_return - risk_free_rate) / annual_risk if annual_risk > 0 else 0,
             "sortino_ratio_annual": sortino_ratio_annual,
             "treynor_ratio_annual": treynor_ratio_annual,
+            "date_range": date_range,
+            "cov_method": cov_method,
             "weights": portfolio["weights"]
         })
 

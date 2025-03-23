@@ -17,11 +17,22 @@ router = APIRouter()
 async def create_markovitz_report(request: dict):
     report_id = request["reportId"]
     additional_tickers = request.get("additionalTickers", [])
+    date_range = request["date_range"]
+    risk_free_rate = request["risk_free_rate"]
+    num_portfolios = request["num_portfolios"]
+    cov_method = request["cov_method"]
 
     print(f"🔍 Запускаем анализ отчёта {report_id} с дополнительными тикерами: {additional_tickers}")
 
     try:
-        result = process_markovitz_report(report_id, additional_tickers)
+        result = process_markovitz_report(
+            report_id,
+            additional_tickers,
+            date_range,
+            risk_free_rate,
+            num_portfolios,
+            cov_method
+        )
 
         with engine.connect() as conn:
             conn.execute(text("""
@@ -45,10 +56,11 @@ async def create_gbm_report(request: dict):
         report_id = request["reportId"]
         selected_percentiles = request.get("selectedPercentiles", [10, 50, 90])
         forecast_horizons = request.get("forecastHorizons", [30, 60, 90, 180, 365, 730, 1095])
+        date_range = request.get("date_range", "3y")
 
         print(f"🔍 Запускаем GBM прогноз для отчёта {report_id}")
 
-        result = process_gbm_report(report_id, selected_percentiles, forecast_horizons)
+        result = process_gbm_report(report_id, selected_percentiles, forecast_horizons, date_range)
 
         with engine.connect() as conn:
             conn.execute(text("""

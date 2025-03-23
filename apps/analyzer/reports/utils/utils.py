@@ -1,5 +1,7 @@
 import numpy as np
 import pandas_market_calendars as mcal
+from datetime import datetime, timedelta
+
 
 def calculate_returns_matrix(stock_prices, tickers):
     """
@@ -94,3 +96,25 @@ def allocate_capital(capital, prices, weights):
             remaining_capital -= portfolio[ticker]["price"]
 
     return portfolio, remaining_capital
+
+
+def get_date_range(date_range: str) -> tuple[str, str]:
+    """Преобразует date_range в формат ('start_date', 'end_date')"""
+    end_date = datetime.today()
+    if date_range == "1m":
+        delta = timedelta(days=30)
+    elif date_range == "3m":
+        delta = timedelta(days=90)
+    elif date_range == "6m":
+        delta = timedelta(days=180)
+    elif date_range == "1y":
+        delta = timedelta(days=365)
+    elif date_range == "2y":
+        delta = timedelta(days=730)
+    elif date_range == "3y":
+        delta = timedelta(days=1095)
+    else:
+        raise ValueError(f"Неподдерживаемый диапазон: {date_range}")
+
+    start_date = end_date - delta
+    return start_date.strftime("%Y-%m-%d"), end_date.strftime("%Y-%m-%d")
