@@ -72,7 +72,7 @@ const ShowPortfolioReportButton: React.FC<CreatePortfolioReportButtonProps> = ({
 			<DrawerRoot size="lg" open={open} onOpenChange={(e) => setOpen(e.open)}>
 				<DrawerContent>
 					<DrawerHeader>
-						<DrawerTitle>Создать отчет</DrawerTitle>
+						<DrawerTitle>Список отчетов</DrawerTitle>
 					</DrawerHeader>
 					<DrawerBody>
 						<Stack>
