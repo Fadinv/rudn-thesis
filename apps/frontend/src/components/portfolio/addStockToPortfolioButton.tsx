@@ -1,6 +1,6 @@
 import StockSearch from '@/components/portfolio/StocksSearch';
 import React, {useEffect, useState} from 'react';
-import {Button, Icon, Input} from '@chakra-ui/react';
+import {Button, Icon} from '@chakra-ui/react';
 import {FaPlus} from 'react-icons/fa';
 import {
 	DrawerRoot,
@@ -21,7 +21,6 @@ import {
 import {
 	useAddStockToPortfolioMutation,
 	useGetStockByIdLazyQuery,
-	useGetStockByTickerLazyQuery,
 } from '@/generated/graphql-hooks';
 
 interface AddStockToPortfolioProps {
@@ -36,7 +35,7 @@ const AddStockToPortfolioButton: React.FC<AddStockToPortfolioProps> = ({
 	const [open, setOpen] = useState(false);
 	const [selectedStockId, setSelectedStockId] = useState<number | null>(null);
 	const [quantity, setQuantity] = useState(1);
-	const [averagePrice, setAveragePrice] = useState('');
+	const [averagePrice, setAveragePrice] = useState(100);
 
 	const [addStock, {loading, error}] = useAddStockToPortfolioMutation();
 
@@ -51,7 +50,7 @@ const AddStockToPortfolioButton: React.FC<AddStockToPortfolioProps> = ({
 	useEffect(() => {
 		if (!selectedStockId) return;
 		void getStockById({variables: {id: selectedStockId}});
-	}, [selectedStockId])
+	}, [selectedStockId]);
 
 	const handleSave = async () => {
 		if (!selectedStockId) return;
@@ -61,7 +60,7 @@ const AddStockToPortfolioButton: React.FC<AddStockToPortfolioProps> = ({
 				portfolioId,
 				stockId: selectedStockId,
 				quantity: Number(quantity),
-				averagePrice: parseFloat(averagePrice),
+				averagePrice: averagePrice,
 			},
 		});
 
@@ -74,7 +73,7 @@ const AddStockToPortfolioButton: React.FC<AddStockToPortfolioProps> = ({
 			<DrawerBackdrop/>
 			<DrawerTrigger asChild>
 				<Button variant="solid" size="sm" mb={4}>
-					<Icon as={FaPlus} /> Добавить акцию
+					<Icon as={FaPlus}/> Добавить акцию
 				</Button>
 			</DrawerTrigger>
 			<DrawerContent offset="4" rounded="md">
@@ -92,33 +91,40 @@ const AddStockToPortfolioButton: React.FC<AddStockToPortfolioProps> = ({
 					<Field
 						mt={4}
 						label={'Количество'}
+						invalid={typeof quantity !== 'number' || quantity <= 0}
 					>
 						<NumberInputRoot>
 							<NumberInputField
 								min={1}
-								defaultValue="1"
+								defaultValue={1}
 								onChange={(e) => setQuantity(Number(e.target.value))}
 							/>
 						</NumberInputRoot>
 					</Field>
-
 					<Field
 						mt={4}
 						label={'Средняя цена'}
+						invalid={typeof averagePrice !== 'number' || averagePrice <= 0}
 					>
-						<Input
-							type="number"
-							placeholder="Введите среднюю цену"
-							value={averagePrice}
-							onChange={(e) => setAveragePrice(e.target.value)}
-						/>
+						<NumberInputRoot>
+							<NumberInputField
+								min={0}
+								defaultValue={100}
+								onChange={(e) => setAveragePrice(Number(e.target.value))}
+							/>
+						</NumberInputRoot>
 					</Field>
 				</DrawerBody>
 				<DrawerFooter>
 					<DrawerCloseTrigger asChild>
 						<Button variant="outline">Отмена</Button>
 					</DrawerCloseTrigger>
-					<Button colorPalette="blue" onClick={handleSave} loading={loading}>
+					<Button
+						disabled={!selectedStockId || typeof averagePrice !== 'number' || averagePrice <= 0 || typeof quantity !== 'number' || quantity <= 0}
+						colorPalette="blue"
+						onClick={handleSave}
+						loading={loading}
+					>
 						Добавить
 					</Button>
 				</DrawerFooter>

@@ -51,7 +51,7 @@ const CreatePortfolioReportButton: React.FC<CreatePortfolioReportButtonProps> = 
 	const [forecastHorizons, setForecastHorizons] = useState([30, 60, 90, 180, 365, 730, 1095]);
 
 	const [dateRange, setDateRange] = useState('3y');
-	const [riskFreeRate, setRiskFreeRate] = useState(0.04);
+	const [riskFreeRate, setRiskFreeRate] = useState(4);
 	const [numPortfolios, setNumPortfolios] = useState(20);
 	const [covMethod, setCovMethod] = useState('ledoit');
 
@@ -59,7 +59,7 @@ const CreatePortfolioReportButton: React.FC<CreatePortfolioReportButtonProps> = 
 		setAdditionalStocks([]);
 		setReportType('markowitz');
 		setDateRange('3y');
-		setRiskFreeRate(0.04);
+		setRiskFreeRate(4);
 		setNumPortfolios(20);
 		setCovMethod('ledoit');
 		setForecastHorizons([30, 60, 90, 180, 365, 730, 1095]);
@@ -87,7 +87,7 @@ const CreatePortfolioReportButton: React.FC<CreatePortfolioReportButtonProps> = 
 							input: {
 								additionalTickers: additionalStocks.map((s) => s.ticker),
 								dateRange,
-								riskFreeRate,
+								riskFreeRate: +(riskFreeRate / 100).toFixed(2),
 								numPortfolios,
 								covMethod,
 							},
@@ -360,8 +360,8 @@ const CreatePortfolioReportButton: React.FC<CreatePortfolioReportButtonProps> = 
 												<NumberInputField
 													min={0}
 													max={100}
-													defaultValue="0.04"
-													step={'0.01'}
+													defaultValue={4}
+													step={1}
 													onChange={(e) => {
 														setRiskFreeRate(e.target.value ? parseFloat((+e.target.value).toFixed(2)) : e.target.value as any);
 													}}

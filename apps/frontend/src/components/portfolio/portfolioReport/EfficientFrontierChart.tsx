@@ -40,6 +40,10 @@ const EfficientFrontierChart: FC<EfficientFrontierChartProps> = ({portfolios, se
 		isSelected: index === selected,
 	}));
 
+	const risks = chartData.map(d => d.risk);
+	const minRisk = Math.floor(risks[0]);
+	const maxRisk = Math.ceil(risks[risks.length - 1]);
+
 	return (
 		<Box width="100%" minH="520px" overflowX="auto">
 			<Box width="700px" height="520px"> {/* фиксированный размер */}
@@ -52,6 +56,7 @@ const EfficientFrontierChart: FC<EfficientFrontierChartProps> = ({portfolios, se
 						unit="%"
 						tick={{fontSize: 12}}
 						label={{value: 'Риск (волатильность)', position: 'insideBottom', offset: -10}}
+						domain={[minRisk, maxRisk]}
 					/>
 					<YAxis
 						type="number"

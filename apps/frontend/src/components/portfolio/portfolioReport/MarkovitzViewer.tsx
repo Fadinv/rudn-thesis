@@ -1,5 +1,5 @@
 import CopyPortfolioButton from '@/components/portfolio/portfolioReport/CopyPortfolioButton';
-import EfficientFrontierChart from '@/components/portfolio/portfolioReport/efficientFrontierChart';
+import EfficientFrontierChart from '@/components/portfolio/portfolioReport/EfficientFrontierChart';
 import {
 	useGetDistributedPortfolioAssetsLazyQuery,
 	useGetPortfolioReportQuery, useGetUserPortfoliosQuery,
