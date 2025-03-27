@@ -14,11 +14,12 @@ def get_portfolio_data(report_id, additional_tickers, start_date, end_date):
             WHERE p_r.id = :report_id
         """), {"report_id": report_id}).fetchone()
 
+        print('get_portfolio_data result -> ', result)
         if not result:
             return None
 
         portfolio_id = result[0]
-
+        print('get_portfolio_data portfolio_id -> ', portfolio_id)
         # Получаем акции из портфеля ТОЛЬКО за нужный диапазон дат
         stock_prices = conn.execute(text("""
             SELECT sp.ticker, sp.date, sp.close
@@ -28,7 +29,9 @@ def get_portfolio_data(report_id, additional_tickers, start_date, end_date):
             AND sp.date BETWEEN :start_date AND :end_date
             ORDER BY sp.date ASC
         """), {"portfolio_id": portfolio_id, "start_date": start_date, "end_date": end_date}).fetchall()
-
+        print("Последние 15 цен из stock_prices:")
+        for row in stock_prices[-15:]:
+            print(f"Ticker: {row[0]}, Date: {row[1]}, Close: {row[2]}")
         if not stock_prices and not additional_tickers:
             return None
 
@@ -52,9 +55,11 @@ def get_portfolio_data(report_id, additional_tickers, start_date, end_date):
                 prices_dict[ticker] = []
             prices_dict[ticker].append(close)
 
+        print('prices_dict prices_dict -> ', prices_dict)
         # Вычисляем доходности
         tickers = list(prices_dict.keys())
         returns_matrix = calculate_returns_matrix(stock_prices, tickers)
+        print('prices_dict prices_dict -> ', prices_dict)
 
         return {
             "tickers": tickers,

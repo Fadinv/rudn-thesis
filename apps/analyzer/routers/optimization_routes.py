@@ -21,6 +21,12 @@ async def create_markovitz_report(request: dict):
     risk_free_rate = request["risk_free_rate"]
     num_portfolios = request["num_portfolios"]
     cov_method = request["cov_method"]
+    print('report_id', report_id)
+    print('additional_tickers', additional_tickers)
+    print('date_range', date_range)
+    print('risk_free_rate', risk_free_rate)
+    print('num_portfolios', num_portfolios)
+    print('cov_method', cov_method)
 
     print(f"🔍 Запускаем анализ отчёта {report_id} с дополнительными тикерами: {additional_tickers}")
 

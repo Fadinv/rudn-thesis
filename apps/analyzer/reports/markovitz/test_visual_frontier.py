@@ -13,7 +13,7 @@ def test_plot_efficient_frontier():
     noise = np.random.normal(0, 0.005, size=(100, 3))
     returns = base + noise
     tickers = ["A", "B", "C"]
-    rf = 0.01
+    rf = 0.04
 
     # Генерация эффективной границы
     frontier = calculate_markowitz_efficient_frontier(returns, tickers, rf, num_portfolios=50)

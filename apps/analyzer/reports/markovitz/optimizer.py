@@ -43,46 +43,43 @@ def optimize_max_return_portfolio(mean_returns, cov_matrix, bounds, constraints,
         "weights": dict(zip(tickers, result.x.tolist()))
     }
 
-def generate_efficient_frontier(mean_returns, cov_matrix, tickers, risk_free_rate, min_risk, max_risk, num_portfolios):
-    """Генерация эффективной границы портфелей."""
-    bounds = tuple((0, 1) for _ in tickers)
-    target_risks = np.linspace(min_risk, max_risk, num_portfolios + 2)[1:-1]
-    efficient_frontier = []
-    prev_return = float('-inf')
+def generate_efficient_frontier(mean_returns, cov_matrix, tickers, risk_free_rate, min_ret, max_ret, num_portfolios):
+    """
+    Генерация эффективной границы по фиксированной доходности:
+    - минимизируем риск
+    - при заданной доходности (target_return)
+    """
 
-    print(target_risks)
-    print(len(target_risks))
-    for target_risk in target_risks:
+    bounds = tuple((0, 1) for _ in tickers)
+    efficient_frontier = []
+
+    target_returns = np.linspace(min_ret, max_ret, num_portfolios)
+
+    for target_return in target_returns:
         initial_weights = np.ones(len(tickers)) / len(tickers)
 
-        def sharpe_objective(weights):
-            port_return = np.dot(weights, mean_returns)
-            port_volatility = np.sqrt(np.dot(weights.T, np.dot(cov_matrix, weights)))
-            return -((port_return - risk_free_rate) / port_volatility)
+        def portfolio_volatility(weights):
+            return np.sqrt(np.dot(weights.T, np.dot(cov_matrix, weights)))
 
         constraints = [
             {'type': 'eq', 'fun': lambda w: np.sum(w) - 1},
-            {'type': 'eq', 'fun': lambda w: np.sqrt(np.dot(w.T, np.dot(cov_matrix, w))) - target_risk}
+            {'type': 'eq', 'fun': lambda w: np.dot(w, mean_returns) - target_return}
         ]
 
-        result = minimize(sharpe_objective, initial_weights, bounds=bounds, constraints=constraints)
+        result = minimize(portfolio_volatility, initial_weights, bounds=bounds, constraints=constraints, method='SLSQP')
 
+        print('result.success = ', result.success)
         if result.success:
-            port_return = np.dot(result.x, mean_returns)
-            port_volatility = np.sqrt(np.dot(result.x.T, np.dot(cov_matrix, result.x)))
-            sharpe_ratio = (port_return - risk_free_rate) / port_volatility if port_volatility > 0 else 0
-
-            if port_volatility > max_risk and port_return < mean_returns.max():
-                continue
-            print(port_return, prev_return, target_risk)
+            weights = result.x
+            risk = portfolio_volatility(weights)
+            sharpe = (target_return - risk_free_rate) / risk if risk > 0 else 0
 
             efficient_frontier.append({
-                "risk": port_volatility,
-                "return": port_return,
-                "sharpe_ratio": sharpe_ratio,
-                "weights": dict(zip(tickers, result.x.tolist()))
+                "risk": risk,
+                "return": target_return,
+                "sharpe_ratio": sharpe,
+                "weights": dict(zip(tickers, weights.tolist()))
             })
-            prev_return = port_return
 
     efficient_frontier.sort(key=lambda x: x["return"])
     return efficient_frontier
@@ -117,8 +114,9 @@ def calculate_markowitz_efficient_frontier(
     min_risk_portfolio = optimize_min_risk_portfolio(mean_returns, cov_matrix, bounds, constraints, tickers)
     max_return_portfolio = optimize_max_return_portfolio(mean_returns, cov_matrix, bounds, constraints, tickers)
 
-    min_risk = min_risk_portfolio["risk"]
-    max_risk = max_return_portfolio["risk"]
+    min_ret = min_risk_portfolio["return"]
+    max_ret = max_return_portfolio["return"]
+    print(min_risk_portfolio, max_return_portfolio, mean_returns, cov_matrix, tickers, risk_free_rate, min_ret, max_ret, num_portfolios)
 
     # 2. Генерация промежуточных портфелей
     intermediate_frontier = generate_efficient_frontier(
@@ -126,12 +124,12 @@ def calculate_markowitz_efficient_frontier(
         cov_matrix=cov_matrix,
         tickers=tickers,
         risk_free_rate=risk_free_rate,
-        min_risk=min_risk,
-        max_risk=max_risk,
-        num_portfolios=num_portfolios - 2  # исключаем крайние
+        min_ret=min_ret,
+        max_ret=max_ret,
+        num_portfolios=num_portfolios - 1  # исключаем крайние
     )
 
     # 3. Финальный список портфелей
-    efficient_frontier = [min_risk_portfolio] + intermediate_frontier + [max_return_portfolio]
+    efficient_frontier = [min_risk_portfolio] + intermediate_frontier
 
     return efficient_frontier

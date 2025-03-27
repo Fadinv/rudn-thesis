@@ -124,11 +124,11 @@ def test_generate_efficient_frontier_properties(sample_data):
     min_risk_portfolio = optimize_min_risk_portfolio(mean, cov, bounds, constraints, tickers)
     max_return_portfolio = optimize_max_return_portfolio(mean, cov, bounds, constraints, tickers)
 
-    # Генерация эффективной границы
+    # Генерация эффективной границы по доходности (не по риску!)
     frontier = generate_efficient_frontier(
         mean, cov, tickers, rf,
-        min_risk_portfolio["risk"],
-        max_return_portfolio["risk"],
+        min_risk_portfolio["return"],
+        max_return_portfolio["return"],
         10
     )
 
