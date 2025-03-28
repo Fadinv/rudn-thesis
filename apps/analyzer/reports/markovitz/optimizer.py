@@ -119,17 +119,14 @@ def calculate_markowitz_efficient_frontier(
     print(min_risk_portfolio, max_return_portfolio, mean_returns, cov_matrix, tickers, risk_free_rate, min_ret, max_ret, num_portfolios)
 
     # 2. Генерация промежуточных портфелей
-    intermediate_frontier = generate_efficient_frontier(
+    efficient_frontier = generate_efficient_frontier(
         mean_returns=mean_returns,
         cov_matrix=cov_matrix,
         tickers=tickers,
         risk_free_rate=risk_free_rate,
         min_ret=min_ret,
         max_ret=max_ret,
-        num_portfolios=num_portfolios - 1  # исключаем крайние
+        num_portfolios=num_portfolios  # исключаем крайние
     )
-
-    # 3. Финальный список портфелей
-    efficient_frontier = [min_risk_portfolio] + intermediate_frontier
 
     return efficient_frontier

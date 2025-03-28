@@ -37,6 +37,7 @@ def process_markovitz_report(
     portfolio_data["risk_free_rate"] = risk_free_rate
     return postprocess_markovitz_results(raw_result, portfolio_data, market_returns, date_range)
 
+
 def postprocess_markovitz_results(
     result: list[dict],
     portfolio_data: dict,
