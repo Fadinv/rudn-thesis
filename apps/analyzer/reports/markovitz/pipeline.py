@@ -50,7 +50,8 @@ def postprocess_markovitz_results(
     daily_risk_free_rate = risk_free_rate / 252
 
     for portfolio in result:
-        daily_return = portfolio["return"]
+        daily_return_log = portfolio["return"]  # логарифмическая
+        daily_return = np.exp(daily_return_log) - 1
         daily_risk = portfolio["risk"]
 
         # Перевод в годовые значения
