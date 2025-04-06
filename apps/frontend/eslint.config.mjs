@@ -11,7 +11,7 @@ const compat = new FlatCompat({
 
 const eslintConfig = [
     {
-        ignores: ["src/generated/**"], // ⬅️ вот это добавляем
+        ignores: ["src/generated/**", "src/components/ui/**"], // ⬅️ вот это добавляем
     },
     ...compat.extends("next/core-web-vitals", "next/typescript"),
 ];
