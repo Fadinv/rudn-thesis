@@ -40,11 +40,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 20.13.1
-      - name: Check file resolution
-        run: |
-          ls -la .
-          cat tsconfig.json
-          grep '@/components' src/app/page.tsx || echo "NO ALIAS FOUND"
+
       - name: Cache Node.js dependencies
         uses: actions/cache@v3
         with:
