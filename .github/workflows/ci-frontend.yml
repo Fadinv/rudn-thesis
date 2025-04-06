@@ -16,6 +16,14 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Cache Node.js dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
       - name: Install root dependencies
         run: npm ci
 
