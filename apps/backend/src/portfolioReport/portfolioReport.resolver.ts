@@ -1,5 +1,5 @@
 import {Resolver, Query, Mutation, Args, Int, Float} from '@nestjs/graphql';
-import {PortfolioDistribution} from 'src/portfolioReport/dto/portfolio-distribution.response';
+import {PortfolioDistribution} from './dto/portfolio-distribution.response';
 import {PortfolioReportService} from './portfolioReport.service';
 import {PortfolioReport} from './portfolioReport.entity';
 

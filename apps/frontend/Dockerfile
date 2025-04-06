@@ -1,15 +1,22 @@
 FROM node:20-alpine
 
-WORKDIR /app
+# Установим рабочую директорию как корень монорепо
+WORKDIR /monorepo
 
-# Копируем только frontend package.json
-COPY ./apps/frontend/package.json ./
+# Копируем package.json и lock
+COPY package.json package-lock.json ./
 
-# Устанавливаем зависимости только для frontend
-RUN npm install --omit=dev
+# Копируем весь monorepo (чтобы попасть в workspaces)
+COPY . .
 
-# Копируем все файлы из папки frontend
-COPY ./apps/frontend ./
+# Установим все зависимости
+RUN npm ci
 
-# Запускаем приложение в dev-режиме
+# Перейдём в frontend
+WORKDIR /monorepo/apps/frontend
+
+# Экспонируем порт
+EXPOSE 3000
+
+# Запускаем dev-режим
 CMD ["npm", "run", "dev"]

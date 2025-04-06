@@ -31,11 +31,7 @@ import {UsersService} from './users/users.service';
 		}),
 		TypeOrmModule.forRoot({
 			type: 'postgres',
-			host: 'postgres',
-			port: 5432,
-			username: 'postgres',
-			password: 'password',
-			database: 'portfolio_db',
+			url: process.env.DATABASE_URL,
 			autoLoadEntities: true,
 			synchronize: true,
 		}),

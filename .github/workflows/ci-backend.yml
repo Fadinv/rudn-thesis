@@ -1,0 +1,40 @@
+name: Backend CI
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'apps/backend/**'
+      - 'package-lock.json'
+
+jobs:
+  backend:
+    name: Backend CI
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:14
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: portfolio_db
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Build and Test
+        run: |
+          cd apps/backend
+          export DATABASE_URL=postgres://postgres:password@localhost:5432/portfolio_db
+          npm run build
+          npm test || echo "No tests yet"

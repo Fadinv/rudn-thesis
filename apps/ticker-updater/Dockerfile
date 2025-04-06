@@ -1,13 +1,22 @@
 FROM node:20-alpine
 
-WORKDIR /app
+# Переходим в корень монорепо
+WORKDIR /monorepo
 
-# Копируем package.json
-COPY ./apps/ticker-updater/package.json ./
-RUN npm install
+# Копируем корневые package.json и lock
+COPY package.json package-lock.json ./
 
-# Копируем все файлы из проекта
-COPY ./apps/ticker-updater ./
+# Копируем весь монорепозиторий (включая workspaces)
+COPY . .
 
+# Устанавливаем зависимости один раз для всех workspaces
+RUN npm ci
+
+# Переходим в директорию ticker-updater
+WORKDIR /monorepo/apps/ticker-updater
+
+# Собираем TypeScript код
 RUN npm run build
+
+# Запуск сервиса
 CMD ["npm", "run", "start"]

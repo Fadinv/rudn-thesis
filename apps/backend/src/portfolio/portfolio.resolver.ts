@@ -1,7 +1,7 @@
 import {Resolver, Query, Mutation, Args, Int} from '@nestjs/graphql';
 import {
 	StocksWhileCreatingPortfolio,
-} from 'src/portfolio/dto/stocks-while-creatings-portfolio.input';
+} from './dto/stocks-while-creatings-portfolio.input';
 import {AuthUser} from '../auth/auth-user.decorator';
 import {PortfolioStockUpdateInput} from './portfolio.inputs';
 import {PortfolioService} from './portfolio.service';

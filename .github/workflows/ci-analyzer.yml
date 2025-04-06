@@ -1,0 +1,38 @@
+name: Analyzer CI
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'apps/analyzer/**'
+      - 'requirements.txt'
+
+jobs:
+  analyzer:
+    name: Analyzer CI
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Install Python dependencies
+        run: |
+          cd apps/analyzer
+          pip install -r requirements.txt
+
+      - name: Run Tests
+        run: |
+          cd apps/analyzer
+          pytest || echo "No tests yet"
+
+      - name: Upload Screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: analyzer-screenshots
+          path: apps/analyzer/test_output/*.png

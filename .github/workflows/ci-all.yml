@@ -1,0 +1,17 @@
+name: CI All
+
+on:
+  workflow_dispatch:
+
+jobs:
+  call-backend:
+    uses: ./.github/workflows/ci-backend.yml
+
+  call-frontend:
+    uses: ./.github/workflows/ci-frontend.yml
+
+  call-ticker:
+    uses: ./.github/workflows/ci-ticker-updater.yml
+
+  call-analyzer:
+    uses: ./.github/workflows/ci-analyzer.yml

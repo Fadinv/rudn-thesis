@@ -1,6 +1,10 @@
 import axios from 'axios';
 import {Client} from 'pg';
 import {SP500List} from './SP500List';
+import * as dotenv from 'dotenv';
+
+dotenv.config({path: '../../.env.shared'});
+dotenv.config({path: './.env'});
 
 const API_KEY = process.env.POLYGON_API_KEY!;
 const DB_URL = process.env.DATABASE_URL!;

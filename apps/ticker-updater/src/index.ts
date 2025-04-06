@@ -1,5 +1,5 @@
 import * as cron from 'node-cron';
-import { updateTickers } from './updateTickers';
+import {updateTickers} from './updateTickers';
 
 console.log('✅ Сервис обновления тикеров запущен.');
 

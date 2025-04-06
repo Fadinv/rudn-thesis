@@ -7,7 +7,7 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: portfolio_db
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
 
@@ -25,8 +25,9 @@ services:
     environment:
       DATABASE_URL: postgres://postgres:password@postgres:5432/portfolio_db
     volumes:
-      - ./apps/backend:/app
-    command: sh -c "npm install && npm run start:dev"
+      - .:/monorepo
+    working_dir: /monorepo/apps/backend
+    command: npm run start:dev
 
   frontend:
     build:
@@ -34,11 +35,15 @@ services:
       dockerfile: apps/frontend/Dockerfile
     ports:
       - "3000:3000"
+    environment:
+      - NEXT_FORCE_SWCPACKAGE=@next/swc-wasm-nodejs
     depends_on:
       - backend
     volumes:
-      - ./apps/frontend:/app
-    command: sh -c "npm install && npm run dev"
+      - .:/monorepo
+      - /monorepo/node_modules
+    working_dir: /monorepo/apps/frontend
+    command: npm run dev
 
   ticker-updater:
     build:
@@ -47,11 +52,14 @@ services:
     env_file:
       - ./.env.shared
       - ./apps/ticker-updater/.env
+    environment:
+      DATABASE_URL: postgres://postgres:password@postgres:5432/portfolio_db
     depends_on:
       - postgres
     volumes:
-      - ./apps/ticker-updater:/app
-    command: sh -c "npm install && npm run start"
+      - .:/monorepo
+    working_dir: /monorepo/apps/ticker-updater
+    command: npm run start
 
   analyzer:
     build: ./apps/analyzer

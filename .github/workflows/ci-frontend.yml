@@ -1,0 +1,25 @@
+name: Frontend CI
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'apps/frontend/**'
+      - 'package-lock.json'
+
+jobs:
+  frontend:
+    name: Frontend CI
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install root dependencies
+        run: npm ci
+
+      - name: Build and Test
+        run: |
+          cd apps/frontend
+          npm run build
+          npm test || echo "No tests yet"

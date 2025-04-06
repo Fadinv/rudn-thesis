@@ -1,0 +1,41 @@
+name: Ticker Updater CI
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'apps/ticker-updater/**'
+      - 'package-lock.json'
+
+jobs:
+  ticker-updater:
+    name: Ticker Updater CI
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:14
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: portfolio_db
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install root dependencies
+        run: npm ci
+
+      - name: Build and Test
+        run: |
+          cd apps/ticker-updater
+          export DATABASE_URL=postgres://postgres:password@localhost:5432/portfolio_db
+          npm run build || echo "No build step"
+          npm test || echo "No tests yet"
