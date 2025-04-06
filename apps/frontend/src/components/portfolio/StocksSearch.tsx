@@ -8,7 +8,7 @@ import {
 	DrawerCloseTrigger,
 } from '@/components/ui/drawer';
 import {GetStockByIdQuery, useSearchStocksLazyQuery} from '@/generated/graphql-hooks';
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {Input, Box, IconButton, Icon, Button, Stack, Flex, Spinner, Text} from '@chakra-ui/react';
 import {FaSearch} from 'react-icons/fa';
 
@@ -25,15 +25,17 @@ const StockSearch: React.FC<StockSearchProps> = ({onSelectStock, stockData}) => 
 		fetchPolicy: 'cache-first',
 	});
 
+	const doSearch = useCallback(() => {
+		return search({variables: {search: searchTerm}});
+	}, [searchTerm, search]);
+
 	useEffect(() => {
 		if (searchTerm.length > 1) void doSearch();
-	}, [searchTerm]);
+	}, [searchTerm, doSearch]);
 
 	const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setSearchTerm(e.target.value);
 	};
-
-	const doSearch = () => search({variables: {search: searchTerm}});
 
 	const handleSelectStock = (stockId: number, stockName: string, stockTicker: string) => {
 		onSelectStock(stockId, stockName, stockTicker);

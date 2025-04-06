@@ -82,7 +82,7 @@ const ForecastGBMViewer: FC<ForecastGBMViewerProps> = ({reportId}) => {
 		}).sort((a, b) => a.date - b.date));
 		setPersentiles(Array.from(newPercentiles).reverse());
 
-	}, [data, reportData, selectedStock]);
+	}, [data, reportData, selectedStock, forecastData]);
 
 	if (loading) return <Text>Загрузка...</Text>;
 	if (!reportData) return <Text>Нет данных</Text>;

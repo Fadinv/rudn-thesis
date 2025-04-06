@@ -37,7 +37,7 @@ const ShowPortfolioReportButton: React.FC<CreatePortfolioReportButtonProps> = ({
 
 	useEffect(() => {
 		if (open) void refetch();
-	}, [open]);
+	}, [open, refetch]);
 
 	const openedReport = portfolioReports?.find((r) => r.id === openedReportId);
 

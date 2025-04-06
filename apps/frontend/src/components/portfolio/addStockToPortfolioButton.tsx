@@ -50,7 +50,7 @@ const AddStockToPortfolioButton: React.FC<AddStockToPortfolioProps> = ({
 	useEffect(() => {
 		if (!selectedStockId) return;
 		void getStockById({variables: {id: selectedStockId}});
-	}, [selectedStockId]);
+	}, [selectedStockId, getStockById]);
 
 	const handleSave = async () => {
 		if (!selectedStockId) return;
