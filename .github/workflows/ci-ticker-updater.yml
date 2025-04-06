@@ -2,6 +2,7 @@ name: Ticker Updater CI
 
 on:
   workflow_dispatch:
+  workflow_call:
 #  push:
 #    paths:
 #      - 'apps/ticker-updater/**'
