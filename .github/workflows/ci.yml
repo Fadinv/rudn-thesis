@@ -58,7 +58,6 @@ jobs:
 
       - name: Install and Test Frontend
         run: |
-          cd apps/frontend
           npm ci
           npm run build
           npm test || echo "No tests yet"
