@@ -1,3 +1,4 @@
+'use client';
 import {
 	DrawerActionTrigger,
 	DrawerBackdrop, DrawerBody, DrawerCloseTrigger,

@@ -1,3 +1,4 @@
+'use client';
 import {NumberInputField, NumberInputRoot} from '@/components/ui/number-input';
 import {
 	SelectContent,
