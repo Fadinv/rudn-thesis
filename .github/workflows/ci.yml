@@ -41,22 +41,21 @@ jobs:
         with:
           node-version: 20.13.1
 
-      - name: Cache Node.js dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-npm-
+      - name: Check file resolution
+        run: |
+          cd apps/frontend
+          ls -la .
+          cat tsconfig.json
+          grep '@/components' src/app/page.tsx || echo "NO ALIAS FOUND"
+          cd ../..
 
-      - name: Install root dependencies
-        run: npm ci
+      - name: Install and Test Frontend
+        run: |
+          cd apps/frontend
+          npm ci
+          npm run build
+          npm test || echo "No tests yet"
 
-      - name: Build frontend via turbo
-        run: npx turbo run build --filter=frontend...
-
-      - name: Test frontend
-        run: npx turbo run test --filter=frontend... || echo "No tests yet"
   ticker-updater:
     name: Ticker Updater CI
     runs-on: ubuntu-latest
