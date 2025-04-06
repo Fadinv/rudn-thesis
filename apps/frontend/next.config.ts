@@ -6,7 +6,8 @@ const nextConfig: NextConfig = {
 		optimizePackageImports: ['@chakra-ui/react'],
 	},
 	typescript: {
-		tsconfigPath: './tsconfig.json',
+		// Абсолютный путь до tsconfig
+		tsconfigPath: path.resolve(__dirname, 'tsconfig.json'),
 	},
 	webpack(config) {
 		config.resolve.alias['@'] = path.resolve(__dirname, 'src');
