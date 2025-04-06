@@ -2,10 +2,10 @@ name: Backend CI
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - 'apps/backend/**'
-      - 'package-lock.json'
+#  push:
+#    paths:
+#      - 'apps/backend/**'
+#      - 'package-lock.json'
 
 jobs:
   backend:

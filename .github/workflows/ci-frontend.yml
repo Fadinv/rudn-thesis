@@ -2,10 +2,10 @@ name: Frontend CI
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - 'apps/frontend/**'
-      - 'package-lock.json'
+#  push:
+#    paths:
+#      - 'apps/frontend/**'
+#      - 'package-lock.json'
 
 jobs:
   frontend:

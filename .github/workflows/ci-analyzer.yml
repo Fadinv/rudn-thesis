@@ -2,10 +2,10 @@ name: Analyzer CI
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - 'apps/analyzer/**'
-      - 'requirements.txt'
+#  push:
+#    paths:
+#      - 'apps/analyzer/**'
+#      - 'requirements.txt'
 
 jobs:
   analyzer:

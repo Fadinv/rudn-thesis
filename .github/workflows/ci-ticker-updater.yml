@@ -2,10 +2,10 @@ name: Ticker Updater CI
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - 'apps/ticker-updater/**'
-      - 'package-lock.json'
+#  push:
+#    paths:
+#      - 'apps/ticker-updater/**'
+#      - 'package-lock.json'
 
 jobs:
   ticker-updater:
