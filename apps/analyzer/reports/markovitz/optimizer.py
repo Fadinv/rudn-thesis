@@ -66,7 +66,7 @@ def generate_efficient_frontier(mean_returns, cov_matrix, tickers, risk_free_rat
             {'type': 'eq', 'fun': lambda w: np.dot(w, mean_returns) - target_return}
         ]
 
-        result = minimize(portfolio_volatility, initial_weights, bounds=bounds, constraints=constraints, method='SLSQP')
+        result = minimize(portfolio_volatility, initial_weights, bounds=bounds, constraints=constraints)
 
         print('result.success = ', result.success)
         if result.success:
