@@ -1,4 +1,4 @@
-import React, { useState} from 'react';
+import React, {useState} from 'react';
 import {Button, Icon, IconButton, Text} from '@chakra-ui/react';
 import {FaTrash} from 'react-icons/fa';
 import {useDeletePortfolioReportMutation} from '@/generated/graphql-hooks';
@@ -25,7 +25,7 @@ const DeletePortfolioReportButton: React.FC<DeletePortfolioButtonProps> = ({
 	                                                                           onDelete,
                                                                            }) => {
 	const [open, setOpen] = useState(false);
-	const [deletePortfolio, {loading, error}] = useDeletePortfolioReportMutation();
+	const [deletePortfolio, {loading}] = useDeletePortfolioReportMutation();
 
 	const handleDelete: React.MouseEventHandler = async (e) => {
 		e.stopPropagation();

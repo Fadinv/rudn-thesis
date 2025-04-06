@@ -14,7 +14,7 @@ interface HomeProps {
 
 const Home: React.FC<HomeProps> = ({onAddStock, onUpdateStock}) => {
 	const [selectedPortfolioId, setSelectedPortfolioId] = useState<number | null>(null);
-	const {data, error, loading} = useGetUserPortfoliosQuery();
+	const {data} = useGetUserPortfoliosQuery();
 
 	return (
 		<Flex style={{flex: 1}}>

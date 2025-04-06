@@ -51,8 +51,8 @@ const CreatePortfolioReportButton: React.FC<CreatePortfolioReportButtonProps> = 
 	const [forecastHorizons, setForecastHorizons] = useState([30, 60, 90, 180, 365, 730, 1095]);
 
 	const [dateRange, setDateRange] = useState('3y');
-	const [riskFreeRate, setRiskFreeRate] = useState(4);
-	const [numPortfolios, setNumPortfolios] = useState(20);
+	const [riskFreeRate, setRiskFreeRate] = useState<number | null>(4);
+	const [numPortfolios, setNumPortfolios] = useState<number | null>(20);
 	const [covMethod, setCovMethod] = useState('ledoit');
 
 	useEffect(() => {
@@ -87,7 +87,7 @@ const CreatePortfolioReportButton: React.FC<CreatePortfolioReportButtonProps> = 
 							input: {
 								additionalTickers: additionalStocks.map((s) => s.ticker),
 								dateRange,
-								riskFreeRate: +(riskFreeRate / 100).toFixed(2),
+								riskFreeRate: +(riskFreeRate! / 100).toFixed(2),
 								numPortfolios,
 								covMethod,
 							},
@@ -291,7 +291,7 @@ const CreatePortfolioReportButton: React.FC<CreatePortfolioReportButtonProps> = 
 													onValueChange={(details) => {
 														const v = details.value[0];
 														const p50 = v;
-														let p10 = Math.min(selectedPercentiles[0], p50 - 5);
+														const p10 = Math.min(selectedPercentiles[0], p50 - 5);
 														let p90 = Math.max(p50 + 5, selectedPercentiles[2]);
 														p90 = Math.min(p90, 99);
 														setSelectedPercentiles([p10, p50, p90]);
@@ -309,8 +309,8 @@ const CreatePortfolioReportButton: React.FC<CreatePortfolioReportButtonProps> = 
 													value={[selectedPercentiles[2]]}
 													onValueChange={(details) => {
 														const p90 = details.value[0];
-														let p50 = Math.min(selectedPercentiles[1], p90 - 5);
-														let p10 = Math.min(selectedPercentiles[0], p50 - 5);
+														const p50 = Math.min(selectedPercentiles[1], p90 - 5);
+														const p10 = Math.min(selectedPercentiles[0], p50 - 5);
 														setSelectedPercentiles([p10, p50, p90]);
 													}}
 												/>
@@ -363,7 +363,7 @@ const CreatePortfolioReportButton: React.FC<CreatePortfolioReportButtonProps> = 
 													defaultValue={4}
 													step={1}
 													onChange={(e) => {
-														setRiskFreeRate(e.target.value ? parseFloat((+e.target.value).toFixed(2)) : e.target.value as any);
+														setRiskFreeRate(e.target.value ? parseFloat((+e.target.value).toFixed(2)) : null);
 													}}
 												/>
 											</NumberInputRoot>

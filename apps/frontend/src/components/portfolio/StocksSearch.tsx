@@ -1,6 +1,5 @@
 import {
 	DrawerRoot,
-	DrawerTrigger,
 	DrawerContent,
 	DrawerHeader,
 	DrawerBody,
@@ -9,10 +8,9 @@ import {
 	DrawerCloseTrigger,
 } from '@/components/ui/drawer';
 import {GetStockByIdQuery, useSearchStocksLazyQuery} from '@/generated/graphql-hooks';
-import {Stock} from '@/generated/graphql-types';
 import React, {useEffect, useState} from 'react';
 import {Input, Box, IconButton, Icon, Button, Stack, Flex, Spinner, Text} from '@chakra-ui/react';
-import {FaSearch, FaPlus} from 'react-icons/fa';
+import {FaSearch} from 'react-icons/fa';
 
 interface StockSearchProps {
 	onSelectStock: (stockId: number, stockName: string, stockTicker: string) => void;

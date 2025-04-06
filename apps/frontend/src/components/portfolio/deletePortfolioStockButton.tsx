@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Button, Field, Icon, IconButton, Text} from '@chakra-ui/react';
+import {Button, Icon, IconButton, Text} from '@chakra-ui/react';
 import {FaTrash} from 'react-icons/fa';
 import {useDeletePortfolioStockMutation} from '@/generated/graphql-hooks';
 import {
@@ -25,7 +25,7 @@ const DeletePortfolioStockButton: React.FC<DeletePortfolioStockButtonProps> = ({
 	                                                                               onDelete,
                                                                                }) => {
 	const [open, setOpen] = useState(false);
-	const [deletePortfolioStock, {loading, error}] = useDeletePortfolioStockMutation();
+	const [deletePortfolioStock, {loading}] = useDeletePortfolioStockMutation();
 
 	const handleDelete = async () => {
 		try {

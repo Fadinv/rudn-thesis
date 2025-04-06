@@ -1,12 +1,11 @@
 import {MarkovitzData} from '@/components/portfolio/portfolioReport/MarkovitzViewer';
-import React, {FC, useEffect, useState} from 'react';
+import React, {FC} from 'react';
 import {
 	ScatterChart,
 	Scatter,
 	XAxis,
 	YAxis,
 	Tooltip,
-	ResponsiveContainer,
 	Legend,
 	ZAxis,
 	CartesianGrid, Cell,
@@ -69,7 +68,7 @@ const EfficientFrontierChart: FC<EfficientFrontierChartProps> = ({portfolios, se
 					<ZAxis type="number" dataKey="sharpe" range={[100, 300]} name="Sharpe Ratio"/>
 					<Tooltip
 						cursor={{strokeDasharray: '3 3'}}
-						formatter={(value: number, name: string) => `${value.toFixed(2)}`}
+						formatter={(value: number) => `${value.toFixed(2)}`}
 						labelFormatter={() => ''}
 					/>
 					<Legend verticalAlign="top" height={36}/>
@@ -77,7 +76,7 @@ const EfficientFrontierChart: FC<EfficientFrontierChartProps> = ({portfolios, se
 						name="Портфели"
 						data={chartData}
 						shape="circle"
-						onClick={(e: any) => onSelect(e.index)}
+						onClick={(e) => onSelect(e.index)}
 					>
 						{chartData.map((entry, index) => (
 							<Cell

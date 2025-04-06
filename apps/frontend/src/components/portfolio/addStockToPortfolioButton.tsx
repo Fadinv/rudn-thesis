@@ -41,8 +41,8 @@ const AddStockToPortfolioButton: React.FC<AddStockToPortfolioProps> = ({
 
 	const [getStockById, {
 		data: stockData,
-		loading: stockByTickerIsLoading,
-		error: stockDataError,
+		// loading: stockByTickerIsLoading,
+		// error: stockDataError,
 	}] = useGetStockByIdLazyQuery({
 		fetchPolicy: 'cache-first',
 	});

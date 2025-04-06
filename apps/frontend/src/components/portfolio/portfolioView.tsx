@@ -1,11 +1,11 @@
+import React from 'react';
 import AddStockToPortfolioButton from '@/components/portfolio/addStockToPortfolioButton';
 import CreatePortfolioReportButton from '@/components/portfolio/createPortfolioReportButton';
 import DeletePortfolioStockButton from '@/components/portfolio/deletePortfolioStockButton';
 import EditPortfolioStockButton from '@/components/portfolio/editPortfolioStockButton';
 import ShowPortfolioReportButton from '@/components/portfolio/portfolioReport/ShowPortfolioReportButton';
 import {useGetPortfolioStocksQuery} from '@/generated/graphql-hooks';
-import React from 'react';
-import {Box, Text, Table, Spinner, Flex} from '@chakra-ui/react';
+import {Text, Table, Spinner, Flex} from '@chakra-ui/react';
 
 interface PortfolioViewProps {
 	portfolioId: number;
@@ -13,7 +13,7 @@ interface PortfolioViewProps {
 	onUpdateStock: (portfolioId: number, stockId: number) => void;
 }
 
-const PortfolioView: React.FC<PortfolioViewProps> = ({portfolioId, onAddStock, onUpdateStock}) => {
+const PortfolioView: React.FC<PortfolioViewProps> = ({portfolioId}) => {
 	const {data, loading, error, refetch} = useGetPortfolioStocksQuery({variables: {portfolioId}});
 
 	return (

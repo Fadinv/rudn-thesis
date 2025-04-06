@@ -3,7 +3,7 @@ import Header from '@/components/header/header';
 import LoginForm from '@/components/loginForm/loginForm';
 import {ColorModeProvider, useColorMode} from '@/components/ui/color-mode';
 import {useCurrentUserQuery} from '@/generated/graphql-hooks';
-import {Spinner, Center, Box, Theme, defaultSystem, ChakraProvider, Flex} from '@chakra-ui/react';
+import {Spinner, Center, Theme, defaultSystem, ChakraProvider, Flex} from '@chakra-ui/react';
 
 const Layout = ({children}: { children: React.ReactNode }) => {
 	const {data, loading, error} = useCurrentUserQuery();

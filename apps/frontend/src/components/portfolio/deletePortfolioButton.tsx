@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
-import {Button, Field, Icon, IconButton, Text} from '@chakra-ui/react';
-import {FaTrash, FaTimes} from 'react-icons/fa';
+import {Button, Icon, IconButton, Text} from '@chakra-ui/react';
+import {FaTrash} from 'react-icons/fa';
 import {useDeletePortfolioMutation} from '@/generated/graphql-hooks';
 import {
 	DialogRoot,
@@ -25,7 +25,7 @@ const DeletePortfolioButton: React.FC<DeletePortfolioButtonProps> = ({
 	                                                                     onDelete,
                                                                      }) => {
 	const [open, setOpen] = useState(false);
-	const [deletePortfolio, {loading, error}] = useDeletePortfolioMutation();
+	const [deletePortfolio, {loading}] = useDeletePortfolioMutation();
 
 	const handleDelete = async () => {
 		try {

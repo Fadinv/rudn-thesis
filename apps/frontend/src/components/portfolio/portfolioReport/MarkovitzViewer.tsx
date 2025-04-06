@@ -1,7 +1,6 @@
 import CopyPortfolioButton from '@/components/portfolio/portfolioReport/CopyPortfolioButton';
 import EfficientFrontierChart from '@/components/portfolio/portfolioReport/EfficientFrontierChart';
 import {
-	useGetDistributedPortfolioAssetsLazyQuery,
 	useGetPortfolioReportQuery, useGetUserPortfoliosQuery,
 } from '@/generated/graphql-hooks';
 import React, {FC, JSX, useState} from 'react';
@@ -54,8 +53,6 @@ const MarkovitzViewer: FC<MarkovitzViewerProps> = ({reportId}) => {
 	const reports = data?.getPortfolioReport?.data as MarkovitzData | undefined;
 	const totalPortfolios = reports?.length ?? 0;
 	const report = reports?.[selectedPortfolio];
-
-	const [getDistributedPortfolioAssets, {loading: getDistributedPortfolioAssetsIsLoading}] = useGetDistributedPortfolioAssetsLazyQuery();
 
 	if (!reportId) return null;
 

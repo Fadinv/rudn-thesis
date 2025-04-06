@@ -5,7 +5,7 @@ const Profile = () => {
 	return (
 		<Box>
 			<Text fontSize="xl" textAlign="center" color="gray.500">
-				Находится в разработке "Profile"
+				Находится в разработке (Profile)
 			</Text>
 		</Box>
 	);

@@ -6,7 +6,6 @@ import {useGetUserPortfoliosQuery} from '@/generated/graphql-hooks';
 import {Portfolio} from '@/generated/graphql-types';
 import {
 	Box,
-	Button,
 	Stack,
 	Text,
 	Flex,
