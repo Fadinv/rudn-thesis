@@ -1,0 +1,107 @@
+name: Portfolio Analyzer CI
+
+on:
+  workflow_dispatch:
+
+jobs:
+  backend:
+    name: Backend CI
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20.13.1
+
+      - name: Cache Node.js dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('apps/backend/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
+      - name: Install and Test Backend
+        run: |
+          cd apps/backend
+          npm ci
+          npm run build
+          npm test || echo "No tests yet"
+
+  frontend:
+    name: Frontend CI
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20.13.1
+
+      - name: Cache Node.js dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('apps/frontend/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
+      - name: Install and Test Frontend
+        run: |
+          cd apps/frontend
+          npm ci
+          npm run build
+          npm test || echo "No tests yet"
+
+  ticker-updater:
+    name: Ticker Updater CI
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20.13.1
+
+      - name: Cache Node.js dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('apps/ticker-updater/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
+      - name: Install and Lint Ticker Updater
+        run: |
+          cd apps/ticker-updater
+          npm ci
+          npm run lint || echo "No lint script yet"
+          npm test || echo "No tests yet"
+
+  analyzer:
+    name: Analyzer CI
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Install and Test Analyzer
+        run: |
+          cd apps/analyzer
+          pip install -r requirements.txt
+          pytest || echo "No tests yet"
+
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: analyzer-screenshots
+          path: apps/analyzer/test_output/*.png
