@@ -1,4 +1,3 @@
-'use client';
 import StockSearch from '@/components/portfolio/StocksSearch';
 import React, {useEffect, useState} from 'react';
 import {Button, Icon} from '@chakra-ui/react';

@@ -1,4 +1,4 @@
-import ClientProviders from '@/components/clientProviders';
+import ClientProviders from '@/app/clientProviders';
 import React from 'react';
 
 export default function RootLayout({children}: { children: React.ReactNode }) {

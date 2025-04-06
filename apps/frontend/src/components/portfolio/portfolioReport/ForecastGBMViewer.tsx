@@ -1,4 +1,3 @@
-'use client';
 import {useGetPortfolioReportQuery} from '@/generated/graphql-hooks';
 import React, {FC, useEffect, useState} from 'react';
 import {XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Area, AreaChart} from 'recharts';

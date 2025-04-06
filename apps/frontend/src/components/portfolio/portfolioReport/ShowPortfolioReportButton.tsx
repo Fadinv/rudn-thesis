@@ -1,4 +1,3 @@
-'use client';
 import ForecastGBMViewer from '@/components/portfolio/portfolioReport/ForecastGBMViewer';
 import MarkovitzViewer from '@/components/portfolio/portfolioReport/MarkovitzViewer';
 import PortfolioReportCard from '@/components/portfolio/portfolioReport/PortfolioReportCard';
