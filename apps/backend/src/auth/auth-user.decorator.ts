@@ -15,7 +15,7 @@ export const AuthUser = createParamDecorator(async (_data: unknown, ctx: Executi
 
 	try {
 		const payload = jwtService.verify(req.cookies.access_token);
-		const user = await usersService.findById(payload.userId);
+		const user = await usersService.findById(payload.sub);
 
 		if (!user) throw new UnauthorizedException(); // ❌ Если юзер не найден
 

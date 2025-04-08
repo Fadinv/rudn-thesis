@@ -1,8 +1,10 @@
 import {useCurrentUserQuery, useLogoutMutation} from '@/generated/graphql-hooks';
+import {useApolloClient} from '@apollo/client';
 import {Button} from '@chakra-ui/react';
 import React, {MouseEventHandler} from 'react';
 
 export const Logout = () => {
+	const client = useApolloClient();
 	const [logout, {loading}] = useLogoutMutation();
 	const {refetch: refetchCurrentUser} = useCurrentUserQuery();
 
@@ -10,6 +12,7 @@ export const Logout = () => {
 		e.preventDefault();
 		try {
 			await logout();
+			await client.resetStore();
 			await refetchCurrentUser();
 		} catch (err) {
 			console.error('Login error:', err);

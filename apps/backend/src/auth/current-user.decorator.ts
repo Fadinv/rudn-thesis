@@ -12,7 +12,7 @@ export const CurrentUser = createParamDecorator(
 
 		try {
 			const payload = jwtService.verify(req.cookies.access_token);
-			return await usersService.findById(payload.userId);
+			return await usersService.findById(payload.sub);
 		} catch (err) {
 			console.error('Ошибка валидации JWT:', err);
 			return null;
