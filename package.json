@@ -8,6 +8,7 @@
     "dev:backend": "npm run dev --workspace apps/backend",
     "dev:tickers": "npm run dev --workspace apps/ticker-updater",
     "dev:frontend": "npm run dev --workspace apps/frontend",
+    "build:frontend": "npm run build --workspace=apps/frontend",
     "build": "turbo run build",
     "start": "docker compose up --build",
     "restart": "docker compose down && docker compose up --build",
