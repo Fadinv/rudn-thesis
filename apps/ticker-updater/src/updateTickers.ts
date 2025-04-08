@@ -133,12 +133,12 @@ async function updateTickers() {
 	const client = new Client({connectionString: DB_URL});
 	await client.connect();
 
-	// const tickers = await fetchTickers();
-	const tickers: any[] = [];
+	const tickers = await fetchTickers();
+	// const tickers: any[] = [];
 	if (tickers.length === 0) {
 		console.log('❌ Нет новых данных.');
-		// await client.end();
-		// return;
+		await client.end();
+		return;
 	}
 
 	let count = 0;
