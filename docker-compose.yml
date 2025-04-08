@@ -59,7 +59,7 @@ services:
     volumes:
       - .:/monorepo
     working_dir: /monorepo/apps/ticker-updater
-    command: npm run start
+    command: npm run start:dev
 
   analyzer:
     build: ./apps/analyzer

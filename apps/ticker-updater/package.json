@@ -9,7 +9,8 @@
     "watch": "tsc -w",
     "serve": "node dist/index.js",
     "prestart": "npm run build",
-    "start": "npm-run-all --parallel watch serve"
+    "start:dev": "npm-run-all --parallel watch serve",
+    "start": "node dist/index.js"
   },
   "dependencies": {
     "axios": "^1.4.0",
