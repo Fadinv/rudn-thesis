@@ -41,11 +41,11 @@ export class AuthResolver {
 	@Mutation(() => Boolean)
 	async logout(@Context('res') res: Response): Promise<boolean> {
 		res.clearCookie('access_token', {
-			httpOnly: true,  // ✅ Доступен только серверу
-			secure: process.env.NODE_ENV === 'production', // ✅ Только HTTPS в продакшене
-			sameSite: 'none',
+			httpOnly: true,
+			secure: process.env.NODE_ENV === 'production',
+			sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+			path: '/',
 		});
-		return true; // ✅ Успешный выход
+		return true;
 	}
-
 }
