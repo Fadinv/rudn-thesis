@@ -30,7 +30,7 @@ export class AuthResolver {
 		res.cookie('access_token', result.access_token, {
 			httpOnly: true,
 			secure: process.env.NODE_ENV === 'production',
-			sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+			sameSite: 'lax',
 			path: '/',
 			maxAge: 60 * 60 * 1000,
 		});
@@ -43,7 +43,7 @@ export class AuthResolver {
 		res.clearCookie('access_token', {
 			httpOnly: true,
 			secure: process.env.NODE_ENV === 'production',
-			sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+			sameSite: 'lax',
 			path: '/',
 		});
 		return true;
