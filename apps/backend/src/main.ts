@@ -1,6 +1,6 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import {NestFactory} from '@nestjs/core';
+import {AppModule} from './app.module';
+import {ValidationPipe} from '@nestjs/common';
 import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
@@ -11,8 +11,12 @@ async function bootstrap() {
 
 	// Настраиваем CORS
 	app.enableCors({
-		origin: ['http://localhost:3000', 'http://localhost:4000/graphql'], // cors
-		credentials: true, // Разрешаем передачу кук и заголовков авторизации
+		origin: [
+			'https://rudn-thesis.vercel.app',
+			'http://localhost:3000',
+			'http://localhost:4000',
+		],
+		credentials: true,
 	});
 
 	// Настраиваем GraphQL-контекст, чтобы Passport мог работать
