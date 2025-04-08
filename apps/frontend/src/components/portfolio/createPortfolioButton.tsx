@@ -37,7 +37,7 @@ const CreatePortfolioButton: React.FC<CreatePortfolioModalProps> = (props) => {
 		<DrawerRoot size={'lg'} open={open} onOpenChange={(e) => setOpen(e.open)}>
 			<DrawerBackdrop/>
 			<DrawerTrigger asChild>
-				<Button variant="solid" size="lg">
+				<Button w={'100%'} variant="solid" size="lg">
 					<Icon as={FaPlus} mr={2}/> Создать портфель
 				</Button>
 			</DrawerTrigger>
