@@ -52,8 +52,6 @@ services:
     env_file:
       - ./.env.shared
       - ./apps/ticker-updater/.env
-    environment:
-      DATABASE_URL: postgres://postgres:password@postgres:5432/portfolio_db
     depends_on:
       - postgres
     volumes:
