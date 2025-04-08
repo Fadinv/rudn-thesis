@@ -30,7 +30,7 @@ export class AuthResolver {
 		res.cookie('access_token', result.access_token, {
 			httpOnly: true,  // ✅ Доступен только серверу
 			secure: process.env.NODE_ENV === 'production', // ✅ Только HTTPS в продакшене
-			sameSite: 'lax', // ✅ Защита от CSRF
+			sameSite: 'none',
 			maxAge: 60 * 60 * 1000, // ✅ 1 час
 		});
 		return result.access_token;  // Возвращаем токен
@@ -42,7 +42,7 @@ export class AuthResolver {
 		res.clearCookie('access_token', {
 			httpOnly: true,  // ✅ Доступен только серверу
 			secure: process.env.NODE_ENV === 'production', // ✅ Только HTTPS в продакшене
-			sameSite: 'lax', // ✅ Защита от CSRF
+			sameSite: 'none',
 		});
 		return true; // ✅ Успешный выход
 	}

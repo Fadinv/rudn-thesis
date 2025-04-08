@@ -21,6 +21,10 @@ async function bootstrap() {
 
 	// Настраиваем GraphQL-контекст, чтобы Passport мог работать
 	app.use((req, res, next) => {
+		const origin = req.headers.origin;
+		if (process.env.NODE_ENV === 'production' && origin !== 'https://rudn-thesis.vercel.app') {
+			return res.status(403).send('Forbidden');
+		}
 		req.res = res;
 		next();
 	});
