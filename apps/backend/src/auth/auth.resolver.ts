@@ -28,12 +28,13 @@ export class AuthResolver {
 		const result = await this.usersService.login(email, password);
 		// ✅ Устанавливаем accessToken в `HttpOnly` cookie
 		res.cookie('access_token', result.access_token, {
-			httpOnly: true,  // ✅ Доступен только серверу
-			secure: process.env.NODE_ENV === 'production', // ✅ Только HTTPS в продакшене
-			sameSite: 'none',
-			maxAge: 60 * 60 * 1000, // ✅ 1 час
+			httpOnly: true,
+			secure: process.env.NODE_ENV === 'production',
+			sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+			path: '/',
+			maxAge: 60 * 60 * 1000,
 		});
-		return result.access_token;  // Возвращаем токен
+		return 'OK';
 	}
 
 	// Выход пользователя (удаление токена)
