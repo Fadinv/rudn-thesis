@@ -58,6 +58,15 @@ def get_portfolio_data(report_id, additional_tickers, start_date, end_date):
         print('prices_dict prices_dict -> ', prices_dict)
         # Вычисляем доходности
         tickers = list(prices_dict.keys())
+        # Удаляем дубликаты по (ticker, date), оставляя последнюю цену
+        seen = set()
+        filtered_prices = []
+        for row in reversed(stock_prices):
+            key = (row[0], row[1])  # (ticker, date)
+            if key not in seen:
+                seen.add(key)
+                filtered_prices.append(row)
+        stock_prices = list(reversed(filtered_prices))  # восстанавливаем исходный порядок
         returns_matrix = calculate_returns_matrix(stock_prices, tickers)
         print('prices_dict prices_dict -> ', prices_dict)
 
@@ -122,7 +131,12 @@ def get_portfolio_data_with_history(report_id, additional_tickers, start_date, e
         """), {"portfolio_id": portfolio_id}).fetchall()
 
         # Преобразуем в словарь {ticker: quantity}
-        quantities = {row[0]: row[1] for row in quantities_result}
+        quantities = {}
+        for ticker, quantity in quantities_result:
+            if ticker in quantities:
+                quantities[ticker] += quantity
+            else:
+                quantities[ticker] = quantity
 
         # Получаем исторические цены акций
         stock_prices = conn.execute(text("""
@@ -186,6 +200,15 @@ def get_portfolio_data_with_history(report_id, additional_tickers, start_date, e
 
         # Вычисляем доходности
         tickers = list(prices_dict.keys())
+        # Удаляем дубликаты по (ticker, date), оставляя последнюю цену
+        seen = set()
+        filtered_prices = []
+        for row in reversed(stock_prices):
+            key = (row[0], row[1])  # (ticker, date)
+            if key not in seen:
+                seen.add(key)
+                filtered_prices.append(row)
+        stock_prices = list(reversed(filtered_prices))  # восстанавливаем исходный порядок
         returns_matrix = calculate_returns_matrix(stock_prices, tickers)
 
         # Получаем последние доступные цены для каждой акции
