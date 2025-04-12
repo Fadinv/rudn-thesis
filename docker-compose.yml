@@ -17,7 +17,7 @@ services:
       dockerfile: apps/backend/Dockerfile
     env_file:
       - ./.env.shared
-      - ./apps/backend/.env
+      - ./apps/backend/.env.local
     ports:
       - "4000:4000"
     depends_on:
@@ -51,13 +51,13 @@ services:
       dockerfile: apps/ticker-updater/Dockerfile
     env_file:
       - ./.env.shared
-      - ./apps/ticker-updater/.env
+      - ./apps/ticker-updater/.env.local
     depends_on:
       - postgres
     volumes:
       - .:/monorepo
     working_dir: /monorepo/apps/ticker-updater
-    command: npm run start:dev
+    command: sh -c "npm install && npm run build && npm run start:dev"
 
   analyzer:
     build: ./apps/analyzer
