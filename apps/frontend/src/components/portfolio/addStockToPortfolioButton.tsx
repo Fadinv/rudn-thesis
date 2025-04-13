@@ -32,7 +32,6 @@ const AddStockToPortfolioButton: React.FC<AddStockToPortfolioProps> = ({
 	                                                                       portfolioId,
 	                                                                       onStockAdded,
                                                                        }) => {
-
 	const [open, setOpen] = useState(false);
 	const [selectedStockId, setSelectedStockId] = useState<number | null>(null);
 	const [quantity, setQuantity] = useState(1);
