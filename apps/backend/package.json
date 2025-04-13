@@ -8,7 +8,7 @@
 		"format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
 		"start": "nest start",
 		"dev": "concurrently \"tsc -w\" \"nest start --watch\"",
-		"prestart": "cd ../.. && npm run build:orm && cd apps/backend",
+		"prestart": "rm -rf dist && rm -f .tsbuildinfo && cd ../.. && npm run build:orm && cd apps/backend",
 		"start:dev": "npm run prestart && nest start --watch",
 		"start:debug": "nest start --debug --watch",
 		"start:prod": "node dist/main",

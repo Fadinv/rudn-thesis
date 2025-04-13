@@ -26,6 +26,8 @@ services:
       DATABASE_URL: postgres://postgres:password@postgres:5432/portfolio_db
     volumes:
       - .:/monorepo
+    working_dir: /monorepo/apps/backend
+    command: npm run start:dev
 
   frontend:
     build:
@@ -51,6 +53,7 @@ services:
       - ./.env.shared
       - ./apps/ticker-updater/.env.local
     depends_on:
+      - backend
       - postgres
     volumes:
       - .:/monorepo

@@ -35,15 +35,11 @@ const AddStockToPortfolioButton: React.FC<AddStockToPortfolioProps> = ({
 	const [open, setOpen] = useState(false);
 	const [selectedStockId, setSelectedStockId] = useState<number | null>(null);
 	const [quantity, setQuantity] = useState(1);
-	const [averagePrice, setAveragePrice] = useState(100);
+	const [averagePrice, setAveragePrice] = useState(120);
 
 	const [addStock, {loading, error}] = useAddStockToPortfolioMutation();
 
-	const [getStockById, {
-		data: stockData,
-		// loading: stockByTickerIsLoading,
-		// error: stockDataError,
-	}] = useGetStockByIdLazyQuery({
+	const [getStockById, {data: stockData}] = useGetStockByIdLazyQuery({
 		fetchPolicy: 'cache-first',
 	});
 

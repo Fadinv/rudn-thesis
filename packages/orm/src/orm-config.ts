@@ -5,5 +5,5 @@ export const typeOrmConfig: TypeOrmModuleOptions = {
 	url: process.env.DATABASE_URL,
 	synchronize: true,
 	autoLoadEntities: true,
-	logging: true,
+	logging: process.env.NODE_ENV === 'development',
 };
