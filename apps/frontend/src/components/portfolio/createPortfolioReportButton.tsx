@@ -1,4 +1,4 @@
-import {NumberInputField, NumberInputRoot} from '@/components/ui/number-input';
+import {NumberInputField, NumberInputRoot} from '@frontend/components/ui/number-input';
 import {
 	SelectContent,
 	SelectItem,
@@ -6,7 +6,7 @@ import {
 	SelectRoot,
 	SelectTrigger,
 	SelectValueText,
-} from '@/components/ui/select';
+} from '@frontend/components/ui/select';
 import React, {useEffect} from 'react';
 import {
 	DrawerRoot,
@@ -16,12 +16,12 @@ import {
 	DrawerFooter,
 	DrawerTitle,
 	DrawerCloseTrigger,
-} from '@/components/ui/drawer';
+} from '@frontend/components/ui/drawer';
 import {useState} from 'react';
 import {
 	useCreateFutureReturnForecastGbmReportMutation,
 	useCreateMarkovitzReportMutation,
-} from '@/generated/graphql-hooks';
+} from '@frontend/generated/graphql-hooks';
 import {
 	Button,
 	IconButton,

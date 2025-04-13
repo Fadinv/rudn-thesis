@@ -6,21 +6,25 @@ export const AuthUser = createParamDecorator(async (_data: unknown, ctx: Executi
 	const {req, jwtService, usersService} = gqlContext.getContext();
 
 	if (!req?.cookies?.access_token) {
-		throw new UnauthorizedException(); // ❌ Если нет токена — кидаем ошибку
+		// ❌ Если нет токена — кидаем ошибку
+		throw new UnauthorizedException();
 	}
 
 	if (!jwtService || !usersService) {
-		throw new UnauthorizedException(); // ❌ Если сервисы не доступны — тоже ошибка
+		// ❌ Если сервисы не доступны — тоже ошибка
+		throw new UnauthorizedException();
 	}
 
 	try {
 		const payload = jwtService.verify(req.cookies.access_token);
 		const user = await usersService.findById(payload.sub);
 
-		if (!user) throw new UnauthorizedException(); // ❌ Если юзер не найден
+		// ❌ Если юзер не найден
+		if (!user) throw new UnauthorizedException();
 
 		return user;
 	} catch (err) {
-		throw new UnauthorizedException(); // ❌ Ошибка валидации JWT
+		// ❌ Ошибка валидации JWT
+		throw new UnauthorizedException();
 	}
 });

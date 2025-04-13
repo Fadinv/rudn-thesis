@@ -1,12 +1,10 @@
 import {Module} from '@nestjs/common';
 import {TypeOrmModule} from '@nestjs/typeorm';
-import {Stock} from '../stocks/stock.entity';
-import {Portfolio} from './portfolio.entity';
-import {PortfolioStock} from './portfolioStock.entity';
-import {PortfolioService} from './portfolio.service';
+import {Portfolio, PortfolioStock, Stock} from '@service/orm';
+import {StocksModule} from '@backend/stocks';
+import {AuthModule} from '@backend/auth';
 import {PortfolioResolver} from './portfolio.resolver';
-import {StocksModule} from '../stocks/stocks.module';
-import {AuthModule} from '../auth/auth.module';
+import {PortfolioService} from './portfolio.service';
 
 @Module({
 	imports: [

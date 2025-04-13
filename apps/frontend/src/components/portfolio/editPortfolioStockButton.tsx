@@ -9,15 +9,15 @@ import {
 	DrawerRoot,
 	DrawerTitle,
 	DrawerTrigger,
-} from '@/components/ui/drawer';
-import {useUpdatePortfolioStockMutation} from '@/generated/graphql-hooks';
+} from '@frontend/components/ui/drawer';
+import {useUpdatePortfolioStockMutation} from '@frontend/generated/graphql-hooks';
 import React, {useState} from 'react';
 import {Button, Icon, IconButton, Input, Text} from '@chakra-ui/react';
-import {Field} from '@/components/ui/field';
+import {Field} from '@frontend/components/ui/field';
 import {
 	NumberInputField,
 	NumberInputRoot,
-} from '@/components/ui/number-input';
+} from '@frontend/components/ui/number-input';
 import {FaEdit} from 'react-icons/fa';
 
 interface EditPortfolioStockButtonProps {

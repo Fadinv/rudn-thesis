@@ -1,4 +1,4 @@
-import {MarkovitzData} from '@/components/portfolio/portfolioReport/MarkovitzViewer';
+import {MarkovitzData} from '@frontend/components/portfolio/portfolioReport/MarkovitzViewer';
 import React, {FC} from 'react';
 import {
 	ScatterChart,

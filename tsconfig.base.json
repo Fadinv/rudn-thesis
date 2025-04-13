@@ -1,0 +1,35 @@
+{
+	"compilerOptions": {
+		"target": "ES2021",
+		"module": "commonjs",
+		"lib": [
+			"esnext"
+		],
+		"baseUrl": ".",
+		"outDir": "dist",
+		"composite": true,
+		"removeComments": true,
+		"declaration": true,
+		"emitDecoratorMetadata": true,
+		"experimentalDecorators": true,
+		"allowSyntheticDefaultImports": true,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"strict": true,
+		"skipLibCheck": true,
+		"paths": {
+			"@backend/*": [
+				"apps/backend/src/*"
+			],
+			"@frontend/*": [
+				"apps/frontend/src/*"
+			],
+			"@tickers/*": [
+				"apps/ticker-updater/src/*"
+			],
+			"@service/orm": [
+				"packages/orm/src"
+			]
+		}
+	}
+}

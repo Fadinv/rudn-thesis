@@ -1,6 +1,6 @@
 import {ObjectType, Field, Int, Float} from '@nestjs/graphql';
 import {Entity, PrimaryGeneratedColumn, Column, ManyToOne} from 'typeorm';
-import {Portfolio} from './portfolio.entity';
+import {Portfolio} from '../portfolio/portfolio.entity';
 import {Stock} from '../stocks/stock.entity';
 
 @ObjectType()
@@ -8,18 +8,18 @@ import {Stock} from '../stocks/stock.entity';
 export class PortfolioStock {
 	@Field(() => Int)
 	@PrimaryGeneratedColumn()
-	id: number;
+	id!: number;
 
 	@Field(() => Portfolio)
 	@ManyToOne(() => Portfolio, (portfolio) => portfolio.stocks, {onDelete: 'CASCADE'})
-	portfolio: Portfolio; // К какому портфелю относится
+	portfolio!: Portfolio; // К какому портфелю относится
 
 	@Field(() => Stock)
 	@ManyToOne(() => Stock, {onDelete: 'CASCADE'})
-	stock: Stock; // Какая акция в портфеле
+	stock!: Stock; // Какая акция в портфеле
 
-	@Field(() => Int, { nullable: true })
-	@Column('int', { nullable: true })
+	@Field(() => Int, {nullable: true})
+	@Column('int', {nullable: true})
 	quantity?: number; // Общее количество акций
 
 	@Field(() => Float, {nullable: true})

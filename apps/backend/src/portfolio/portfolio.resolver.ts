@@ -1,13 +1,9 @@
 import {Resolver, Query, Mutation, Args, Int} from '@nestjs/graphql';
-import {
-	StocksWhileCreatingPortfolio,
-} from './dto/stocks-while-creatings-portfolio.input';
-import {AuthUser} from '../auth/auth-user.decorator';
+import {Portfolio, PortfolioStock, User} from '@service/orm';
+import {AuthUser} from '@backend/auth';
+import {PortfolioService, } from './portfolio.service';
 import {PortfolioStockUpdateInput} from './portfolio.inputs';
-import {PortfolioService} from './portfolio.service';
-import {Portfolio} from './portfolio.entity';
-import {PortfolioStock} from './portfolioStock.entity';
-import {User} from '../users/user.entity';
+import { StocksWhileCreatingPortfolio } from './dto/stocks-while-creatings-portfolio.input';
 
 @Resolver(() => Portfolio)
 export class PortfolioResolver {

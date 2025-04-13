@@ -1,9 +1,9 @@
 import {UseGuards} from '@nestjs/common';
 import {Resolver, Query, Mutation, Args, Int} from '@nestjs/graphql';
-import {StockInput} from './stock.input';
+import {Stock} from '@service/orm';
+import {GqlAuthGuard} from '@backend/auth';
 import {StocksService} from './stocks.service';
-import {Stock} from './stock.entity';
-import {GqlAuthGuard} from '../auth/auth.guard';
+import {StockInput} from './stock.input';
 
 @Resolver(() => Stock)
 export class StocksResolver {
@@ -53,7 +53,7 @@ export class StocksResolver {
 
 	@Query(() => [Stock])
 	@UseGuards(GqlAuthGuard)
-	async searchStocks(@Args('search', { type: () => String }) search: string): Promise<Stock[]> {
+	async searchStocks(@Args('search', {type: () => String}) search: string): Promise<Stock[]> {
 		return this.stocksService.searchStocks(search);
 	}
 }

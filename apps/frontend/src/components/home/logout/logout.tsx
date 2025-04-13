@@ -1,4 +1,4 @@
-import {useCurrentUserQuery, useLogoutMutation} from '@/generated/graphql-hooks';
+import {useCurrentUserQuery, useLogoutMutation} from '@frontend/generated/graphql-hooks';
 import {useApolloClient} from '@apollo/client';
 import {Button} from '@chakra-ui/react';
 import React, {MouseEventHandler} from 'react';

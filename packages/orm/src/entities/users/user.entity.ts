@@ -8,14 +8,14 @@ import {Portfolio} from '../portfolio/portfolio.entity';
 export class User {
 	@Field(() => Int)
 	@PrimaryGeneratedColumn()
-	id: number;
+	id!: number;
 
 	@Field()
 	@Column({unique: true})
-	email: string;
+	email!: string;
 
 	@Column()
-	password: string;
+	password!: string;
 
 	@Field(() => [Portfolio], {nullable: true})
 	@OneToMany(() => Portfolio, (portfolio) => portfolio.user, {cascade: true})

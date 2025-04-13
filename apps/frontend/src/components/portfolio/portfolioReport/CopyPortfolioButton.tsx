@@ -5,13 +5,13 @@ import {
 	DrawerHeader, DrawerRoot,
 	DrawerTitle,
 	DrawerTrigger,
-} from '@/components/ui/drawer';
+} from '@frontend/components/ui/drawer';
 import {
 	GetDistributedPortfolioAssetsQuery,
 	useCreatePortfolioMutation,
 	useGetDistributedPortfolioAssetsLazyQuery,
-} from '@/generated/graphql-hooks';
-import {StocksWhileCreatingPortfolio} from '@/generated/graphql-types';
+} from '@frontend/generated/graphql-hooks';
+import {StocksWhileCreatingPortfolio} from '@frontend/generated/graphql-types';
 import React, {useEffect, useState} from 'react';
 import {
 	Button, Icon,
@@ -20,7 +20,7 @@ import {
 import {
 	NumberInputField,
 	NumberInputRoot,
-} from '@/components/ui/number-input';
+} from '@frontend/components/ui/number-input';
 import {FaCopy} from 'react-icons/fa';
 
 interface CopyPortfolioButtonProps {

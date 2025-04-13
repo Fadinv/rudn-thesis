@@ -1,6 +1,6 @@
 import {Resolver, Query, Args, Float} from '@nestjs/graphql';
-import {StockPriceService} from './stockPrice.service';
-import {StockPrice} from './stockPrice.entity';
+import {StockPrice} from '@service/orm';
+import {StockPriceService} from './stock-price.service';
 
 @Resolver(() => StockPrice)
 export class StockPriceResolver {

@@ -1,51 +1,56 @@
 {
-  "name": "rudn-thesis",
-  "version": "0.0.1",
-  "private": true,
-  "packageManager": "npm@10.5.2",
-  "scripts": {
-    "dev": "turbo run dev",
-    "dev:backend": "npm run dev --workspace apps/backend",
-    "dev:tickers": "npm run dev --workspace apps/ticker-updater",
-    "dev:frontend": "npm run dev --workspace apps/frontend",
-    "build:frontend": "cd apps/frontend && npm run build",
-    "build": "turbo run build",
-    "start": "docker compose up --build",
-    "restart": "docker compose down && docker compose up --build",
-    "clean": "rm -rf node_modules package-lock.json apps/backend/node_modules apps/frontend/node_modules && npm cache clean --force",
-    "clean:docker": "docker system prune -af && docker builder prune -af && docker volume prune -f && docker rmi $(docker images -q) || true",
-    "clean:all": "npm run clean && npm run clean:docker",
-    "reinstall": "npm run clean && npm install",
-    "restart:docker": "npm run clean:docker && docker compose down && docker compose build --no-cache && docker compose up",
-    "generate:types": "npx graphql-codegen --config apps/backend/codegen.yml",
-    "test:analyzer": "docker compose exec analyzer pytest -v --maxfail=1 --disable-warnings --tb=short",
-    "test:analyzer:cov": "docker compose exec analyzer pytest -v --cov=reports --cov-report=term-missing"
-  },
-  "workspaces": [
-    "apps/backend",
-    "apps/frontend",
-    "apps/ticker-updater"
-  ],
-  "dependencies": {
-    "@apollo/client": "^3.13.1",
-    "@chakra-ui/react": "^3.8.0",
-    "@emotion/react": "^11.14.0",
-    "@next/swc-wasm-nodejs": "^13.5.10",
-    "graphql": "^16.10.0",
-    "graphql-codegen": "^0.4.0",
-    "next": "15.1.7",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "react-icons": "^5.5.0"
-  },
-  "devDependencies": {
-    "@graphql-codegen/cli": "^5.0.5",
-    "@graphql-codegen/typescript-react-apollo": "^4.3.2",
-    "@graphql-codegen/typescript-resolvers": "^4.4.2",
-    "@types/node-cron": "^3.0.11",
-    "@types/pg": "^8.11.11",
-    "concurrently": "^9.1.2",
-    "graphql-type-json": "^0.3.2",
-    "turbo": "^2.4.2"
-  }
+	"name": "rudn-thesis",
+	"version": "0.0.1",
+	"private": true,
+	"packageManager": "npm@10.5.2",
+	"scripts": {
+		"dev": "turbo run dev",
+		"dev:backend": "npm run dev --workspace apps/backend",
+		"dev:tickers": "npm run dev --workspace apps/ticker-updater",
+		"dev:frontend": "npm run dev --workspace apps/frontend",
+		"build:frontend": "cd apps/frontend && npm run build",
+		"build:orm": "cd packages/orm && npm run build",
+		"build": "turbo run build",
+		"start": "docker compose up --build",
+		"restart": "docker compose down && docker compose up --build",
+		"clean": "rm -rf node_modules package-lock.json apps/backend/node_modules apps/frontend/node_modules && npm cache clean --force",
+		"clean:docker": "docker system prune -af && docker builder prune -af && docker volume prune -f && docker rmi $(docker images -q) || true",
+		"clean:all": "npm run clean && npm run clean:docker",
+		"reinstall": "npm run clean && npm install",
+		"restart:docker": "npm run clean:docker && docker compose down && docker compose build --no-cache && docker compose up",
+		"generate:types": "npx graphql-codegen --config apps/backend/codegen.yml",
+		"test:analyzer": "docker compose exec analyzer pytest -v --maxfail=1 --disable-warnings --tb=short",
+		"test:analyzer:cov": "docker compose exec analyzer pytest -v --cov=reports --cov-report=term-missing"
+	},
+	"workspaces": [
+		"apps/backend",
+		"apps/frontend",
+		"apps/ticker-updater",
+		"packages/orm"
+	],
+	"dependencies": {
+		"@apollo/client": "^3.13.1",
+		"@chakra-ui/react": "^3.8.0",
+		"@emotion/react": "^11.14.0",
+		"@next/swc-wasm-nodejs": "^13.5.10",
+		"graphql": "^16.10.0",
+		"graphql-codegen": "^0.4.0",
+		"next": "15.1.7",
+		"react": "^19.0.0",
+		"react-dom": "^19.0.0",
+		"react-icons": "^5.5.0",
+		"@nestjs/typeorm": "^11.0.0",
+		"@nestjs/graphql": "^13.0.2",
+		"bcryptjs": "^3.0.0"
+	},
+	"devDependencies": {
+		"@graphql-codegen/cli": "^5.0.5",
+		"@graphql-codegen/typescript-react-apollo": "^4.3.2",
+		"@graphql-codegen/typescript-resolvers": "^4.4.2",
+		"@types/node-cron": "^3.0.11",
+		"@types/pg": "^8.11.11",
+		"concurrently": "^9.1.2",
+		"graphql-type-json": "^0.3.2",
+		"turbo": "^2.4.2"
+	}
 }

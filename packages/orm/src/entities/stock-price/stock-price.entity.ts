@@ -6,33 +6,33 @@ import {Entity, Column, PrimaryGeneratedColumn, Index} from 'typeorm';
 @Index(['ticker', 'date'], {unique: true}) // ✅ Дата + тикер должны быть уникальными
 export class StockPrice {
 	@PrimaryGeneratedColumn()
-	id: number;
+	id!: number;
 
 	@Field()
 	@Column()
-	ticker: string; // ✅ Храним тикер как строку (без связи с Stock)
+	ticker!: string; // ✅ Храним тикер как строку (без связи с Stock)
 
 	@Field()
 	@Column({type: 'date'})
-	date: string;
+	date!: string;
 
 	@Field(() => Float)
 	@Column('float')
-	open: number;
+	open!: number;
 
 	@Field(() => Float)
 	@Column('float')
-	high: number;
+	high!: number;
 
 	@Field(() => Float)
 	@Column('float')
-	low: number;
+	low!: number;
 
 	@Field(() => Float)
 	@Column('float')
-	close: number;
+	close!: number;
 
 	@Field(() => Float)
 	@Column('float')
-	volume: number;
+	volume!: number;
 }

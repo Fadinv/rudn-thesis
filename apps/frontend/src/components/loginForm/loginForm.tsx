@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {Fieldset, Input, Button, Box, Heading, Text} from '@chakra-ui/react';
-import {Field} from '@/components/ui/field';
-import {useCurrentUserQuery, useLoginMutation} from '@/generated/graphql-hooks';
+import {Field} from '@frontend/components/ui/field';
+import {useCurrentUserQuery, useLoginMutation} from '@frontend/generated/graphql-hooks';
 
 const LoginForm = () => {
 	const [email, setEmail] = useState('');

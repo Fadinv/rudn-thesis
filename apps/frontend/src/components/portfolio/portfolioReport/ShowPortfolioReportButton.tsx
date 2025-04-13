@@ -1,6 +1,6 @@
-import ForecastGBMViewer from '@/components/portfolio/portfolioReport/ForecastGBMViewer';
-import MarkovitzViewer from '@/components/portfolio/portfolioReport/MarkovitzViewer';
-import PortfolioReportCard from '@/components/portfolio/portfolioReport/PortfolioReportCard';
+import ForecastGBMViewer from '@frontend/components/portfolio/portfolioReport/ForecastGBMViewer';
+import MarkovitzViewer from '@frontend/components/portfolio/portfolioReport/MarkovitzViewer';
+import PortfolioReportCard from '@frontend/components/portfolio/portfolioReport/PortfolioReportCard';
 import React, {useEffect, useState} from 'react';
 import {
 	DrawerRoot,
@@ -10,10 +10,10 @@ import {
 	DrawerFooter,
 	DrawerTitle,
 	DrawerCloseTrigger,
-} from '@/components/ui/drawer';
+} from '@frontend/components/ui/drawer';
 import {
 	useGetPortfolioReportsQuery,
-} from '@/generated/graphql-hooks';
+} from '@frontend/generated/graphql-hooks';
 import {
 	Button,
 	Box,
@@ -23,7 +23,7 @@ import {
 	createListCollection,
 } from '@chakra-ui/react';
 import {FaCheckCircle, FaFileAlt, FaHourglassHalf, FaTimesCircle} from 'react-icons/fa';
-import {useColorModeValue} from '@/components/ui/color-mode';
+import {useColorModeValue} from '@frontend/components/ui/color-mode';
 
 interface CreatePortfolioReportButtonProps {
 	portfolioId: number;

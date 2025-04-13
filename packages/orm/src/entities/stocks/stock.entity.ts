@@ -6,27 +6,27 @@ import {Entity, PrimaryGeneratedColumn, Column} from 'typeorm';
 export class Stock {
 	@Field()
 	@PrimaryGeneratedColumn()
-	id: number;
+	id!: number;
 
 	@Field()
 	@Column({unique: true})
-	ticker: string;
+	ticker!: string;
 
 	@Field()
 	@Column()
-	name: string;
+	name!: string;
 
 	@Field()
 	@Column()
-	market: string;
+	market!: string;
 
 	@Field()
 	@Column()
-	locale: string;
+	locale!: string;
 
 	@Field()
 	@Column({name: 'primary_exchange'})
-	primaryExchange: string;
+	primaryExchange!: string;
 
 	@Field({nullable: true})
 	@Column({nullable: true})
@@ -34,11 +34,11 @@ export class Stock {
 
 	@Field()
 	@Column()
-	active: boolean;
+	active!: boolean;
 
 	@Field()
 	@Column({name: 'currency_name'})
-	currencyName: string;
+	currencyName!: string;
 
 	@Field({nullable: true})
 	@Column({nullable: true, name: 'cik'})
@@ -54,7 +54,7 @@ export class Stock {
 
 	@Field()
 	@Column({name: 'last_updated_utc'})
-	lastUpdatedUtc: string;
+	lastUpdatedUtc!: string;
 
 	@Field({nullable: true})
 	@Column({nullable: true, name: 'logo_url'})

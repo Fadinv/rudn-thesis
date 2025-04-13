@@ -1,6 +1,6 @@
 import React from 'react';
 import {IconButton} from '@chakra-ui/react';
-import {Tooltip} from '@/components/ui/tooltip';
+import {Tooltip} from '@frontend/components/ui/tooltip';
 import {useRouter} from 'next/navigation';
 import {FaUser} from 'react-icons/fa';
 

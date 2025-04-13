@@ -1,8 +1,8 @@
-import CopyPortfolioButton from '@/components/portfolio/portfolioReport/CopyPortfolioButton';
-import EfficientFrontierChart from '@/components/portfolio/portfolioReport/EfficientFrontierChart';
+import CopyPortfolioButton from '@frontend/components/portfolio/portfolioReport/CopyPortfolioButton';
+import EfficientFrontierChart from '@frontend/components/portfolio/portfolioReport/EfficientFrontierChart';
 import {
 	useGetPortfolioReportQuery, useGetUserPortfoliosQuery,
-} from '@/generated/graphql-hooks';
+} from '@frontend/generated/graphql-hooks';
 import React, {FC, JSX, useState} from 'react';
 import {LuFolder, LuSquareCheck, LuChartNoAxesCombined} from 'react-icons/lu';
 import {PieChart, Pie, Cell, Legend, Tooltip as RechartsTooltip} from 'recharts';
@@ -16,7 +16,7 @@ import {
 	FaShieldAlt,
 	FaInfoCircle,
 } from 'react-icons/fa';
-import {Tooltip} from '@/components/ui/tooltip';
+import {Tooltip} from '@frontend/components/ui/tooltip';
 
 export type MarkovitzData = {
 	risk_annual: number;

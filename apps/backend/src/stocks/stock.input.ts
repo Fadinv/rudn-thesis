@@ -3,28 +3,28 @@ import {InputType, Field} from '@nestjs/graphql';
 @InputType()
 export class StockInput {
 	@Field()
-	ticker: string;
+	ticker!: string;
 
 	@Field()
-	name: string;
+	name!: string;
 
 	@Field()
-	market: string;
+	market!: string;
 
 	@Field()
-	locale: string;
+	locale!: string;
 
 	@Field()
-	primaryExchange: string;
+	primaryExchange!: string;
 
 	@Field()
-	type: string;
+	type!: string;
 
 	@Field()
-	active: boolean;
+	active!: boolean;
 
 	@Field()
-	currencyName: string;
+	currencyName!: string;
 
 	@Field({nullable: true})
 	cik?: string;
@@ -36,7 +36,7 @@ export class StockInput {
 	shareClassFigi?: string;
 
 	@Field()
-	lastUpdatedUtc: string;
+	lastUpdatedUtc!: string;
 
 	@Field({nullable: true})
 	logoUrl?: string;

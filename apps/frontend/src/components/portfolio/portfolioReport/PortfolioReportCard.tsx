@@ -1,7 +1,7 @@
 import React from 'react';
-import {useColorModeValue} from '@/components/ui/color-mode';
+import {useColorModeValue} from '@frontend/components/ui/color-mode';
 import {Flex, Text} from '@chakra-ui/react';
-import DeletePortfolioReportButton from '@/components/portfolio/portfolioReport/deletePortfolioReportButton';
+import DeletePortfolioReportButton from '@frontend/components/portfolio/portfolioReport/deletePortfolioReportButton';
 
 interface PortfolioReportCardProps {
 	report: {

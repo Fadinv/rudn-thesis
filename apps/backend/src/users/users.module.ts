@@ -1,14 +1,13 @@
 import {Module} from '@nestjs/common';
 import {TypeOrmModule} from '@nestjs/typeorm';
-import {UsersService} from './users.service';
-import {UsersResolver} from './users.resolver';
-import {User} from './user.entity';
-import {AuthModule} from '../auth/auth.module'; // ✅ Импортируем AuthModule
+import {User} from '@service/orm';
+import {AuthModule} from '@backend/auth';
+import {UsersService, UsersResolver} from '@backend/users';
 
 @Module({
 	imports: [
 		TypeOrmModule.forFeature([User]),
-		AuthModule, // ✅ Теперь UsersModule получает доступ к JwtService
+		AuthModule,
 	],
 	providers: [UsersService, UsersResolver],
 	exports: [UsersService],

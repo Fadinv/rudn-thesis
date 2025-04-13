@@ -1,7 +1,7 @@
-import HomeButton from '@/components/header/homeButton/homeButton';
-import ProfileButton from '@/components/header/profileButton/profileButton';
-import {Logout} from '@/components/home/logout/logout';
-import {ColorModeButton} from '@/components/ui/color-mode';
+import HomeButton from '@frontend/components/header/homeButton/homeButton';
+import ProfileButton from '@frontend/components/header/profileButton/profileButton';
+import {Logout} from '@frontend/components/home/logout/logout';
+import {ColorModeButton} from '@frontend/components/ui/color-mode';
 import {Flex} from '@chakra-ui/react';
 import React from 'react';
 

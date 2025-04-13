@@ -9,7 +9,7 @@
     "watch": "tsc -w",
     "serve": "node dist/index.js",
     "prestart": "npm run build",
-    "start:dev": "npm-run-all --parallel watch serve",
+    "start:dev": "npm run --workspace @portfolio-analyzer/orm build && npm-run-all --parallel watch serve",
     "start": "node dist/index.js"
   },
   "dependencies": {

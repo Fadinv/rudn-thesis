@@ -1,4 +1,4 @@
-import {useGetPortfolioReportQuery} from '@/generated/graphql-hooks';
+import {useGetPortfolioReportQuery} from '@frontend/generated/graphql-hooks';
 import React, {FC, useEffect, useState} from 'react';
 import {XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Area, AreaChart} from 'recharts';
 import {
@@ -8,7 +8,7 @@ import {
 	SelectRoot,
 	SelectTrigger,
 	SelectValueText,
-} from '@/components/ui/select';
+} from '@frontend/components/ui/select';
 import {createListCollection, Box, Flex, Text} from '@chakra-ui/react';
 
 interface ForecastGBMViewerProps {

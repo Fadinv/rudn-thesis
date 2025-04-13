@@ -3,7 +3,7 @@ import {InputType, Field, Int, Float} from '@nestjs/graphql';
 @InputType()
 export class PortfolioStockUpdateInput {
 	@Field(() => Int)
-	portfolioStockId: number;
+	portfolioStockId!: number;
 
 	@Field(() => Int, {nullable: true})
 	quantity?: number;

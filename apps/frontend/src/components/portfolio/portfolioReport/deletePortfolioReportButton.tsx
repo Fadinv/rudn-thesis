@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {Button, Icon, IconButton, Text} from '@chakra-ui/react';
 import {FaTrash} from 'react-icons/fa';
-import {useDeletePortfolioReportMutation} from '@/generated/graphql-hooks';
+import {useDeletePortfolioReportMutation} from '@frontend/generated/graphql-hooks';
 import {
 	DialogRoot,
 	DialogTrigger,
@@ -11,7 +11,7 @@ import {
 	DialogDescription,
 	DialogFooter,
 	DialogCloseTrigger,
-} from '@/components/ui/dialog';
+} from '@frontend/components/ui/dialog';
 
 interface DeletePortfolioButtonProps {
 	reportId: string;

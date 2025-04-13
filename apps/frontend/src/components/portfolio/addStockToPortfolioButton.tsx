@@ -1,4 +1,4 @@
-import StockSearch from '@/components/portfolio/StocksSearch';
+import StockSearch from '@frontend/components/portfolio/StocksSearch';
 import React, {useEffect, useState} from 'react';
 import {Button, Icon} from '@chakra-ui/react';
 import {FaPlus} from 'react-icons/fa';
@@ -12,16 +12,16 @@ import {
 	DrawerFooter,
 	DrawerBackdrop,
 	DrawerCloseTrigger,
-} from '@/components/ui/drawer';
-import {Field} from '@/components/ui/field';
+} from '@frontend/components/ui/drawer';
+import {Field} from '@frontend/components/ui/field';
 import {
 	NumberInputField,
 	NumberInputRoot,
-} from '@/components/ui/number-input';
+} from '@frontend/components/ui/number-input';
 import {
 	useAddStockToPortfolioMutation,
 	useGetStockByIdLazyQuery,
-} from '@/generated/graphql-hooks';
+} from '@frontend/generated/graphql-hooks';
 
 interface AddStockToPortfolioProps {
 	portfolioId: number;

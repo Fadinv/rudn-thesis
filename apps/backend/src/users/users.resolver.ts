@@ -1,8 +1,8 @@
-import {UseGuards} from '@nestjs/common';
 import {Resolver, Query, Mutation, Args, Context} from '@nestjs/graphql';
-import {CurrentUser} from '../auth/current-user.decorator';
-import {UsersService} from './users.service';
-import {User} from './user.entity';
+import {User} from '@service/orm';
+import {Request} from 'express-serve-static-core';
+import {CurrentUser} from '@backend/auth';
+import {UsersService} from '@backend/users';
 
 @Resolver(() => User)
 export class UsersResolver {
@@ -46,7 +46,7 @@ export class UsersResolver {
 	}
 
 	@Mutation(() => Boolean)
-	async deleteUser(@Args('id') id: number, @Context('req') req): Promise<boolean> {
+	async deleteUser(@Args('id') id: number, @Context('req') _req: Request): Promise<boolean> {
 		return this.usersService.deleteUser(id);
 	}
 }

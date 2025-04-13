@@ -6,8 +6,8 @@ import {
 	DrawerRoot,
 	DrawerTitle,
 	DrawerTrigger,
-} from '@/components/ui/drawer';
-import {useCreatePortfolioMutation} from '@/generated/graphql-hooks';
+} from '@frontend/components/ui/drawer';
+import {useCreatePortfolioMutation} from '@frontend/generated/graphql-hooks';
 import React, {useState} from 'react';
 import {
 	Button, Icon,

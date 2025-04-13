@@ -1,10 +1,10 @@
 import React from 'react';
-import AddStockToPortfolioButton from '@/components/portfolio/addStockToPortfolioButton';
-import CreatePortfolioReportButton from '@/components/portfolio/createPortfolioReportButton';
-import DeletePortfolioStockButton from '@/components/portfolio/deletePortfolioStockButton';
-import EditPortfolioStockButton from '@/components/portfolio/editPortfolioStockButton';
-import ShowPortfolioReportButton from '@/components/portfolio/portfolioReport/ShowPortfolioReportButton';
-import {useGetPortfolioStocksQuery} from '@/generated/graphql-hooks';
+import AddStockToPortfolioButton from '@frontend/components/portfolio/addStockToPortfolioButton';
+import CreatePortfolioReportButton from '@frontend/components/portfolio/createPortfolioReportButton';
+import DeletePortfolioStockButton from '@frontend/components/portfolio/deletePortfolioStockButton';
+import EditPortfolioStockButton from '@frontend/components/portfolio/editPortfolioStockButton';
+import ShowPortfolioReportButton from '@frontend/components/portfolio/portfolioReport/ShowPortfolioReportButton';
+import {useGetPortfolioStocksQuery} from '@frontend/generated/graphql-hooks';
 import {Text, Table, Spinner, Flex} from '@chakra-ui/react';
 
 interface PortfolioViewProps {

@@ -1,15 +1,14 @@
 import {Module} from '@nestjs/common';
 import {GraphQLModule} from '@nestjs/graphql';
 import {ApolloDriver} from '@nestjs/apollo';
-import {TypeOrmModule} from '@nestjs/typeorm';
-import {PortfolioReportModule} from './portfolioReport/portfolioReport.module';
-import {StockPriceModule} from './stockPrice/stockPrice.module';
-import {UsersModule} from './users/users.module';
-import {StocksModule} from './stocks/stocks.module';
-import {PortfolioModule} from './portfolio/portfolio.module';
-import {AuthModule} from './auth/auth.module';
+import {OrmModule} from '@service/orm';
+import {PortfolioReportModule} from '@backend/portfolio-report';
+import {StockPriceModule} from '@backend/stock-price';
+import {UsersModule, UsersService} from '@backend/users';
+import {StocksModule} from '@backend/stocks';
+import {PortfolioModule} from '@backend/portfolio';
+import {AuthModule} from '@backend/auth';
 import {JwtService} from '@nestjs/jwt';
-import {UsersService} from './users/users.service';
 
 @Module({
 	imports: [
@@ -29,12 +28,7 @@ import {UsersService} from './users/users.service';
 				}),
 			}),
 		}),
-		TypeOrmModule.forRoot({
-			type: 'postgres',
-			url: process.env.DATABASE_URL,
-			autoLoadEntities: true,
-			synchronize: true,
-		}),
+		OrmModule,
 		AuthModule,
 		UsersModule,
 		StocksModule,

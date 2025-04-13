@@ -1,11 +1,8 @@
 import {Injectable, NotFoundException, ForbiddenException} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {Repository} from 'typeorm';
-import {Portfolio} from './portfolio.entity';
-import {PortfolioStockUpdateInput} from './portfolio.inputs';
-import {PortfolioStock} from './portfolioStock.entity';
-import {User} from '../users/user.entity';
-import {Stock} from '../stocks/stock.entity';
+import {PortfolioStockUpdateInput} from '@backend/portfolio';
+import {Portfolio, PortfolioStock, Stock, User} from '@service/orm';
 
 @Injectable()
 export class PortfolioService {

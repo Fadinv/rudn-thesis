@@ -1,13 +1,8 @@
 import {Injectable} from '@nestjs/common';
-import {Field, Float, Int} from '@nestjs/graphql';
 import {InjectRepository} from '@nestjs/typeorm';
-import {FutureReturnForecastInput} from 'src/portfolioReport/dto/future-return-forecast.input';
-import {MarkovitzReportInput} from 'src/portfolioReport/dto/markovitz-report.input';
+import {Portfolio, PortfolioReport, PortfolioStock, StockPrice} from '@service/orm';
+import {FutureReturnForecastInput, MarkovitzReportInput} from '@backend/portfolio-report';
 import {Repository} from 'typeorm';
-import {PortfolioStock} from '../portfolio/portfolioStock.entity';
-import {StockPrice} from '../stockPrice/stockPrice.entity';
-import {PortfolioReport} from './portfolioReport.entity';
-import {Portfolio} from '../portfolio/portfolio.entity';
 import axios from 'axios';
 
 export type ReportType = 'markowitz' | 'future_returns_forecast_gbm' | 'value_at_risk';
@@ -26,7 +21,6 @@ export class PortfolioReportService {
 		@InjectRepository(PortfolioStock)
 		private readonly portfolioStockRepository: Repository<PortfolioStock>,
 	) {}
-
 
 	private _supportedReports: Partial<Record<ReportType, boolean>> = {
 		'markowitz': true,

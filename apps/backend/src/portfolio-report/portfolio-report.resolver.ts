@@ -1,11 +1,9 @@
 import {Resolver, Query, Mutation, Args, Int, Float} from '@nestjs/graphql';
-import {PortfolioDistribution} from './dto/portfolio-distribution.response';
-import {PortfolioReportService} from './portfolioReport.service';
-import {PortfolioReport} from './portfolioReport.entity';
-
-// DTOs
+import {PortfolioReport} from '@service/orm';
 import {MarkovitzReportInput} from './dto/markovitz-report.input';
 import {FutureReturnForecastInput} from './dto/future-return-forecast.input';
+import {PortfolioReportService} from './portfolio-report.service';
+import {PortfolioDistribution} from './dto/portfolio-distribution.response';
 
 @Resolver(() => PortfolioReport)
 export class PortfolioReportResolver {

@@ -9,8 +9,8 @@ import {
 	DrawerRoot,
 	DrawerTitle,
 	DrawerTrigger,
-} from '@/components/ui/drawer';
-import {useUpdatePortfolioMutation} from '@/generated/graphql-hooks';
+} from '@frontend/components/ui/drawer';
+import {useUpdatePortfolioMutation} from '@frontend/generated/graphql-hooks';
 import React, {useState} from 'react';
 import {Button, Icon, Input, Field, IconButton} from '@chakra-ui/react';
 import {FaEdit} from 'react-icons/fa';

@@ -1,8 +1,7 @@
 import {Module} from '@nestjs/common';
 import {TypeOrmModule} from '@nestjs/typeorm';
-import {StockPrice} from './stockPrice.entity';
-import {StockPriceService} from './stockPrice.service';
-import {StockPriceResolver} from './stockPrice.resolver';
+import {StockPrice} from '@service/orm';
+import {StockPriceService, StockPriceResolver} from '@backend/stock-price';
 
 @Module({
 	imports: [TypeOrmModule.forFeature([StockPrice])],

@@ -1,8 +1,8 @@
-import {useGetUserPortfoliosQuery} from '@/generated/graphql-hooks';
+import {useGetUserPortfoliosQuery} from '@frontend/generated/graphql-hooks';
 import React, {useState} from 'react';
 import {Box, Flex} from '@chakra-ui/react';
 import Sidebar from './sidebar/sidebar';
-import PortfolioView from '@/components/portfolio/portfolioView';
+import PortfolioView from '@frontend/components/portfolio/portfolioView';
 
 interface HomeProps {
 	// onCreatePortfolio: () => void;

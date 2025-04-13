@@ -1,16 +1,16 @@
-import {useColorModeValue} from '@/components/ui/color-mode';
+import {useColorModeValue} from '@frontend/components/ui/color-mode';
 import React from 'react';
-import DeletePortfolioButton from '@/components/portfolio/deletePortfolioButton';
-import EditPortfolioButton from '@/components/portfolio/editPortfolioButton';
-import {useGetUserPortfoliosQuery} from '@/generated/graphql-hooks';
-import {Portfolio} from '@/generated/graphql-types';
+import DeletePortfolioButton from '@frontend/components/portfolio/deletePortfolioButton';
+import EditPortfolioButton from '@frontend/components/portfolio/editPortfolioButton';
+import {useGetUserPortfoliosQuery} from '@frontend/generated/graphql-hooks';
+import {Portfolio} from '@frontend/generated/graphql-types';
 import {
 	Box,
 	Stack,
 	Text,
 	Flex,
 } from '@chakra-ui/react';
-import CreatePortfolioButton from '@/components/portfolio/createPortfolioButton';
+import CreatePortfolioButton from '@frontend/components/portfolio/createPortfolioButton';
 
 interface SidebarProps {
 	portfolios?: Pick<Portfolio, 'id' | 'name'>[];

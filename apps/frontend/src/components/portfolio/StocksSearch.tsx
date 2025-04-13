@@ -6,8 +6,8 @@ import {
 	DrawerFooter,
 	DrawerTitle,
 	DrawerCloseTrigger,
-} from '@/components/ui/drawer';
-import {GetStockByIdQuery, useSearchStocksLazyQuery} from '@/generated/graphql-hooks';
+} from '@frontend/components/ui/drawer';
+import {GetStockByIdQuery, useSearchStocksLazyQuery} from '@frontend/generated/graphql-hooks';
 import React, {useCallback, useEffect, useState} from 'react';
 import {Input, Box, IconButton, Icon, Button, Stack, Flex, Spinner, Text} from '@chakra-ui/react';
 import {FaSearch} from 'react-icons/fa';

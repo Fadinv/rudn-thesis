@@ -1,22 +1,18 @@
 FROM node:20-alpine
 
-# Рабочая директория — корень монорепо
 WORKDIR /monorepo
 
-# Копируем package.json и lock-файл из корня
+# Копируем только package.json и lock-файл для кэширования
 COPY package.json package-lock.json ./
 
-# Копируем весь monorepo (нужно для workspaces и сборки)
-COPY . .
-
-# Устанавливаем зависимости (в том числе для backend)
+# Устанавливаем зависимости
 RUN npm ci
 
-# Переход в backend директорию
+# Копируем весь монорепозиторий (после установки — для кэширования зависимостей)
+COPY . .
+
 WORKDIR /monorepo/apps/backend
 
-# Прокидываем порт, если нужно (например, 4000)
 EXPOSE 4000
 
-# Запуск Nest.js в режиме разработки
 CMD ["npm", "run", "start:dev"]
