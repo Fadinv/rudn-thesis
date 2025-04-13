@@ -32,16 +32,16 @@
 		"@apollo/client": "^3.13.1",
 		"@chakra-ui/react": "^3.8.0",
 		"@emotion/react": "^11.14.0",
+		"@nestjs/graphql": "^13.0.2",
+		"@nestjs/typeorm": "^11.0.0",
 		"@next/swc-wasm-nodejs": "^13.5.10",
+		"bcryptjs": "^3.0.0",
 		"graphql": "^16.10.0",
 		"graphql-codegen": "^0.4.0",
 		"next": "15.1.7",
 		"react": "^19.0.0",
 		"react-dom": "^19.0.0",
-		"react-icons": "^5.5.0",
-		"@nestjs/typeorm": "^11.0.0",
-		"@nestjs/graphql": "^13.0.2",
-		"bcryptjs": "^3.0.0"
+		"react-icons": "^5.5.0"
 	},
 	"devDependencies": {
 		"@graphql-codegen/cli": "^5.0.5",
@@ -51,6 +51,6 @@
 		"@types/pg": "^8.11.11",
 		"concurrently": "^9.1.2",
 		"graphql-type-json": "^0.3.2",
-		"turbo": "^2.4.2"
+		"turbo": "^2.5.0"
 	}
 }

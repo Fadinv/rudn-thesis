@@ -4,7 +4,7 @@
 	"private": true,
 	"scripts": {
 		"build": "nest build",
-		"prebuild": "rimraf dist && cd ../../packages/orm && npm run build:orm && cd apps/backend",
+		"prebuild": "rm -rf dist && rm -f .tsbuildinfo && cd ../.. && npm run build:orm && cd apps/backend",
 		"format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
 		"start": "nest start",
 		"dev": "concurrently \"tsc -w\" \"nest start --watch\"",
