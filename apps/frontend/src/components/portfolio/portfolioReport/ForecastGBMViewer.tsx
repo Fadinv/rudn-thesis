@@ -1,3 +1,4 @@
+import {useColorModeValue} from '@frontend/components/ui/color-mode';
 import {useGetPortfolioReportQuery} from '@frontend/generated/graphql-hooks';
 import React, {FC, useEffect, useState} from 'react';
 import {XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Area, AreaChart} from 'recharts';
@@ -27,6 +28,12 @@ const FILL_COLORS: { [key: string]: string } = {
 	'2': '#fff',
 };
 
+const FILL_COLORS_BLACK: { [key: string]: string } = {
+	'0': '#dc3545',
+	'1': '#bbd0ff',
+	'2': '#111111',
+};
+
 const OPACITY: { [key: string]: number } = {
 	'0': .5,
 	'1': 1,
@@ -39,6 +46,7 @@ const ForecastGBMViewer: FC<ForecastGBMViewerProps> = ({reportId}) => {
 
 	const [percentiles, setPersentiles] = useState<number[]>([]);
 	const [chartData, setChartData] = useState<{ [key: string]: number }[]>([]);
+	const fillColors = useColorModeValue(FILL_COLORS, FILL_COLORS_BLACK);
 
 	const reportData = data?.getPortfolioReport?.data;
 
@@ -143,7 +151,7 @@ const ForecastGBMViewer: FC<ForecastGBMViewerProps> = ({reportId}) => {
 							return <Area style={{zIndex: Math.abs(-index)}} key={index} type="monotone"
 							             dataKey={`p${el}`} stroke={COLORS[String(index)]}
 							             strokeWidth={2}
-							             fill={FILL_COLORS[String(index)]}
+							             fill={fillColors[String(index)]}
 							             fillOpacity={OPACITY[String(index)]}
 							/>;
 						})}
@@ -155,7 +163,7 @@ const ForecastGBMViewer: FC<ForecastGBMViewerProps> = ({reportId}) => {
 								stroke="#6c757d"
 								strokeWidth={2}
 								fillOpacity={0}
-								fill={FILL_COLORS[String(2)]}
+								fill={fillColors[String(2)]}
 								name="Исторические данные"
 							/>
 						)}
