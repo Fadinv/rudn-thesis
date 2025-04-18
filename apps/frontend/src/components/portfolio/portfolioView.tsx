@@ -9,8 +9,6 @@ import {Text, Table, Spinner, Flex} from '@chakra-ui/react';
 
 interface PortfolioViewProps {
 	portfolioId: number;
-	onAddStock: (portfolioId: number) => void;
-	onUpdateStock: (portfolioId: number, stockId: number) => void;
 }
 
 const PortfolioView: React.FC<PortfolioViewProps> = ({portfolioId}) => {

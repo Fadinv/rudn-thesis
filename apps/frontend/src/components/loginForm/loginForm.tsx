@@ -1,4 +1,5 @@
-import React, {useState} from 'react';
+import {useApolloClient} from '@apollo/client';
+import React, {useEffect, useState} from 'react';
 import {Fieldset, Input, Button, Box, Heading, Text} from '@chakra-ui/react';
 import {Field} from '@frontend/components/ui/field';
 import {useCurrentUserQuery, useLoginMutation} from '@frontend/generated/graphql-hooks';
@@ -7,7 +8,7 @@ const LoginForm = () => {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [login, {loading, error}] = useLoginMutation();
-	const {refetch: refetchCurrentUser} = useCurrentUserQuery();
+	const {refetch: refetchCurrentUser} = useCurrentUserQuery({fetchPolicy: 'cache-only'});
 
 	const handleLogin: React.FormEventHandler<HTMLFormElement> = async (e) => {
 		e.preventDefault();
