@@ -4,9 +4,7 @@ import {Box, Flex} from '@chakra-ui/react';
 import Sidebar from './sidebar/sidebar';
 import PortfolioView from '@frontend/components/portfolio/portfolioView';
 
-interface HomeProps {}
-
-const Home: React.FC<HomeProps> = () => {
+const Home: React.FC = () => {
 	const [selectedPortfolioId, setSelectedPortfolioId] = useState<number | null>(null);
 	const {data} = useGetUserPortfoliosQuery();
 
