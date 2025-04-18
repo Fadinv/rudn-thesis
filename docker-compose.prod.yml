@@ -23,6 +23,8 @@ services:
     env_file:
       - ./.env.shared
       - ./apps/backend/.env.local
+    environment:
+      - NODE_ENV=production
     ports:
       - "4000:4000"
     depends_on:
@@ -39,6 +41,8 @@ services:
     env_file:
       - ./.env.shared
       - ./apps/ticker-updater/.env.local
+    environment:
+      - NODE_ENV=production
     depends_on:
       postgres:
         condition: service_healthy
