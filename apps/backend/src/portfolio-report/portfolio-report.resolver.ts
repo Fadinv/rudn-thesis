@@ -1,5 +1,6 @@
+import {AuthUser} from '@backend/auth';
 import {Resolver, Query, Mutation, Args, Int, Float} from '@nestjs/graphql';
-import {PortfolioReport} from '@service/orm';
+import {PortfolioReport, User} from '@service/orm';
 import {MarkovitzReportInput} from './dto/markovitz-report.input';
 import {FutureReturnForecastInput} from './dto/future-return-forecast.input';
 import {PortfolioReportService} from './portfolio-report.service';
@@ -12,6 +13,7 @@ export class PortfolioReportResolver {
 	// Создание отчета Марковица
 	@Mutation(() => PortfolioReport)
 	async createMarkovitzReport(
+		@AuthUser() _user: User,
 		@Args('portfolioId', {type: () => Int}) portfolioId: number,
 		@Args('input') input: MarkovitzReportInput,
 	): Promise<PortfolioReport> {
@@ -21,6 +23,7 @@ export class PortfolioReportResolver {
 	// Создание отчета "Прогнозирование будущей доходности"
 	@Mutation(() => PortfolioReport)
 	async createFutureReturnForecastGBMReport(
+		@AuthUser() _user: User,
 		@Args('portfolioId', {type: () => Int}) portfolioId: number,
 		@Args('input') input: FutureReturnForecastInput,
 	): Promise<PortfolioReport> {
@@ -33,6 +36,7 @@ export class PortfolioReportResolver {
 	// Получение оптимального распределения активов в зависимости от капитала и весов
 	@Query(() => PortfolioDistribution)
 	async getDistributedPortfolioAssets(
+		@AuthUser() _user: User,
 		@Args('capital', {type: () => Float}) capital: number,
 		@Args('stockTickerList', {type: () => [String]}) stockTickerList: string[],
 		@Args('weights', {type: () => [Float], nullable: false}) weights: number[],
@@ -46,19 +50,28 @@ export class PortfolioReportResolver {
 
 	// Получение отчета по ID
 	@Query(() => PortfolioReport, {nullable: true})
-	async getPortfolioReport(@Args('reportId') reportId: string): Promise<PortfolioReport | null> {
+	async getPortfolioReport(
+		@AuthUser() _user: User,
+		@Args('reportId') reportId: string,
+	): Promise<PortfolioReport | null> {
 		return this.portfolioReportService.getReport(reportId);
 	}
 
 	// Получение всех отчетов по портфелю
 	@Query(() => [PortfolioReport])
-	async getPortfolioReports(@Args('portfolioId', {type: () => Int}) portfolioId: number): Promise<PortfolioReport[]> {
+	async getPortfolioReports(
+		@AuthUser() _user: User,
+		@Args('portfolioId', {type: () => Int}) portfolioId: number
+	): Promise<PortfolioReport[]> {
 		return this.portfolioReportService.getReportsByPortfolio(portfolioId);
 	}
 
 	// Удаление отчета
 	@Mutation(() => Boolean)
-	async deletePortfolioReport(@Args('reportId') reportId: string): Promise<boolean> {
+	async deletePortfolioReport(
+		@AuthUser() _user: User,
+		@Args('reportId') reportId: string,
+	): Promise<boolean> {
 		return this.portfolioReportService.deleteReport(reportId);
 	}
 }

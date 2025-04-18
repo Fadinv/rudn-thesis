@@ -1,3 +1,4 @@
+import {ServerErrorFallback} from '@frontend/components/mainLayout/serverErrorFallback';
 import React from 'react';
 import Header from '@frontend/components/header/header';
 import LoginForm from '@frontend/components/loginForm/loginForm';
@@ -20,7 +21,7 @@ const Layout = ({children}: { children: React.ReactNode }) => {
 		);
 	}
 
-	if (error) return <p>Error: {error.message}</p>;
+	if (error) return <ServerErrorFallback/>;
 
 	if (!data?.currentUser) {
 		return (

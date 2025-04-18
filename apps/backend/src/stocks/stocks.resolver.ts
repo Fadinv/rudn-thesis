@@ -10,16 +10,19 @@ export class StocksResolver {
 	constructor(private readonly stocksService: StocksService) {}
 
 	@Query(() => [Stock])
+	@UseGuards(GqlAuthGuard)
 	async getStocks(): Promise<Stock[]> {
 		return this.stocksService.findAll();
 	}
 
 	@Query(() => Stock, {nullable: true})
+	@UseGuards(GqlAuthGuard)
 	async getStockById(@Args('id', {type: () => Int}) id: number): Promise<Stock | null> {
 		return this.stocksService.findById(id);
 	}
 
 	@Query(() => Stock, {nullable: true})
+	@UseGuards(GqlAuthGuard)
 	async getStockByTicker(@Args('ticker') ticker: string): Promise<Stock | null> {
 		return this.stocksService.findByTicker(ticker);
 	}

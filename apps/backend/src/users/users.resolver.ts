@@ -1,8 +1,8 @@
 import {Resolver, Query, Mutation, Args, Context} from '@nestjs/graphql';
 import {User} from '@service/orm';
 import {Request} from 'express-serve-static-core';
-import {CurrentUser} from '@backend/auth';
 import {UsersService} from '@backend/users';
+import {CurrentUser} from '../auth/current-user.decorator';
 
 @Resolver(() => User)
 export class UsersResolver {
