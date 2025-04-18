@@ -1,5 +1,4 @@
-import {useApolloClient} from '@apollo/client';
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {Fieldset, Input, Button, Box, Heading, Text} from '@chakra-ui/react';
 import {Field} from '@frontend/components/ui/field';
 import {useCurrentUserQuery, useLoginMutation} from '@frontend/generated/graphql-hooks';
