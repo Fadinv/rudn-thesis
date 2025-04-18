@@ -1,5 +1,6 @@
 export * from './orm-config';
 export * from './orm.module';
+export * from './data-source';
 export * from './entities/users/user.entity';
 export * from './entities/stocks/stock.entity';
 export * from './entities/stock-price/stock-price.entity';

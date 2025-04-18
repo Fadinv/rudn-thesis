@@ -1,26 +1,27 @@
 import axios from 'axios';
-import {Client} from 'pg';
-import {SP500List} from './SP500List';
 import * as dotenv from 'dotenv';
+import {In} from 'typeorm';
+import {
+	AppDataSource,
+	Stock,
+	StockPrice,
+} from '@service/orm';
+import {SP500List} from './SP500List';
 
 dotenv.config({path: '../../.env.shared'});
 dotenv.config({path: './.env'});
 
 const API_KEY = process.env.POLYGON_API_KEY!;
-const DB_URL = process.env.DATABASE_URL!;
 const STOCK_API_URL = `https://api.polygon.io/v3/reference/tickers?market=stocks&active=true&limit=1000&apiKey=${API_KEY}`;
 
-const FROM_DATE = new Date(new Date().setFullYear(new Date().getFullYear() - 3))
-	.toISOString()
-	.split('T')[0];
+const FROM_DATE = new Date(new Date().setFullYear(new Date().getFullYear() - 3)).toISOString().split('T')[0];
 const TO_DATE = new Date().toISOString().split('T')[0];
 
-const REQUEST_DELAY = 250;
 const MAX_RETRIES = 5;
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-async function fetchWithRetry(url: string, retries = MAX_RETRIES) {
+async function fetchWithRetry(url: string, retries = MAX_RETRIES): Promise<any> {
 	for (let attempt = 1; attempt <= retries; attempt++) {
 		try {
 			const response = await axios.get(url);
@@ -29,7 +30,6 @@ async function fetchWithRetry(url: string, retries = MAX_RETRIES) {
 			if (error.response?.status === 429) {
 				console.warn(`⚠️ 429 Too Many Requests. Повтор через 5 сек (попытка ${attempt})`);
 				await sleep(5000);
-				return fetchWithRetry(url, retries);
 			} else {
 				console.error(`❌ Ошибка запроса: ${error.message}`);
 				return null;
@@ -60,139 +60,103 @@ async function fetchTickers() {
 	return tickers;
 }
 
-// 📈 Получаем цену и логотип для тикера
 async function fetchTickerDetails(ticker: string) {
-	await sleep(REQUEST_DELAY);
 	const url = `https://api.polygon.io/v3/reference/tickers/${ticker}?apiKey=${API_KEY}`;
 	return fetchWithRetry(url);
 }
 
-// Обновляем исторические котировки
-async function updateStockPrices(client: Client, ticker: string) {
-	try {
-		// 🔍 Получаем последнюю загруженную дату для тикера
-		const {rows} = await client.query(
-			`SELECT MAX(date) AS last_date FROM stock_prices WHERE ticker = $1`,
-			[ticker],
-		);
+async function updateStockPrices(ticker: string) {
+	const priceRepo = AppDataSource.getRepository(StockPrice);
 
-		let fromDate = FROM_DATE; // 📅 Используем старый FROM_DATE по умолчанию
-		if (rows[0]?.last_date) { // ✅ Если есть загруженные котировки
-			const lastDate = new Date(rows[0].last_date);
-			lastDate.setDate(lastDate.getDate() + 1); // ⏩ Двигаем дату вперед на 1 день
-			fromDate = lastDate.toISOString().split('T')[0]; // Преобразуем в YYYY-MM-DD
-		}
+	const last = await priceRepo.findOne({
+		where: {ticker},
+		order: {date: 'DESC'},
+	});
 
-		const toDate = new Date().toISOString().split('T')[0]; // 📅 Сегодняшняя дата
-
-		// Проверяем, чтобы `fromDate` ≤ `toDate`
-		if (new Date(fromDate) >= new Date(toDate)) {
-			console.log(`⏭️ Пропускаем ${ticker}, актуальные котировки уже загружены.`);
-			return;
-		}
-
-		console.log(`📊 Догружаем котировки для ${ticker} с ${fromDate} по ${toDate}`);
-
-		const response = await fetchWithRetry(
-			`https://api.polygon.io/v2/aggs/ticker/${ticker}/range/1/day/${fromDate}/${toDate}?apiKey=${API_KEY}`,
-		);
-
-		if (!response || !response.results) return;
-
-		// 🔄 Формируем массив котировок
-		const stockPrices = response.results.map((item: any) => ({
-			ticker,
-			date: new Date(item.t).toISOString().split('T')[0], // Преобразуем timestamp в YYYY-MM-DD
-			open: item.o,
-			high: item.h,
-			low: item.l,
-			close: item.c,
-			volume: item.v,
-		}));
-
-		// 📌 Вставляем новые котировки, избегая дубликатов
-		for (const price of stockPrices) {
-			await client.query(
-				`
-                INSERT INTO stock_prices (ticker, date, open, high, low, close, volume)
-                VALUES ($1, $2, $3, $4, $5, $6, $7)
-                ON CONFLICT (ticker, date) DO NOTHING;
-                `,
-				[price.ticker, price.date, price.open, price.high, price.low, price.close, price.volume],
-			);
-		}
-
-		console.log(`✅ Котировки для ${ticker} обновлены!`);
-	} catch (error) {
-		console.error(`❌ Ошибка при обновлении котировок ${ticker}:`, error);
+	let fromDate = FROM_DATE;
+	if (last?.date) {
+		const nextDate = new Date(last.date);
+		nextDate.setDate(nextDate.getDate() + 1);
+		fromDate = nextDate.toISOString().split('T')[0];
 	}
-}
 
-// Обновляем тикеры в БД
-async function updateTickers() {
-	const client = new Client({connectionString: DB_URL});
-	await client.connect();
-
-	const tickers = await fetchTickers();
-	// const tickers: any[] = [];
-	if (tickers.length === 0) {
-		console.log('❌ Нет новых данных.');
-		await client.end();
+	if (new Date(fromDate) >= new Date(TO_DATE)) {
+		console.log(`⏭️ Пропускаем ${ticker}, актуальные котировки уже загружены.`);
 		return;
 	}
 
-	let count = 0;
+	console.log(`📊 Догружаем котировки для ${ticker} с ${fromDate} по ${TO_DATE}`);
 
-	for (const ticker of tickers) {
-		if (SP500List.has(ticker.ticker)) {
-			let logoUrl: string | null = null;
-			try {
-				const details = await fetchTickerDetails(ticker.ticker);
-				logoUrl = details?.results?.branding?.logo_url || null;
-				count++;
-			} catch (_) {}
+	const response = await fetchWithRetry(
+		`https://api.polygon.io/v2/aggs/ticker/${ticker}/range/1/day/${fromDate}/${TO_DATE}?apiKey=${API_KEY}`,
+	);
 
-			await client.query(
-				`
-                  INSERT INTO stock (ticker, name, market, locale, primary_exchange, type, active, currency_name, cik, composite_figi, share_class_figi, last_updated_utc, logo_url)
-                  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
-                  ON CONFLICT (ticker) DO UPDATE 
-                  SET name = EXCLUDED.name, market = EXCLUDED.market, locale = EXCLUDED.locale, primary_exchange = EXCLUDED.primary_exchange, 
-                      type = EXCLUDED.type, active = EXCLUDED.active, currency_name = EXCLUDED.currency_name, 
-                      cik = EXCLUDED.cik, composite_figi = EXCLUDED.composite_figi, share_class_figi = EXCLUDED.share_class_figi, 
-                      last_updated_utc = EXCLUDED.last_updated_utc, logo_url = EXCLUDED.logo_url;
-                `,
-				[
-					ticker.ticker,
-					ticker.name,
-					ticker.market,
-					ticker.locale,
-					ticker.primary_exchange,
-					ticker.type,
-					ticker.active,
-					ticker.currency_name,
-					ticker.cik || null,
-					ticker.composite_figi || null,
-					ticker.share_class_figi || null,
-					ticker.last_updated_utc,
-					logoUrl,
-				],
-			);
-		}
+	if (!response?.results?.length) {
+		console.log(`⚠️ Нет котировок для ${ticker}`);
+		return;
 	}
 
-	const result = await client.query('SELECT ticker FROM stock');
-	const insertedTickers = new Set<string>(); // Будем хранить тикеры, которые реально попали в БД
-	result.rows.forEach(row => insertedTickers.add(row.ticker));
+	const records = response.results.map((r: any) =>
+		priceRepo.create({
+			ticker,
+			date: new Date(r.t).toISOString().split('T')[0],
+			open: r.o,
+			high: r.h,
+			low: r.l,
+			close: r.c,
+			volume: r.v,
+		}),
+	);
 
-	console.log(`✅ Обновлено ${insertedTickers.size} тикеров.`);
+	await priceRepo.upsert(records, ['ticker', 'date']); // ✅ батч-вставка
 
-	// 🔥 🔄 Загружаем котировки только для тех тикеров, которые реально были добавлены в БД
-	for (const ticker of insertedTickers) {
-		await updateStockPrices(client, ticker);
-	}
-
-	await client.end();
+	console.log(`✅ Котировки для ${ticker} обновлены!`);
 }
 
-export {updateTickers};
+export async function updateTickers() {
+	const stockRepo = AppDataSource.getRepository(Stock);
+	const tickers = await fetchTickers();
+	if (!tickers?.length) {
+		console.log('❌ Нет данных для обновления.');
+		return;
+	}
+
+	const insertedTickers: string[] = [];
+
+	for (const ticker of tickers) {
+		if (!SP500List.has(ticker.ticker)) continue;
+
+		let logoUrl: string | undefined = undefined;
+
+		try {
+			const details = await fetchTickerDetails(ticker.ticker);
+			logoUrl = details?.results?.branding?.logo_url || null;
+		} catch {}
+
+		const stock = stockRepo.create({
+			ticker: ticker.ticker,
+			name: ticker.name,
+			market: ticker.market,
+			locale: ticker.locale,
+			primaryExchange: ticker.primary_exchange, // 👈 camelCase в классе
+			type: ticker.type,
+			active: ticker.active,
+			currencyName: ticker.currency_name,
+			cik: ticker.cik,
+			compositeFigi: ticker.composite_figi,
+			shareClassFigi: ticker.share_class_figi,
+			lastUpdatedUtc: ticker.last_updated_utc,
+			logoUrl: logoUrl,
+		});
+
+		await stockRepo.upsert(stock, ['ticker']);
+		console.log(`Тикер обновлен ${ticker.ticker}`);
+		insertedTickers.push(ticker.ticker);
+	}
+
+	console.log(`✅ Обновлено ${insertedTickers.length} тикеров.`);
+
+	for (const ticker of insertedTickers) {
+		await updateStockPrices(ticker);
+	}
+}

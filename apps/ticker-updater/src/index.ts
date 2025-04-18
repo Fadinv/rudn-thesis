@@ -1,11 +1,16 @@
 import * as cron from 'node-cron';
 import {updateTickers} from './updateTickers';
+import {AppDataSource} from '@service/orm';
 
 console.log('✅ Сервис обновления тикеров запущен.');
 
 let isUpdating = false; // Флаг выполнения обновления
 
 async function runUpdate() {
+	if (!AppDataSource.isInitialized) {
+		await AppDataSource.initialize();
+	}
+
 	if (isUpdating) {
 		console.log('⚠ Обновление уже выполняется, пропускаем запуск.');
 		return;

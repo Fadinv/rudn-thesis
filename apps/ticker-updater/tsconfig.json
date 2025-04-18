@@ -1,9 +1,16 @@
 {
-  "extends": "../../tsconfig.base.json",
-  "compilerOptions": {
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "tsBuildInfoFile": "./.tsbuildinfo"
-  },
-  "include": ["src"]
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"outDir": "./dist",
+		"rootDir": "./src",
+		"tsBuildInfoFile": "./.tsbuildinfo"
+	},
+	"references": [
+		{
+			"path": "../../packages/orm"
+		}
+	],
+	"include": [
+		"src"
+	]
 }
