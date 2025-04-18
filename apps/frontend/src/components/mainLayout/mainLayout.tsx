@@ -13,7 +13,7 @@ const Layout = ({children}: { children: React.ReactNode }) => {
 	const isDark = colorMode === 'dark';
 	const colorPalette = isDark ? 'teal' : undefined;
 
-	if (loading || data?.currentUser === undefined) {
+	if (loading) {
 		return (
 			<Center h="100vh">
 				<Spinner size="xl" color="blue.500"/>
