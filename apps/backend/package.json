@@ -6,7 +6,7 @@
 		"build": "nest build",
 		"prebuild": "rm -rf dist && rm -f .tsbuildinfo && cd ../.. && npm run build:orm && cd apps/backend",
 		"format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-		"start": "nest start",
+		"start": "nest start --watch",
 		"dev": "concurrently \"tsc -w\" \"nest start --watch\"",
 		"prestart": "rm -rf dist && rm -f .tsbuildinfo && cd ../.. && npm run build:orm && cd apps/backend",
 		"start:dev": "npm run prestart && nest start --watch",
