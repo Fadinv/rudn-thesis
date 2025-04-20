@@ -36,7 +36,7 @@ def process_markovitz_report(
         index_ticker = EXCHANGE_INDEX_MAP.get(exchange)
 
         if index_ticker:
-            market_returns = get_market_returns(portfolio_data.start_date, end_date, index_ticker, target_currency)
+            market_returns = get_market_returns(portfolio_data["start_date"], end_date, index_ticker, target_currency)
         else:
             market_returns = None
 
