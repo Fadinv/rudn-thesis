@@ -147,14 +147,14 @@ export async function updateTickers() {
 			name: ticker.name,
 			market: ticker.market,
 			locale: ticker.locale,
-			primaryExchange: ticker.primary_exchange, // 👈 camelCase в классе
+			primaryExchange: ticker.primary_exchange ?? '', // 👈 camelCase в классе
 			type: ticker.type,
-			active: ticker.active,
-			currencyName: ticker.currency_name,
+			active: ticker.active ?? true,
+			currencyName: ticker.currency_name ?? '',
 			cik: ticker.cik,
 			compositeFigi: ticker.composite_figi,
 			shareClassFigi: ticker.share_class_figi,
-			lastUpdatedUtc: ticker.last_updated_utc,
+			lastUpdatedUtc: ticker.last_updated_utc ?? '',
 			logoUrl: logoUrl,
 			source: 'polygon',
 			exchange: 'NASDAQ',
