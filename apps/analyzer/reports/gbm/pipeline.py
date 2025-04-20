@@ -8,11 +8,12 @@ def process_gbm_report(
     selected_percentiles: list[int],
     forecast_horizons: list[int],
     date_range: str = "3y",
+    target_currency: str = 'usd',
 ) -> dict:
     # 1. Определяем диапазон дат
     start_date, end_date = get_date_range(date_range)
 
-    portfolio_data = get_portfolio_data_with_history(report_id, [], start_date, end_date)
+    portfolio_data = get_portfolio_data_with_history(report_id, [], start_date, end_date, target_currency)
     if not portfolio_data:
         raise ValueError(f"Report {report_id} not found or no data available")
 
@@ -26,4 +27,6 @@ def process_gbm_report(
     )
 
     forecast_result["portfolioHistory"] = portfolio_data["portfolio_history"]
+    forecast_result["targetCurrency"] = target_currency
+
     return forecast_result

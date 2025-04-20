@@ -38,13 +38,18 @@ const DeletePortfolioButton: React.FC<DeletePortfolioButtonProps> = ({
 	};
 
 	return (
-		<DialogRoot open={open} onOpenChange={(e) => setOpen(e.open)}>
+		<DialogRoot role="alertdialog" open={open} onOpenChange={(e) => setOpen(e.open)}>
 			<DialogTrigger asChild>
 				<IconButton size="xs" colorScheme="red" colorPalette="red" variant="solid">
 					<Icon as={FaTrash}/>
 				</IconButton>
 			</DialogTrigger>
-			<DialogContent>
+			<DialogContent
+				onClick={(e) => {
+					e.preventDefault();
+					e.stopPropagation();
+				}}
+			>
 				<DialogHeader>
 					<DialogTitle>Удаление портфеля</DialogTitle>
 				</DialogHeader>

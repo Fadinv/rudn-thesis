@@ -2,7 +2,6 @@ import pandas_market_calendars as mcal
 from datetime import datetime, timedelta, date
 import numpy as np
 
-
 def get_forecast_dates(horizons: list[int], today: datetime.date = None) -> dict[int, datetime.date]:
     if today is None:
         today = datetime.today().date()
@@ -51,6 +50,7 @@ def generate_gbm_forecast(
     }
 
     mu_values, sigma_values = calculate_annualized_metrics(returns)
+    print('LAST_PRICES', last_prices, mu_values, sigma_values)
 
     for ticker, mu, sigma in zip(tickers, mu_values, sigma_values):
         S0 = last_prices.get(ticker, 0)

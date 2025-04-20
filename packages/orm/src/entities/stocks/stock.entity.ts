@@ -59,4 +59,16 @@ export class Stock {
 	@Field({nullable: true})
 	@Column({nullable: true, name: 'logo_url'})
 	logoUrl?: string;
+
+	@Field({description: 'Источник данных'})
+	@Column({default: ''})
+	source!: string;
+
+	@Field({description: 'Для отображения или уточнения биржи NASDAQ / MOEX'})
+	@Column({default: ''})
+	exchange!: string;
+
+	@Field({description: 'Если true - то это индекс'})
+	@Column({default: false})
+	isIndex!: boolean;
 }

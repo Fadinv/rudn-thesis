@@ -2,6 +2,9 @@ import {InputType, Field, Float, Int} from '@nestjs/graphql';
 
 @InputType()
 export class MarkovitzReportInput {
+	@Field(() => String, {nullable: true})
+	currency?: string;
+
 	@Field(() => [String], {nullable: true})
 	additionalTickers?: string[];
 

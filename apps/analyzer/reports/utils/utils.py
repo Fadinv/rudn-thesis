@@ -118,3 +118,33 @@ def get_date_range(date_range: str) -> tuple[str, str]:
 
     start_date = end_date - delta
     return start_date.strftime("%Y-%m-%d"), end_date.strftime("%Y-%m-%d")
+
+from datetime import date, timedelta
+from sqlalchemy import text
+from database import engine
+
+# Кеш для хранения данных
+_cached_usd_rub_prices = None
+
+
+def fill_missing_fx_rates(fx_data: dict[str, float]) -> dict[str, float]:
+    """Заполняет пропущенные даты, используя последнее доступное значение."""
+    if not fx_data:
+        return {}
+
+    sorted_dates = sorted(fx_data.keys())
+    start = date.fromisoformat(sorted_dates[0])
+    end = date.fromisoformat(sorted_dates[-1])
+
+    filled_data = {}
+    last_value = None
+    current = start
+
+    while current <= end:
+        iso = current.isoformat()
+        if iso in fx_data:
+            last_value = fx_data[iso]
+        filled_data[iso] = last_value
+        current += timedelta(days=1)
+
+    return filled_data

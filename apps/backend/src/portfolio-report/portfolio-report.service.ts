@@ -216,6 +216,7 @@ export class PortfolioReportService {
 				risk_free_rate: input?.riskFreeRate,
 				num_portfolios: input?.numPortfolios,
 				cov_method: input?.covMethod,
+				target_currency: input?.currency,
 			});
 			console.log(`✅ Python принял отчёт ${reportId}, ожидаем расчёта`);
 		} catch (error) {
@@ -236,6 +237,7 @@ export class PortfolioReportService {
 				selectedPercentiles: input.selectedPercentiles,
 				forecastHorizons: input.forecastHorizons,
 				date_range: input?.dateRange,
+				target_currency: input?.currency,
 			});
 			console.log(`✅ Python принял отчёт ${reportId}, ожидаем расчёта`);
 		} catch (error) {

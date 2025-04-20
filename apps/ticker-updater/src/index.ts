@@ -1,3 +1,4 @@
+import {updateMoexTickers} from './updateMoexTickers';
 import * as cron from 'node-cron';
 import {updateTickers} from './updateTickers';
 import {AppDataSource} from '@service/orm';
@@ -20,11 +21,12 @@ async function runUpdate() {
 	try {
 		console.log('🔄 Запуск обновления тикеров...');
 		await updateTickers();
+		await updateMoexTickers();
 		console.log('✅ Обновление завершено!');
 	} catch (error) {
 		console.error('❌ Ошибка при обновлении тикеров:', error);
 	} finally {
-		isUpdating = false; // Всегда сбрасываем флаг после выполнения
+		isUpdating = false;
 	}
 }
 
@@ -32,7 +34,7 @@ async function runUpdate() {
 runUpdate();
 
 // ⏳ Запускаем cron каждые 5 минут (можешь менять на `*/1` для тестов)
-cron.schedule('*/360 * * * *', async () => {
+cron.schedule('0 */6 * * *', async () => {
 	console.log('⏳ Плановое обновление тикеров...');
 	await runUpdate();
 });

@@ -17,6 +17,15 @@ type Stock {
   shareClassFigi: String
   lastUpdatedUtc: String!
   logoUrl: String
+
+  """Источник данных"""
+  source: String!
+
+  """Для отображения или уточнения биржи NASDAQ / MOEX"""
+  exchange: String!
+
+  """Если true - то это индекс"""
+  isIndex: Boolean!
 }
 
 type PortfolioStock {
@@ -72,7 +81,7 @@ type StockPrice {
   high: Float!
   low: Float!
   close: Float!
-  volume: Float!
+  volume: Float
 }
 
 type PortfolioDistribution {
@@ -151,6 +160,7 @@ input PortfolioStockUpdateInput {
 }
 
 input MarkovitzReportInput {
+  currency: String
   additionalTickers: [String!]
   dateRange: String
   riskFreeRate: Float
@@ -159,6 +169,7 @@ input MarkovitzReportInput {
 }
 
 input FutureReturnForecastInput {
+  currency: String
   selectedPercentiles: [Float!]!
   forecastHorizons: [Float!]!
   dateRange: String

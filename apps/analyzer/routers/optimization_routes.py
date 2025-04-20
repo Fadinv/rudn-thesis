@@ -21,12 +21,15 @@ async def create_markovitz_report(request: dict):
     risk_free_rate = request["risk_free_rate"]
     num_portfolios = request["num_portfolios"]
     cov_method = request["cov_method"]
+    target_currency = request.get("target_currency", 'usd')
+
     print('report_id', report_id)
     print('additional_tickers', additional_tickers)
     print('date_range', date_range)
     print('risk_free_rate', risk_free_rate)
     print('num_portfolios', num_portfolios)
     print('cov_method', cov_method)
+    print('target_currency', target_currency)
 
     print(f"🔍 Запускаем анализ отчёта {report_id} с дополнительными тикерами: {additional_tickers}")
 
@@ -37,7 +40,8 @@ async def create_markovitz_report(request: dict):
             date_range,
             risk_free_rate,
             num_portfolios,
-            cov_method
+            cov_method,
+            target_currency
         )
 
         with engine.connect() as conn:
@@ -60,13 +64,14 @@ async def create_markovitz_report(request: dict):
 async def create_gbm_report(request: dict):
     try:
         report_id = request["reportId"]
+        target_currency = request.get("target_currency", 'usd')
         selected_percentiles = request.get("selectedPercentiles", [10, 50, 90])
         forecast_horizons = request.get("forecastHorizons", [30, 60, 90, 180, 365, 730, 1095])
         date_range = request.get("date_range", "3y")
 
         print(f"🔍 Запускаем GBM прогноз для отчёта {report_id}")
 
-        result = process_gbm_report(report_id, selected_percentiles, forecast_horizons, date_range)
+        result = process_gbm_report(report_id, selected_percentiles, forecast_horizons, date_range, target_currency)
 
         with engine.connect() as conn:
             conn.execute(text("""

@@ -1,18 +1,22 @@
 import axios from 'axios';
 import * as dotenv from 'dotenv';
-import {In} from 'typeorm';
 import {
 	AppDataSource,
 	Stock,
 	StockPrice,
 } from '@service/orm';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import {SP500List} from './SP500List';
+import {fxList} from './fx-list';
+import {createUsdRubTicker} from './helpers/createUsdRubTickers';
 
 dotenv.config({path: '../../.env.shared'});
 dotenv.config({path: './.env'});
 
 const API_KEY = process.env.POLYGON_API_KEY!;
 const STOCK_API_URL = `https://api.polygon.io/v3/reference/tickers?market=stocks&active=true&limit=1000&apiKey=${API_KEY}`;
+const CSV_PATH = path.resolve(__dirname, 'csv/USD_RUB_Historical_Data.csv');
 
 const FROM_DATE = new Date(new Date().setFullYear(new Date().getFullYear() - 3)).toISOString().split('T')[0];
 const TO_DATE = new Date().toISOString().split('T')[0];
@@ -115,16 +119,21 @@ async function updateStockPrices(ticker: string) {
 
 export async function updateTickers() {
 	const stockRepo = AppDataSource.getRepository(Stock);
-	const tickers = await fetchTickers();
+
+	const tickers = await fetchTickers()
+	// const tickers: any[] = [];
 	if (!tickers?.length) {
 		console.log('❌ Нет данных для обновления.');
-		return;
+		// return;
 	}
+
+	const usdRub = await createUsdRubTicker();
+	tickers.push(usdRub);
 
 	const insertedTickers: string[] = [];
 
 	for (const ticker of tickers) {
-		if (!SP500List.has(ticker.ticker)) continue;
+		if (!SP500List.has(ticker.ticker) && !fxList.has(ticker.ticker)) continue;
 
 		let logoUrl: string | undefined = undefined;
 
@@ -147,6 +156,10 @@ export async function updateTickers() {
 			shareClassFigi: ticker.share_class_figi,
 			lastUpdatedUtc: ticker.last_updated_utc,
 			logoUrl: logoUrl,
+			source: 'polygon',
+			exchange: 'NASDAQ',
+			// TODO: При изменении логики стоит доработать универсально
+			isIndex: ticker.ticker === 'SPY',
 		});
 
 		await stockRepo.upsert(stock, ['ticker']);
@@ -156,7 +169,72 @@ export async function updateTickers() {
 
 	console.log(`✅ Обновлено ${insertedTickers.length} тикеров.`);
 
+	if (process.env.USE_CSV_TICKER_LIST === 'true') {
+		await importUsdRubFromCsv();
+	}
+
 	for (const ticker of insertedTickers) {
 		await updateStockPrices(ticker);
 	}
+}
+
+async function importUsdRubFromCsv() {
+	const priceRepo = AppDataSource.getRepository(StockPrice);
+	const stockRepo = AppDataSource.getRepository(Stock);
+
+	const ticker = 'C:USDRUB';
+	const isEnabled = process.env.USE_CSV_TICKER_LIST === 'true';
+	if (!isEnabled) return;
+
+	// Убедимся, что тикер есть в stock
+	const existing = await stockRepo.findOneBy({ ticker });
+	if (!existing) {
+		const usdRubStock = stockRepo.create({
+			ticker,
+			name: 'USD / RUB',
+			market: 'fx',
+			locale: 'global',
+			primaryExchange: 'FX',
+			active: true,
+			currencyName: 'RUB',
+			source: 'polygon',
+			exchange: 'FX',
+			isIndex: false,
+			lastUpdatedUtc: '',
+		});
+		await stockRepo.save(usdRubStock);
+		console.log('📈 Тикер C:USDRUB добавлен');
+	}
+
+	const csvPath = path.resolve(__dirname, '../csv/USD_RUB_Historical_Data.csv');
+	const fileContent = fs.readFileSync(csvPath, 'utf-8');
+	const lines = fileContent.split('\n').slice(1); // пропускаем заголовок
+
+	const records: StockPrice[] = [];
+
+	for (const line of lines) {
+		const [dateStr, priceStrRaw] = line.split(',').map(s => s.replace(/"/g, '').trim());
+
+		if (!dateStr || !priceStrRaw) continue;
+
+		// Парсим дату как MM/DD/YYYY → YYYY-MM-DD
+		const [month, day, year] = dateStr.split('/');
+		const isoDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+
+		const price = parseFloat(priceStrRaw.replace(',', '.'));
+		if (isNaN(price)) continue;
+
+		records.push(priceRepo.create({
+			ticker,
+			date: isoDate,
+			open: price,
+			high: price,
+			low: price,
+			close: price,
+			volume: 0,
+		}));
+	}
+
+	await priceRepo.upsert(records, ['ticker', 'date']);
+	console.log(`✅ Импортировано ${records.length} записей по курсу USD/RUB`);
 }
