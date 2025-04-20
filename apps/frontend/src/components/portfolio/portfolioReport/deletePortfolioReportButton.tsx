@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Button, Icon, IconButton, Text} from '@chakra-ui/react';
 import {FaTrash} from 'react-icons/fa';
 import {useDeletePortfolioReportMutation} from '@frontend/generated/graphql-hooks';
@@ -27,6 +27,16 @@ const DeletePortfolioReportButton: React.FC<DeletePortfolioButtonProps> = ({
 	const [open, setOpen] = useState(false);
 	const [deletePortfolio, {loading}] = useDeletePortfolioReportMutation();
 
+	useEffect(() => {
+		if (!open) return;
+		// Костыль для нормального отображения модального окна
+		window.setTimeout(() => {
+			const dialog = document.getElementById('dialog:delete-report-dialog:backdrop');
+			if (!dialog) return;
+			dialog.style.zIndex = '1400';
+		});
+	}, [open]);
+
 	const handleDelete: React.MouseEventHandler = async (e) => {
 		e.stopPropagation();
 		e.preventDefault();
@@ -40,7 +50,7 @@ const DeletePortfolioReportButton: React.FC<DeletePortfolioButtonProps> = ({
 	};
 
 	return (
-		<DialogRoot open={open} onOpenChange={(e) => setOpen(e.open)}>
+		<DialogRoot id={'delete-report-dialog'} open={open} onOpenChange={(e) => setOpen(e.open)}>
 			<DialogTrigger asChild>
 				<IconButton onClick={(e) => {
 					e.stopPropagation();
@@ -50,7 +60,10 @@ const DeletePortfolioReportButton: React.FC<DeletePortfolioButtonProps> = ({
 					<Icon as={FaTrash}/>
 				</IconButton>
 			</DialogTrigger>
-			<DialogContent>
+			<DialogContent onClick={(e) => {
+				e.stopPropagation();
+				e.preventDefault();
+			}}>
 				<DialogHeader>
 					<DialogTitle>Удаление отчета</DialogTitle>
 				</DialogHeader>
@@ -62,7 +75,7 @@ const DeletePortfolioReportButton: React.FC<DeletePortfolioButtonProps> = ({
 						Удалить
 					</Button>
 				</DialogFooter>
-				<DialogCloseTrigger/>
+				<DialogCloseTrigger role={'alertdialog'}/>
 			</DialogContent>
 		</DialogRoot>
 	);

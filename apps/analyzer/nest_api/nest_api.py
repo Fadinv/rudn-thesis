@@ -2,111 +2,234 @@ import numpy as np
 from database import engine
 from sqlalchemy import text
 from reports.utils.utils import calculate_returns_matrix
+from nest_api.load_usd_rub_prices import get_usd_rub_prices_in_range
+from datetime import datetime, timedelta, date
+from collections import defaultdict
+import pandas_market_calendars as mcal
+import traceback
 
-def get_portfolio_data(report_id, additional_tickers, start_date, end_date):
-    """Запрашивает данные о портфеле и объединяет их с дополнительными тикерами в указанном диапазоне дат."""
+
+def _fetch_report_data(conn, report_id):
+    return conn.execute(text("""
+        SELECT p.id, p."isReadyForAnalysis", p."userId", p.name,
+               p_r."reportType", p_r.status, p_r.data, p_r."portfolioId"
+        FROM portfolio_reports p_r
+        JOIN portfolio p ON p_r."portfolioId" = p.id
+        WHERE p_r.id = :report_id
+    """), {"report_id": report_id}).fetchone()
+
+
+def _fetch_stock_prices(conn, portfolio_id, start_date, end_date):
+    return conn.execute(text("""
+        SELECT sp.ticker, sp.date, sp.close, s.exchange, s.currency_name
+        FROM stock_prices sp
+        JOIN stock s ON s.ticker = sp.ticker
+        JOIN portfolio_stock ps ON ps."stockId" = s.id
+        WHERE ps."portfolioId" = :portfolio_id
+        AND sp.date BETWEEN :start_date AND :end_date
+        ORDER BY sp.date ASC
+    """), {"portfolio_id": portfolio_id, "start_date": start_date, "end_date": end_date}).fetchall()
+
+
+def _fetch_additional_prices(conn, additional_tickers, start_date, end_date):
+    if not additional_tickers:
+        return []
+    return conn.execute(text("""
+        SELECT sp.ticker, sp.date, sp.close, s.exchange, s.currency_name
+        FROM stock_prices sp
+        JOIN stock s ON s.ticker = sp.ticker
+        WHERE sp.ticker IN :additional_tickers
+        AND sp.date BETWEEN :start_date AND :end_date
+        ORDER BY sp.date ASC
+    """), {"additional_tickers": tuple(additional_tickers), "start_date": start_date, "end_date": end_date}).fetchall()
+
+
+def get_portfolio_data(report_id, additional_tickers, start_date, end_date, target_currency='usd'):
+    """Главная функция: собирает и возвращает данные портфеля с учётом валюты."""
     with engine.connect() as conn:
-        result = conn.execute(text("""
-            SELECT p.id, p."isReadyForAnalysis", p."userId", p.name,
-                   p_r."reportType", p_r.status, p_r.data, p_r."portfolioId"
-            FROM portfolio_reports p_r
-            JOIN portfolio p ON p_r."portfolioId" = p.id
-            WHERE p_r.id = :report_id
-        """), {"report_id": report_id}).fetchone()
+        report_data = _fetch_report_data(conn, report_id)
 
-        print('get_portfolio_data result -> ', result)
-        if not result:
+        if not report_data:
+            return None
+        portfolio_id = report_data[0]
+
+        start_date = _adjust_start_date_by_availability(conn, portfolio_id, additional_tickers, start_date)
+        if date.fromisoformat(start_date) >= date.fromisoformat(end_date):
+            print(f"❌ Диапазон дат некорректен: start_date {start_date} >= end_date {end_date}")
             return None
 
-        portfolio_id = result[0]
-        print('get_portfolio_data portfolio_id -> ', portfolio_id)
-        # Получаем акции из портфеля ТОЛЬКО за нужный диапазон дат
-        stock_prices = conn.execute(text("""
-            SELECT sp.ticker, sp.date, sp.close
-            FROM stock_prices sp
-            JOIN portfolio_stock ps ON ps."stockId" = (SELECT id FROM stock WHERE ticker = sp.ticker)
-            WHERE ps."portfolioId" = :portfolio_id
-            AND sp.date BETWEEN :start_date AND :end_date
-            ORDER BY sp.date ASC
-        """), {"portfolio_id": portfolio_id, "start_date": start_date, "end_date": end_date}).fetchall()
-        print("Последние 15 цен из stock_prices:")
-        for row in stock_prices[-15:]:
-            print(f"Ticker: {row[0]}, Date: {row[1]}, Close: {row[2]}")
+        stock_prices = _fetch_stock_prices(conn, portfolio_id, start_date, end_date)
         if not stock_prices and not additional_tickers:
             return None
 
-        # Добавляем дополнительные тикеры (в том же диапазоне)
-        if additional_tickers:
-            additional_prices = conn.execute(text("""
-                SELECT sp.ticker, sp.date, sp.close
-                FROM stock_prices sp
-                WHERE sp.ticker IN :additional_tickers
-                AND sp.date BETWEEN :start_date AND :end_date
-                ORDER BY sp.date ASC
-            """), {"additional_tickers": tuple(additional_tickers), "start_date": start_date, "end_date": end_date}).fetchall()
+        additional_prices = _fetch_additional_prices(conn, additional_tickers, start_date, end_date)
+        stock_prices.extend(additional_prices)
 
-            stock_prices.extend(additional_prices)
+        currency_by_ticker = _build_currency_map(stock_prices)
+        exchange_set, currency_set = _build_sets(stock_prices)
 
-        # Преобразуем данные в нужный формат
-        prices_dict = {}
-        for row in stock_prices:
-            ticker, date, close = row
-            if ticker not in prices_dict:
-                prices_dict[ticker] = []
-            prices_dict[ticker].append(close)
+        print("exchange_set:", exchange_set)
+        print("currency_set:", currency_set)
 
-        print('prices_dict prices_dict -> ', prices_dict)
-        # Вычисляем доходности
+        stock_prices = _convert_currencies(
+            stock_prices, currency_by_ticker, currency_set, target_currency, start_date, end_date
+        )
+
+        prices_dict = _build_prices_dict(stock_prices)
+        stock_prices = _remove_duplicates(stock_prices)
+
         tickers = list(prices_dict.keys())
-        # Удаляем дубликаты по (ticker, date), оставляя последнюю цену
-        seen = set()
-        filtered_prices = []
-        for row in reversed(stock_prices):
-            key = (row[0], row[1])  # (ticker, date)
-            if key not in seen:
-                seen.add(key)
-                filtered_prices.append(row)
-        stock_prices = list(reversed(filtered_prices))  # восстанавливаем исходный порядок
         returns_matrix = calculate_returns_matrix(stock_prices, tickers)
-        print('prices_dict prices_dict -> ', prices_dict)
 
         return {
             "tickers": tickers,
             "returns": returns_matrix,
-            "risk_free_rate": 0.04,  # Фиксируем безрисковую ставку
+            "exchange_set": exchange_set,
+            "currency": target_currency,
+            "risk_free_rate": 0.04,
         }
 
-
-def get_market_returns(start_date: str, end_date: str, ticker="SPY"):
+def _adjust_start_date_by_availability(conn, portfolio_id, additional_tickers, start_date: str) -> str:
+    """Ограничивает start_date самой поздней из earliest доступных дат по тикерам."""
+    base_query = """
+        SELECT s.ticker, MIN(sp.date) AS first_date
+        FROM stock_prices sp
+        JOIN stock s ON s.ticker = sp.ticker
+        JOIN portfolio_stock ps ON ps."stockId" = s.id
+        WHERE ps."portfolioId" = :portfolio_id
+        GROUP BY s.ticker
     """
-    Получает дневные доходности рыночного индекса (например, SPY) из базы данных.
+    result = conn.execute(text(base_query), {"portfolio_id": portfolio_id}).fetchall()
+
+    if additional_tickers:
+        add_query = """
+            SELECT s.ticker, MIN(sp.date) AS first_date
+            FROM stock_prices sp
+            JOIN stock s ON s.ticker = sp.ticker
+            WHERE s.ticker IN :additional_tickers
+            GROUP BY s.ticker
+        """
+        additional_result = conn.execute(text(add_query), {"additional_tickers": tuple(additional_tickers)}).fetchall()
+        result.extend(additional_result)
+
+    if not result:
+        return start_date
+
+    latest_earliest_date = max(row[1] for row in result)  # max(MIN(date))
+    if date.fromisoformat(start_date) < latest_earliest_date:
+        print(f"⚠️ start_date ограничена с {start_date} до {latest_earliest_date}")
+        return latest_earliest_date.isoformat()
+
+    return start_date
+
+def _build_currency_map(stock_prices):
+    currency_by_ticker = {}
+    for row in stock_prices:
+        ticker = row[0]
+        currency = row[4]
+        currency_by_ticker[ticker] = currency.upper()
+    return currency_by_ticker
+
+def _build_sets(stock_prices):
+    exchange_set = set()
+    currency_set = set()
+    for row in stock_prices:
+        exchange_set.add(row[3])
+        currency_set.add(row[4].upper())
+    return exchange_set, currency_set
+
+def _convert_currencies(stock_prices, currency_by_ticker, currency_set, target_currency, start_date, end_date):
+    if target_currency == 'usd' and 'SUR' in currency_set:
+        print('🔁 Конвертация SUR → USD')
+        fx_rates = get_usd_rub_prices_in_range(start_date, end_date)
+
+        converted = []
+        for ticker, date, close, exchange, _ in stock_prices:
+            currency = currency_by_ticker[ticker]
+            if currency == 'SUR':
+                fx = fx_rates.get(str(date))
+                if fx:
+                    close = close / fx
+            converted.append((ticker, date, close, exchange))
+        return converted
+
+    elif target_currency == 'sur' and 'USD' in currency_set:
+        print('🔁 Конвертация USD → SUR')
+        fx_rates = get_usd_rub_prices_in_range(start_date, end_date)
+
+        converted = []
+        for ticker, date, close, exchange, _ in stock_prices:
+            currency = currency_by_ticker[ticker]
+            if currency == 'USD':
+                fx = fx_rates.get(str(date))
+                if fx:
+                    close = close * fx
+            converted.append((ticker, date, close, exchange))
+        return converted
+
+    else:
+        return [(ticker, date, close, exchange) for ticker, date, close, exchange, _ in stock_prices]
+
+def _build_prices_dict(stock_prices):
+    prices_dict = {}
+    for ticker, date, close, exchange in stock_prices:
+        prices_dict.setdefault(ticker, []).append(close)
+    return prices_dict
+
+def _remove_duplicates(stock_prices):
+    seen = set()
+    filtered = []
+    for row in reversed(stock_prices):
+        key = (row[0], row[1])  # (ticker, date)
+        if key not in seen:
+            seen.add(key)
+            filtered.append(row)
+    return list(reversed(filtered))
+
+
+def get_market_returns(start_date: str, end_date: str, ticker="SPY", target_currency='usd'):
+    """
+    Получает дневные доходности рыночного индекса (например, SPY) из базы данных, с учётом валюты.
     :param start_date: Начальная дата (YYYY-MM-DD)
     :param end_date: Конечная дата (YYYY-MM-DD)
-    :param ticker: Тикер рыночного индекса (по умолчанию SPY)
+    :param ticker: Тикер рыночного индекса
+    :param target_currency: Валюта результата ('usd' или 'sur')
     :return: numpy массив доходностей (N дней)
     """
     with engine.connect() as conn:
-        stock_prices = conn.execute(text("""
-            SELECT date, close FROM stock_prices
-            WHERE ticker = :ticker
-            AND date BETWEEN :start_date AND :end_date
-            ORDER BY date ASC
+        result = conn.execute(text("""
+            SELECT sp.date, sp.close, s.currency_name
+            FROM stock_prices sp
+            JOIN stock s ON s.ticker = sp.ticker
+            WHERE sp.ticker = :ticker
+            AND sp.date BETWEEN :start_date AND :end_date
+            ORDER BY sp.date ASC
         """), {"ticker": ticker, "start_date": start_date, "end_date": end_date}).fetchall()
 
-    if not stock_prices:
+    if not result:
         raise ValueError(f"Нет данных по {ticker} за период {start_date} - {end_date}")
 
-    closes = [row[1] for row in stock_prices]  # Берем только цены закрытия
+    currency = result[0][2].upper()
+    data = [(row[0], row[1]) for row in result]
 
-    # Вычисляем логарифмические доходности
-    returns = np.diff(np.log(closes))  # log(P_t / P_t-1)
+    # Конвертация, если необходимо
+    if target_currency == 'usd' and currency == 'SUR':
+        print(f"🔁 Конвертация индекса {ticker} из SUR в USD")
+        fx_rates = get_usd_rub_prices_in_range(start_date, end_date)
+        data = [(d, c / fx_rates[str(d)]) for d, c in data if str(d) in fx_rates]
+
+    elif target_currency == 'sur' and currency == 'USD':
+        print(f"🔁 Конвертация индекса {ticker} из USD в SUR")
+        fx_rates = get_usd_rub_prices_in_range(start_date, end_date)
+        data = [(d, c * fx_rates[str(d)]) for d, c in data if str(d) in fx_rates]
+
+    closes = [c for _, c in data]
+    returns = np.diff(np.log(closes))
 
     return returns
 
 
-import pandas_market_calendars as mcal
-
-def get_portfolio_data_with_history(report_id, additional_tickers, start_date, end_date):
+def get_portfolio_data_with_history(report_id, additional_tickers, start_date, end_date, target_currency='usd'):
     """Запрашивает данные о портфеле и объединяет их с дополнительными тикерами в указанном диапазоне дат."""
     with engine.connect() as conn:
         result = conn.execute(text("""
@@ -122,104 +245,151 @@ def get_portfolio_data_with_history(report_id, additional_tickers, start_date, e
 
         portfolio_id = result[0]
 
-        # Получаем количество акций в портфеле
-        quantities_result = conn.execute(text("""
-            SELECT s.ticker, ps.quantity
-            FROM portfolio_stock ps
-            JOIN stock s ON ps."stockId" = s.id
-            WHERE ps."portfolioId" = :portfolio_id
-        """), {"portfolio_id": portfolio_id}).fetchall()
-
-        # Преобразуем в словарь {ticker: quantity}
-        quantities = {}
-        for ticker, quantity in quantities_result:
-            if ticker in quantities:
-                quantities[ticker] += quantity
-            else:
-                quantities[ticker] = quantity
-
-        # Получаем исторические цены акций
-        stock_prices = conn.execute(text("""
-            SELECT sp.ticker, sp.date, sp.close
-            FROM stock_prices sp
-            JOIN portfolio_stock ps ON ps."stockId" = (SELECT id FROM stock WHERE ticker = sp.ticker)
-            WHERE ps."portfolioId" = :portfolio_id
-            AND sp.date BETWEEN :start_date AND :end_date
-            ORDER BY sp.date ASC
-        """), {"portfolio_id": portfolio_id, "start_date": start_date, "end_date": end_date}).fetchall()
-
-        if not stock_prices and not additional_tickers:
+        start_date = _adjust_start_date_by_availability(conn, portfolio_id, additional_tickers, start_date)
+        if date.fromisoformat(start_date) >= date.fromisoformat(end_date):
+            print(f"❌ Диапазон дат некорректен: start_date {start_date} >= end_date {end_date}")
             return None
 
-        # Добавляем дополнительные тикеры
-        if additional_tickers:
-            additional_prices = conn.execute(text("""
-                SELECT sp.ticker, sp.date, sp.close
-                FROM stock_prices sp
-                WHERE sp.ticker IN :additional_tickers
-                AND sp.date BETWEEN :start_date AND :end_date
-                ORDER BY sp.date ASC
-            """), {"additional_tickers": tuple(additional_tickers), "start_date": start_date, "end_date": end_date}).fetchall()
+        quantities = _get_portfolio_quantities(conn, portfolio_id)
 
-            stock_prices.extend(additional_prices)
+        stock_prices = _get_all_prices_with_currency(conn, portfolio_id, additional_tickers, start_date, end_date)
 
-        # Преобразуем данные в словарь {ticker: {date: price}}
-        prices_dict = {}
-        for row in stock_prices:
-            ticker, date, close = row
-            if ticker not in prices_dict:
-                prices_dict[ticker] = {}
-            prices_dict[ticker][str(date)] = close
+        if not stock_prices:
+            return None
 
-        # Определяем первый рабочий день каждого месяца
-        nyse = mcal.get_calendar("NYSE")
+        currency_by_ticker = {row[0]: row[4].upper() for row in stock_prices}
+
+        exchange_set, currency_set = _build_sets(stock_prices)
+
+        stock_prices = _convert_currencies_general(stock_prices, currency_by_ticker, currency_set, target_currency, start_date, end_date)
+
+        prices_dict = defaultdict(dict)
+        for ticker, date_, close, *_ in stock_prices:
+            prices_dict[ticker][str(date_)] = close
+
         all_dates = sorted(set(date for ticker_data in prices_dict.values() for date in ticker_data))
-        start_year, start_month = int(all_dates[0][:4]), int(all_dates[0][5:7])
-        end_year, end_month = int(all_dates[-1][:4]), int(all_dates[-1][5:7])
 
-        first_business_days = []
-        for year in range(start_year, end_year + 1):
-            for month in range(1, 13):
-                if year == start_year and month < start_month:
-                    continue
-                if year == end_year and month > end_month:
-                    break
-                first_of_month = f"{year}-{month:02d}-01"
-                schedule = nyse.valid_days(start_date=first_of_month, end_date=f"{year}-{month:02d}-07")
-                if len(schedule) > 0:
-                    first_business_days.append(str(schedule[0].date()))
+        # определяем даты для анализа (первая доступная дата каждого месяца по любому тикеру)
+        first_business_days = _get_available_month_starts(all_dates)
 
-        # Рассчитываем историческую стоимость портфеля только для первых рабочих дней месяца
-        portfolio_history = {}
-        for date in first_business_days:
-            total_value = 0
-            for ticker, quantity in quantities.items():
-                price = prices_dict.get(ticker, {}).get(date, 0)
-                total_value += price * quantity
-            portfolio_history[date] = total_value
+        # рассчитываем историю портфеля
+        portfolio_history = _calculate_portfolio_history(first_business_days, prices_dict, quantities)
 
-        # Вычисляем доходности
         tickers = list(prices_dict.keys())
-        # Удаляем дубликаты по (ticker, date), оставляя последнюю цену
-        seen = set()
-        filtered_prices = []
-        for row in reversed(stock_prices):
-            key = (row[0], row[1])  # (ticker, date)
-            if key not in seen:
-                seen.add(key)
-                filtered_prices.append(row)
-        stock_prices = list(reversed(filtered_prices))  # восстанавливаем исходный порядок
-        returns_matrix = calculate_returns_matrix(stock_prices, tickers)
+        stock_prices_filtered = _remove_duplicates(stock_prices)
+        returns_matrix = calculate_returns_matrix(stock_prices_filtered, tickers)
 
-        # Получаем последние доступные цены для каждой акции
-        last_prices = {ticker: max(prices_dict[ticker].values()) for ticker in tickers if prices_dict[ticker]}
-
+        last_prices = {
+            ticker: prices_dict[ticker][sorted(prices_dict[ticker].keys())[-1]]
+            for ticker in tickers if prices_dict[ticker]
+        }
 
         return {
             "tickers": tickers,
             "returns": returns_matrix,
+            "currency": target_currency,
             "quantities": quantities,
             "last_prices": last_prices,
+            "exchange_set": exchange_set,
             "portfolio_history": portfolio_history,
             "risk_free_rate": 0.04,
         }
+
+
+def _get_portfolio_quantities(conn, portfolio_id):
+    result = conn.execute(text("""
+        SELECT s.ticker, ps.quantity
+        FROM portfolio_stock ps
+        JOIN stock s ON ps."stockId" = s.id
+        WHERE ps."portfolioId" = :portfolio_id
+    """), {"portfolio_id": portfolio_id}).fetchall()
+    quantities = defaultdict(float)
+    for ticker, quantity in result:
+        quantities[ticker] += quantity
+    return dict(quantities)
+
+
+def _get_all_prices_with_currency(conn, portfolio_id, additional_tickers, start_date, end_date):
+    base_prices = conn.execute(text("""
+        SELECT sp.ticker, sp.date, sp.close, s.exchange, s.currency_name
+        FROM stock_prices sp
+        JOIN stock s ON s.ticker = sp.ticker
+        JOIN portfolio_stock ps ON ps."stockId" = s.id
+        WHERE ps."portfolioId" = :portfolio_id
+        AND sp.date BETWEEN :start_date AND :end_date
+        ORDER BY sp.date ASC
+    """), {"portfolio_id": portfolio_id, "start_date": start_date, "end_date": end_date}).fetchall()
+
+    if additional_tickers:
+        extra_prices = conn.execute(text("""
+            SELECT sp.ticker, sp.date, sp.close, s.exchange, s.currency_name
+            FROM stock_prices sp
+            JOIN stock s ON s.ticker = sp.ticker
+            WHERE sp.ticker IN :additional_tickers
+            AND sp.date BETWEEN :start_date AND :end_date
+            ORDER BY sp.date ASC
+        """), {"additional_tickers": tuple(additional_tickers), "start_date": start_date, "end_date": end_date}).fetchall()
+        return base_prices + extra_prices
+
+    return base_prices
+
+
+def _convert_currencies_general(stock_prices, currency_by_ticker, currency_set, target_currency, start_date, end_date):
+    fx_rates = get_usd_rub_prices_in_range(start_date, end_date)
+    converted = []
+
+    for ticker, date_, close, exchange, *_ in stock_prices:
+        currency = currency_by_ticker[ticker]
+        rate = fx_rates.get(str(date_))
+        if target_currency == 'usd' and currency == 'SUR' and rate:
+            close /= rate
+        elif target_currency == 'rub' and currency == 'USD' and rate:
+            close *= rate
+        converted.append((ticker, date_, close, exchange))
+
+    return converted
+
+
+def _build_sets(stock_prices):
+    exchange_set = set()
+    currency_set = set()
+    for row in stock_prices:
+        exchange_set.add(row[3])
+        currency_set.add(row[4].upper())
+    return exchange_set, currency_set
+
+
+def _get_available_month_starts(all_dates):
+    month_starts = {}
+    for d in all_dates:
+        y, m = d[:4], d[5:7]
+        key = f"{y}-{m}"
+        if key not in month_starts:
+            month_starts[key] = d
+    return list(month_starts.values())
+
+
+def _calculate_portfolio_history(dates, prices_dict, quantities):
+    history = {}
+    last_known_price = defaultdict(float)
+
+    for date_ in dates:
+        total = 0
+        for ticker, qty in quantities.items():
+            price = prices_dict.get(ticker, {}).get(date_)
+            if price is not None:
+                last_known_price[ticker] = price
+            total += last_known_price[ticker] * qty  # используем последнюю известную цену
+        history[date_] = total
+    return history
+
+
+def _remove_duplicates(stock_prices):
+    seen = set()
+    filtered = []
+    for row in reversed(stock_prices):
+        key = (row[0], row[1])
+        if key not in seen:
+            seen.add(key)
+            filtered.append(row)
+    return list(reversed(filtered))

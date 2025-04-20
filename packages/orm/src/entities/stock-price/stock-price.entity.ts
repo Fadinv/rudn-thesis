@@ -32,7 +32,7 @@ export class StockPrice {
 	@Column('float')
 	close!: number;
 
-	@Field(() => Float)
-	@Column('float')
-	volume!: number;
+	@Field(() => Float, {nullable: true})
+	@Column('float', {nullable: true})
+	volume?: number;
 }

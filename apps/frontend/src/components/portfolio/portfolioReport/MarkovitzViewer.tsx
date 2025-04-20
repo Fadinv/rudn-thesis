@@ -298,16 +298,20 @@ const MarkovitzViewer: FC<MarkovitzViewerProps> = ({reportId}) => {
 											value={report.sortino_ratio_daily.toFixed(2)}
 											metricKey="sortino_ratio_daily"
 										/>
-										<MetricRow
-											label="beta"
-											value={report.beta.toFixed(2)}
-											metricKey="beta"
-										/>
-										<MetricRow
-											label="Коэффициент Трейнора (годовой)"
-											value={report.treynor_ratio_annual.toFixed(2)}
-											metricKey="treynor_ratio_annual"
-										/>
+										{report.beta && (
+											<MetricRow
+												label="beta"
+												value={report.beta.toFixed(2)}
+												metricKey="beta"
+											/>
+										)}
+										{report.treynor_ratio_annual && (
+											<MetricRow
+												label="Коэффициент Трейнора (годовой)"
+												value={report.treynor_ratio_annual.toFixed(2)}
+												metricKey="treynor_ratio_annual"
+											/>
+										)}
 										<Table.Row>
 											<Table.Cell>Категория риска</Table.Cell>
 											<Table.Cell>{getRiskCategoryLabel(report.risk_category)}</Table.Cell>

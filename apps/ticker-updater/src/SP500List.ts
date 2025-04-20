@@ -1,4 +1,5 @@
 export const SP500List = new Set([
+	'IMOEX',
 	'SPY',
 	'MSFT',
 	'AAPL',

@@ -43,6 +43,7 @@ interface CreatePortfolioReportButtonProps {
 const CreatePortfolioReportButton: React.FC<CreatePortfolioReportButtonProps> = ({portfolioId}) => {
 	const [open, setOpen] = useState(false);
 	const [reportType, setReportType] = useState<'markowitz' | 'future_returns_forecast_gbm' | 'value_at_risk'>('markowitz');
+	const [currency, setCurrency] = useState<'usd' | 'sur'>('usd');
 	const [additionalStocks, setAdditionalStocks] = useState<{ id: number; name: string; ticker: string }[]>([]);
 	const [createMarkovitzReport, {loading: createMarkovitzReportIsLoading}] = useCreateMarkovitzReportMutation();
 	const [createFutureReturnForecastReport, {loading: createFutureReturnForecastReportIsLoading}] = useCreateFutureReturnForecastGbmReportMutation();
@@ -90,6 +91,7 @@ const CreatePortfolioReportButton: React.FC<CreatePortfolioReportButtonProps> = 
 								riskFreeRate: +(riskFreeRate! / 100).toFixed(2),
 								numPortfolios,
 								covMethod,
+								currency,
 							},
 						},
 					});
@@ -103,6 +105,7 @@ const CreatePortfolioReportButton: React.FC<CreatePortfolioReportButtonProps> = 
 								selectedPercentiles,
 								forecastHorizons,
 								dateRange,
+								currency,
 							},
 						},
 					});
@@ -122,6 +125,13 @@ const CreatePortfolioReportButton: React.FC<CreatePortfolioReportButtonProps> = 
 		items: [
 			{label: 'Оптимальный портфель (Марковиц)', value: 'markowitz'},
 			{label: 'Прогноз будущей стоимости (GBM)', value: 'future_returns_forecast_gbm'},
+		],
+	});
+
+	const currencyCollection = createListCollection({
+		items: [
+			{label: 'Американский доллар', value: 'usd'},
+			{label: 'Российский рубль', value: 'sur'},
 		],
 	});
 
@@ -168,7 +178,6 @@ const CreatePortfolioReportButton: React.FC<CreatePortfolioReportButtonProps> = 
 					<DrawerBody>
 						<Stack>
 							<Box>
-								<Text mb={2}>Выберите тип отчета:</Text>
 								<Field.Root invalid={!reportType}>
 									<SelectRoot
 										defaultValue={['markowitz']}
@@ -186,6 +195,31 @@ const CreatePortfolioReportButton: React.FC<CreatePortfolioReportButtonProps> = 
 											{reportTypes.items.map((reportType) => (
 												<SelectItem item={reportType} key={reportType.value}>
 													{reportType.label}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</SelectRoot>
+									<Field.ErrorText>Обязательно для заполнения</Field.ErrorText>
+								</Field.Root>
+							</Box>
+							<Box>
+								<Field.Root invalid={!currency}>
+									<SelectRoot
+										defaultValue={['usd']}
+										onValueChange={(e) => {
+											setCurrency(e.value[0] as 'usd' | 'sur');
+										}}
+										collection={currencyCollection}
+										size="sm"
+									>
+										<SelectLabel>Валюта</SelectLabel>
+										<SelectTrigger>
+											<SelectValueText placeholder="Выберите валюту"/>
+										</SelectTrigger>
+										<SelectContent>
+											{currencyCollection.items.map((cur) => (
+												<SelectItem item={cur} key={cur.value}>
+													{cur.label}
 												</SelectItem>
 											))}
 										</SelectContent>

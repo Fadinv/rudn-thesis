@@ -10,8 +10,8 @@
     "watch": "tsc -w",
     "serve": "node dist/index.js",
     "prestart": "rm -rf dist && rm -f .tsbuildinfo && cd ../.. && npm run build:orm && cd apps/ticker-updater && tsc",
-    "start:dev": "npm-run-all --parallel watch serve",
-    "start": "node dist/index.js"
+    "start:dev": "npm run prestart && npm-run-all --parallel watch serve",
+    "start": "npm run prestart && node dist/index.js"
   },
   "dependencies": {
     "axios": "^1.4.0",

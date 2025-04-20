@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
@@ -21,6 +19,7 @@ export type Scalars = {
 };
 
 export type FutureReturnForecastInput = {
+  currency?: InputMaybe<Scalars['String']['input']>;
   dateRange?: InputMaybe<Scalars['String']['input']>;
   forecastHorizons: Array<Scalars['Float']['input']>;
   selectedPercentiles: Array<Scalars['Float']['input']>;
@@ -29,6 +28,7 @@ export type FutureReturnForecastInput = {
 export type MarkovitzReportInput = {
   additionalTickers?: InputMaybe<Array<Scalars['String']['input']>>;
   covMethod?: InputMaybe<Scalars['String']['input']>;
+  currency?: InputMaybe<Scalars['String']['input']>;
   dateRange?: InputMaybe<Scalars['String']['input']>;
   numPortfolios?: InputMaybe<Scalars['Int']['input']>;
   riskFreeRate?: InputMaybe<Scalars['Float']['input']>;
@@ -288,7 +288,11 @@ export type Stock = {
   cik?: Maybe<Scalars['String']['output']>;
   compositeFigi?: Maybe<Scalars['String']['output']>;
   currencyName: Scalars['String']['output'];
+  /** Для отображения или уточнения биржи NASDAQ / MOEX */
+  exchange: Scalars['String']['output'];
   id: Scalars['Float']['output'];
+  /** Если true - то это индекс */
+  isIndex: Scalars['Boolean']['output'];
   lastUpdatedUtc: Scalars['String']['output'];
   locale: Scalars['String']['output'];
   logoUrl?: Maybe<Scalars['String']['output']>;
@@ -296,6 +300,8 @@ export type Stock = {
   name: Scalars['String']['output'];
   primaryExchange: Scalars['String']['output'];
   shareClassFigi?: Maybe<Scalars['String']['output']>;
+  /** Источник данных */
+  source: Scalars['String']['output'];
   ticker: Scalars['String']['output'];
   type?: Maybe<Scalars['String']['output']>;
 };
@@ -324,7 +330,7 @@ export type StockPrice = {
   low: Scalars['Float']['output'];
   open: Scalars['Float']['output'];
   ticker: Scalars['String']['output'];
-  volume: Scalars['Float']['output'];
+  volume?: Maybe<Scalars['Float']['output']>;
 };
 
 export type StocksWhileCreatingPortfolio = {
@@ -551,7 +557,9 @@ export type StockResolvers<ContextType = any, ParentType extends ResolversParent
   cik?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   compositeFigi?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   currencyName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  exchange?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  isIndex?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   lastUpdatedUtc?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   locale?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   logoUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -559,6 +567,7 @@ export type StockResolvers<ContextType = any, ParentType extends ResolversParent
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   primaryExchange?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   shareClassFigi?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  source?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   ticker?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   type?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -571,7 +580,7 @@ export type StockPriceResolvers<ContextType = any, ParentType extends ResolversP
   low?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   open?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   ticker?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  volume?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  volume?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 

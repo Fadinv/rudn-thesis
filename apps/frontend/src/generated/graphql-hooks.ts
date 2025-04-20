@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
 import * as ApolloReactHooks from '@apollo/client';
@@ -23,6 +21,7 @@ export type Scalars = {
 };
 
 export type FutureReturnForecastInput = {
+  currency?: InputMaybe<Scalars['String']['input']>;
   dateRange?: InputMaybe<Scalars['String']['input']>;
   forecastHorizons: Array<Scalars['Float']['input']>;
   selectedPercentiles: Array<Scalars['Float']['input']>;
@@ -31,6 +30,7 @@ export type FutureReturnForecastInput = {
 export type MarkovitzReportInput = {
   additionalTickers?: InputMaybe<Array<Scalars['String']['input']>>;
   covMethod?: InputMaybe<Scalars['String']['input']>;
+  currency?: InputMaybe<Scalars['String']['input']>;
   dateRange?: InputMaybe<Scalars['String']['input']>;
   numPortfolios?: InputMaybe<Scalars['Int']['input']>;
   riskFreeRate?: InputMaybe<Scalars['Float']['input']>;
@@ -290,7 +290,11 @@ export type Stock = {
   cik?: Maybe<Scalars['String']['output']>;
   compositeFigi?: Maybe<Scalars['String']['output']>;
   currencyName: Scalars['String']['output'];
+  /** Для отображения или уточнения биржи NASDAQ / MOEX */
+  exchange: Scalars['String']['output'];
   id: Scalars['Float']['output'];
+  /** Если true - то это индекс */
+  isIndex: Scalars['Boolean']['output'];
   lastUpdatedUtc: Scalars['String']['output'];
   locale: Scalars['String']['output'];
   logoUrl?: Maybe<Scalars['String']['output']>;
@@ -298,6 +302,8 @@ export type Stock = {
   name: Scalars['String']['output'];
   primaryExchange: Scalars['String']['output'];
   shareClassFigi?: Maybe<Scalars['String']['output']>;
+  /** Источник данных */
+  source: Scalars['String']['output'];
   ticker: Scalars['String']['output'];
   type?: Maybe<Scalars['String']['output']>;
 };
@@ -326,7 +332,7 @@ export type StockPrice = {
   low: Scalars['Float']['output'];
   open: Scalars['Float']['output'];
   ticker: Scalars['String']['output'];
-  volume: Scalars['Float']['output'];
+  volume?: Maybe<Scalars['Float']['output']>;
 };
 
 export type StocksWhileCreatingPortfolio = {
@@ -430,7 +436,7 @@ export type GetPortfolioStocksQueryVariables = Exact<{
 }>;
 
 
-export type GetPortfolioStocksQuery = { __typename?: 'Query', getPortfolioStocks: Array<{ __typename?: 'PortfolioStock', id: number, quantity?: number | null, averagePrice?: number | null, stock: { __typename?: 'Stock', id: number, ticker: string, name: string } }> };
+export type GetPortfolioStocksQuery = { __typename?: 'Query', getPortfolioStocks: Array<{ __typename?: 'PortfolioStock', id: number, quantity?: number | null, averagePrice?: number | null, stock: { __typename?: 'Stock', id: number, ticker: string, name: string, exchange: string } }> };
 
 export type GetStockByIdQueryVariables = Exact<{
   id: Scalars['Int']['input'];
@@ -935,6 +941,7 @@ export const GetPortfolioStocksDocument = gql`
       id
       ticker
       name
+      exchange
     }
   }
 }
