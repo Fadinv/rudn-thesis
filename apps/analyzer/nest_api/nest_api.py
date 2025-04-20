@@ -87,6 +87,7 @@ def get_portfolio_data(report_id, additional_tickers, start_date, end_date, targ
             "exchange_set": exchange_set,
             "currency": target_currency,
             "risk_free_rate": 0.04,
+            "start_date": start_date,
         }
 
 def _adjust_start_date_by_availability(conn, portfolio_id, additional_tickers, start_date: str) -> str:
@@ -116,6 +117,8 @@ def _adjust_start_date_by_availability(conn, portfolio_id, additional_tickers, s
         return start_date
 
     latest_earliest_date = max(row[1] for row in result)  # max(MIN(date))
+    print(f"📅 Проверка дат: start_date={start_date}, latest available={latest_earliest_date}")
+
     if date.fromisoformat(start_date) < latest_earliest_date:
         print(f"⚠️ start_date ограничена с {start_date} до {latest_earliest_date}")
         return latest_earliest_date.isoformat()
@@ -293,6 +296,7 @@ def get_portfolio_data_with_history(report_id, additional_tickers, start_date, e
             "exchange_set": exchange_set,
             "portfolio_history": portfolio_history,
             "risk_free_rate": 0.04,
+            "start_date": start_date,
         }
 
 
