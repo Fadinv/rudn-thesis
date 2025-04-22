@@ -14,7 +14,7 @@ const Layout = ({children}: { children: React.ReactNode }) => {
 
 	useEffect(() => {
 		if (called && !loading && !data?.currentUser) router.push('/');
-	}, [data, loading, called]);
+	}, [data, loading, called, router]);
 
 	const isDark = colorMode === 'dark';
 	const colorPalette = isDark ? 'teal' : undefined;

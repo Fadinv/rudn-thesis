@@ -1,10 +1,10 @@
-// apps/frontend/pages/index.tsx
-
+import React from 'react';
 import {
 	Box, Heading, Text, VStack, IconButton, Container, Link, SimpleGrid, Flex, Separator,
 } from '@chakra-ui/react';
 import {FaTelegramPlane, FaChartLine, FaRobot, FaLock} from 'react-icons/fa';
 import LoginButton from '@frontend/components/loginButton/loginButton';
+import {IconType} from 'react-icons/lib';
 
 export default function HomePage() {
 	return (
@@ -46,7 +46,8 @@ export default function HomePage() {
 			<Separator maxW={'7xl'} m={'0 auto'}/>
 
 			{/* Преимущества */}
-			<Container bg="rgba(22, 22, 22, 0.05)" borderRadius="xl" mt={8} mb={8}  maxW="container.lg" py={{base: 12, md: 16}}>
+			<Container bg="rgba(22, 22, 22, 0.05)" borderRadius="xl" mt={8} mb={8} maxW="container.lg"
+			           py={{base: 12, md: 16}}>
 				<VStack gap={4} textAlign="center">
 					<Heading fontSize="2xl">Как это работает?</Heading>
 				</VStack>
@@ -81,7 +82,8 @@ export default function HomePage() {
 			<Separator maxW={'7xl'} m={'0 auto'}/>
 
 			{/* Telegram */}
-			<Container bg="rgba(22, 22, 22, 0.05)" borderRadius="xl" mt={8} mb={8} maxW="container.lg" py={{base: 12, md: 16}}>
+			<Container bg="rgba(22, 22, 22, 0.05)" borderRadius="xl" mt={8} mb={8} maxW="container.lg"
+			           py={{base: 12, md: 16}}>
 				<VStack gap={2} textAlign="center">
 					<Text fontSize="md" fontWeight="medium">
 						Приложение активно разрабатывается
@@ -113,7 +115,7 @@ export default function HomePage() {
 	);
 }
 
-const Feature = ({icon: Icon, title, description}: { icon: any; title: string; description: string }) => (
+const Feature = ({icon: Icon, title, description}: { icon: IconType; title: string; description: string }) => (
 	<Flex direction="column" align="center" textAlign="center" px={4}>
 		<Icon size={32}/>
 		<Text fontWeight="bold" mt={4}>{title}</Text>
@@ -121,7 +123,7 @@ const Feature = ({icon: Icon, title, description}: { icon: any; title: string; d
 	</Flex>
 );
 
-const UserCard = ({icon: Icon, label}: { icon: any; label: string }) => (
+const UserCard = ({icon: Icon, label}: { icon: IconType; label: string }) => (
 	<Flex direction="column" align="center" gap={2}>
 		<Icon size={32}/>
 		<Text fontWeight="medium">{label}</Text>

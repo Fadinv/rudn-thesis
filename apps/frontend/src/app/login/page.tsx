@@ -4,8 +4,9 @@ import {useRouter, useSearchParams} from 'next/navigation';
 import React, {useEffect} from 'react';
 import {Center, Spinner} from '@chakra-ui/react';
 import {useLoginByTokenMutation} from '@frontend/generated/graphql-hooks';
+import {Suspense} from 'react';
 
-const LoginPage = ({}: { children: React.ReactNode }) => {
+const LoginPageComponent: React.FC = () => {
 	const [login] = useLoginByTokenMutation();
 	const router = useRouter();
 	const searchParams = useSearchParams();
@@ -19,12 +20,27 @@ const LoginPage = ({}: { children: React.ReactNode }) => {
 				.then(() => router.push('/home'))
 				.catch(() => router.push('/'));
 		}
-	}, [login]);
+	}, [login, router, token]);
 
 	return (
 		<Center h="100vh">
 			<Spinner size="xl" color="blue.500"/>
 		</Center>
+	);
+};
+
+const LoginPage: React.FC = () => {
+
+	return (
+		<Suspense
+			fallback={
+				<Center h="100vh">
+					<Spinner size="xl" color="blue.500"/>
+				</Center>
+			}
+		>
+			<LoginPageComponent/>
+		</Suspense>
 	);
 };
 
