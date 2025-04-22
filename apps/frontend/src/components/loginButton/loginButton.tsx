@@ -9,7 +9,6 @@ import {
 	DialogTrigger,
 	DialogContent,
 	DialogHeader,
-	DialogTitle,
 	DialogDescription,
 	DialogFooter,
 	DialogCloseTrigger,
