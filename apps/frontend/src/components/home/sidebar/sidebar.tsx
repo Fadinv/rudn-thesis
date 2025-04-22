@@ -3,7 +3,6 @@ import React from 'react';
 import DeletePortfolioButton from '@frontend/components/portfolio/deletePortfolioButton';
 import EditPortfolioButton from '@frontend/components/portfolio/editPortfolioButton';
 import {useGetUserPortfoliosQuery} from '@frontend/generated/graphql-hooks';
-import {Portfolio} from '@frontend/generated/graphql-types';
 import {
 	Box,
 	Stack,
@@ -13,13 +12,11 @@ import {
 import CreatePortfolioButton from '@frontend/components/portfolio/createPortfolioButton';
 
 interface SidebarProps {
-	portfolios?: Pick<Portfolio, 'id' | 'name'>[];
 	onSelectPortfolio: (id: number) => void;
 	selectedPortfolioId: number | null;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
-	                                         portfolios,
 	                                         onSelectPortfolio,
 	                                         selectedPortfolioId,
                                          }) => {
@@ -29,6 +26,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 	const activeBgColor = useColorModeValue('blue.100', 'blue.900');
 	const activeBorderColor = useColorModeValue('blue.500', 'blue.300');
 	const textColor = useColorModeValue('gray.800', 'gray.200');
+	const {data: portfolios} = useGetUserPortfoliosQuery();
 
 	const {refetch: refetchGetUserPortfolio} = useGetUserPortfoliosQuery({initialFetchPolicy: 'cache-only'});
 
@@ -41,7 +39,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
 			{/* Список портфелей */}
 			<Stack align="stretch" gap={2}>
-				{portfolios?.map((portfolio) => {
+				{portfolios?.getUserPortfolios?.map((portfolio) => {
 					const isSelected = portfolio.id === selectedPortfolioId;
 
 					return (

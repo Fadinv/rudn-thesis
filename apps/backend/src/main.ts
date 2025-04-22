@@ -1,7 +1,9 @@
+import {GqlTokenThrottleGuard} from '@backend/comon/guards/gql-token-throttle.guard';
 import {NestFactory} from '@nestjs/core';
 import {ValidationPipe} from '@nestjs/common';
 import cookieParser from 'cookie-parser';
 import {AppModule} from './app.module';
+import rateLimit from 'express-rate-limit';
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
@@ -26,6 +28,16 @@ async function bootstrap() {
 		req.res = res;
 		next();
 	});
+
+	app.use(
+		rateLimit({
+			windowMs: 1 * 60 * 1000,
+			limit: 60,
+			message: 'toManyRequests',
+		}),
+	);
+
+	app.useGlobalGuards(new GqlTokenThrottleGuard());
 
 	await app.listen(4000, '0.0.0.0');
 }

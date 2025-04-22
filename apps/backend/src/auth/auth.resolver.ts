@@ -44,6 +44,22 @@ export class AuthResolver {
 		return 'OK';
 	}
 
+	// Логин пользователя по токену
+	@Mutation(() => String)
+	async loginByToken(
+		@Args('token') token: string,
+		@Context('res') res: Response,
+	): Promise<string> {
+		const result = await this.usersService.loginByToken(token);
+
+		res.cookie('access_token', result.access_token, {
+			...this.cookieOptions,
+			maxAge: this.COOKIE_MAX_AGE,
+		});
+
+		return 'OK';
+	}
+
 	// Выход пользователя (удаление токена)
 	@Mutation(() => Boolean)
 	async logout(@Context('res') res: Response): Promise<boolean> {

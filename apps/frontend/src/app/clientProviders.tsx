@@ -4,7 +4,6 @@ import {Toaster} from '@frontend/components/ui/toaster';
 import React from 'react';
 import {ApolloProvider} from '@apollo/client';
 import {Provider} from '@frontend/components/ui/provider';
-import MainLayout from '@frontend/components/mainLayout/mainLayout';
 import {client} from '@frontend/lib/apollo-client';
 
 export default function ClientProviders({children}: { children: React.ReactNode }) {
@@ -12,7 +11,7 @@ export default function ClientProviders({children}: { children: React.ReactNode 
 		<Provider>
 			<Toaster/>
 			<ApolloProvider client={client}>
-				<MainLayout>{children}</MainLayout>
+				{children}
 			</ApolloProvider>
 		</Provider>
 	);

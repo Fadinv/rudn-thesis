@@ -93,9 +93,6 @@ type PortfolioDistribution {
 
 type Query {
   currentUser: User
-  getUsers: [User!]!
-  getUserById(id: Float!): User
-  getUserByEmail(email: String!): User
   getStocks: [Stock!]!
   getStockById(id: Int!): Stock
   getStockByTicker(ticker: String!): Stock
@@ -111,10 +108,8 @@ type Query {
 type Mutation {
   register(email: String!, password: String!): String!
   login(email: String!, password: String!): String!
+  loginByToken(token: String!): String!
   logout: Boolean!
-  createUser(email: String!, password: String!): User!
-  updateUser(id: Float!, email: String!, password: String): User!
-  deleteUser(id: Float!): Boolean!
   createStock(data: StockInput!): Stock!
   updateStock(id: Float!, data: StockInput!): Stock!
   deleteStock(id: Float!): Boolean!

@@ -49,6 +49,7 @@ export type Mutation = {
   deleteStock: Scalars['Boolean']['output'];
   deleteUser: Scalars['Boolean']['output'];
   login: Scalars['String']['output'];
+  loginByToken: Scalars['String']['output'];
   logout: Scalars['Boolean']['output'];
   register: Scalars['String']['output'];
   updatePortfolio: Portfolio;
@@ -124,6 +125,11 @@ export type MutationDeleteUserArgs = {
 export type MutationLoginArgs = {
   email: Scalars['String']['input'];
   password: Scalars['String']['input'];
+};
+
+
+export type MutationLoginByTokenArgs = {
+  token: Scalars['String']['input'];
 };
 
 
@@ -485,6 +491,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   deleteStock?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteStockArgs, 'id'>>;
   deleteUser?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteUserArgs, 'id'>>;
   login?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationLoginArgs, 'email' | 'password'>>;
+  loginByToken?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationLoginByTokenArgs, 'token'>>;
   logout?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   register?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationRegisterArgs, 'email' | 'password'>>;
   updatePortfolio?: Resolver<ResolversTypes['Portfolio'], ParentType, ContextType, RequireFields<MutationUpdatePortfolioArgs, 'newName' | 'portfolioId'>>;

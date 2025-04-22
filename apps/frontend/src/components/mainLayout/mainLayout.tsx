@@ -1,5 +1,6 @@
 import {ServerErrorFallback} from '@frontend/components/mainLayout/serverErrorFallback';
-import React from 'react';
+import {useRouter} from 'next/navigation';
+import React, {useEffect} from 'react';
 import Header from '@frontend/components/header/header';
 import LoginForm from '@frontend/components/loginForm/loginForm';
 import {ColorModeProvider, useColorMode} from '@frontend/components/ui/color-mode';
@@ -7,8 +8,13 @@ import {useCurrentUserQuery} from '@frontend/generated/graphql-hooks';
 import {Spinner, Center, Theme, defaultSystem, ChakraProvider, Flex} from '@chakra-ui/react';
 
 const Layout = ({children}: { children: React.ReactNode }) => {
-	const {data, loading, error} = useCurrentUserQuery();
+	const {data, loading, error, called} = useCurrentUserQuery();
 	const {colorMode} = useColorMode();
+	const router = useRouter();
+
+	useEffect(() => {
+		if (called && !loading && !data?.currentUser) router.push('/');
+	}, [data, loading, called]);
 
 	const isDark = colorMode === 'dark';
 	const colorPalette = isDark ? 'teal' : undefined;

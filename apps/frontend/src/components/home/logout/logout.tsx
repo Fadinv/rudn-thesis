@@ -1,15 +1,18 @@
 import {CurrentUserDocument, useLogoutMutation} from '@frontend/generated/graphql-hooks';
 import {useApolloClient} from '@apollo/client';
 import {Button} from '@chakra-ui/react';
+import {useRouter} from 'next/navigation';
 import React, {MouseEventHandler} from 'react';
 
 export const Logout = () => {
 	const client = useApolloClient();
 	const [logout, {loading}] = useLogoutMutation();
+	const router = useRouter();
 
 	const handleLogout: MouseEventHandler<HTMLButtonElement> = async (e) => {
 		e.preventDefault();
 		try {
+			router.push('/');
 			await logout();
 			client.writeQuery({
 				query: CurrentUserDocument,

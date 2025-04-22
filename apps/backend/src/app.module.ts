@@ -1,3 +1,4 @@
+import {RedisClientModule} from '@backend/redis/redis-client.module';
 import {Module} from '@nestjs/common';
 import {GraphQLModule} from '@nestjs/graphql';
 import {ApolloDriver} from '@nestjs/apollo';
@@ -12,13 +13,14 @@ import {JwtService} from '@nestjs/jwt';
 
 @Module({
 	imports: [
+		RedisClientModule,
 		GraphQLModule.forRootAsync({
 			driver: ApolloDriver,
 			imports: [AuthModule, UsersModule],
 			inject: [JwtService, UsersService],
 			useFactory: (jwtService: JwtService, usersService: UsersService) => ({
 				autoSchemaFile: './schema.gql',
-				playground: true,
+				playground: process.env.NODE_ENV !== 'production',
 				path: '/graphql',
 				context: ({req, res}) => ({
 					req,

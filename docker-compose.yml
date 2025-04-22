@@ -22,6 +22,7 @@ services:
       - "4000:4000"
     depends_on:
       - postgres
+      - redis
     environment:
       DATABASE_URL: postgres://postgres:password@postgres:5432/portfolio_db
     volumes:
@@ -55,6 +56,7 @@ services:
     depends_on:
       - backend
       - postgres
+      - redis
     volumes:
       - .:/monorepo
     working_dir: /monorepo/apps/ticker-updater
@@ -71,5 +73,13 @@ services:
     volumes:
       - ./apps/analyzer:/app
 
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+
 volumes:
   postgres-data:
+  redis-data:

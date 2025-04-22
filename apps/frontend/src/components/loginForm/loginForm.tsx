@@ -1,5 +1,6 @@
+import {useRouter} from 'next/navigation';
 import React, {useState} from 'react';
-import {Fieldset, Input, Button, Box, Heading, Text} from '@chakra-ui/react';
+import {Fieldset, Input, Button, Box, Text, Heading} from '@chakra-ui/react';
 import {Field} from '@frontend/components/ui/field';
 import {useCurrentUserQuery, useLoginMutation} from '@frontend/generated/graphql-hooks';
 
@@ -8,6 +9,7 @@ const LoginForm = () => {
 	const [password, setPassword] = useState('');
 	const [login, {loading, error}] = useLoginMutation();
 	const {refetch: refetchCurrentUser} = useCurrentUserQuery({fetchPolicy: 'cache-only'});
+	const router = useRouter();
 
 	const handleLogin: React.FormEventHandler<HTMLFormElement> = async (e) => {
 		e.preventDefault();
@@ -15,6 +17,7 @@ const LoginForm = () => {
 			const {data} = await login({variables: {email, password}});
 
 			if (data?.login) {
+				router.push('/home');
 				await refetchCurrentUser();
 			}
 		} catch (err) {
@@ -23,7 +26,7 @@ const LoginForm = () => {
 	};
 
 	return (
-		<Box maxW="md" minW="md" mx="auto" p={6} borderWidth={1} borderRadius="lg" boxShadow="md">
+		<Box w={'100%'} maxW="md" mx="auto" p={6} borderWidth={1} borderRadius="lg" boxShadow="md">
 			<Heading size="lg" mb={4} textAlign="center">Войти</Heading>
 			<form onSubmit={handleLogin}>
 				<Fieldset.Root size="lg">
@@ -47,7 +50,7 @@ const LoginForm = () => {
 					</Field>
 					{error && <Text color="red.500">Не удалось выполнить вход</Text>}
 					<Button colorScheme="blue" width="full" type="submit" loading={loading}>
-						Login
+						Далее
 					</Button>
 				</Fieldset.Root>
 			</form>

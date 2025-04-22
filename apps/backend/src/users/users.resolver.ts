@@ -13,40 +13,40 @@ export class UsersResolver {
 		return user;
 	}
 
-	@Query(() => [User])
-	async getUsers(): Promise<User[]> {
-		return this.usersService.findAll();
-	}
+	// @Query(() => [User])
+	// async getUsers(): Promise<User[]> {
+	// 	return this.usersService.findAll();
+	// }
 
-	@Query(() => User, {nullable: true})
-	async getUserById(@Args('id') id: number): Promise<User | null> {
-		return this.usersService.findById(id);
-	}
+	// @Query(() => User, {nullable: true})
+	// async getUserById(@Args('id') id: number): Promise<User | null> {
+	// 	return this.usersService.findById(id);
+	// }
 
-	@Query(() => User, {nullable: true})
-	async getUserByEmail(@Args('email') email: string): Promise<User | null> {
-		return this.usersService.findByEmail(email);
-	}
+	// @Query(() => User, {nullable: true})
+	// async getUserByEmail(@Args('email') email: string): Promise<User | null> {
+	// 	return this.usersService.findByEmail(email);
+	// }
 
-	@Mutation(() => User)
-	async createUser(
-		@Args('email') email: string,
-		@Args('password') password: string,
-	): Promise<User> {
-		return this.usersService.createUser(email, password);
-	}
+	// @Mutation(() => User)
+	// async createUser(
+	// 	@Args('email') email: string,
+	// 	@Args('password') password: string,
+	// ): Promise<User> {
+	// 	return this.usersService.createUser(email, password);
+	// }
 
-	@Mutation(() => User)
-	async updateUser(
-		@Args('id') id: number,
-		@Args('email') email: string,
-		@Args('password', {nullable: true}) password?: string,
-	): Promise<User> {
-		return this.usersService.updateUser(id, email, password);
-	}
+	// @Mutation(() => User)
+	// async updateUser(
+	// 	@Args('id') id: number,
+	// 	@Args('email') email: string,
+	// 	@Args('password', {nullable: true}) password?: string,
+	// ): Promise<User> {
+	// 	return this.usersService.updateUser(id, email, password);
+	// }
 
-	@Mutation(() => Boolean)
-	async deleteUser(@Args('id') id: number, @Context('req') _req: Request): Promise<boolean> {
-		return this.usersService.deleteUser(id);
-	}
+	// @Mutation(() => Boolean)
+	// async deleteUser(@Args('id') id: number, @Context('req') _req: Request): Promise<boolean> {
+	// 	return this.usersService.deleteUser(id);
+	// }
 }

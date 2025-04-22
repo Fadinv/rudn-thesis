@@ -10,7 +10,7 @@ export async function logoutOutOfSession() {
 	}
 }
 
-const showToast = () => {
+const showOutOfSessionToast = () => {
 	toaster.create({
 		title: 'Сессия завершена',
 		description: 'Пожалуйста, войдите снова.',
@@ -18,4 +18,13 @@ const showToast = () => {
 	});
 };
 
-export const throttledLogoutOfSessionToast = debounce(showToast, 100);
+const showInvalidTokenToast = () => {
+	toaster.create({
+		title: 'Недействительный токен',
+		description: 'Пожалуйста, уточните правильность токена. Вероятно он истек.',
+		type: 'error',
+	});
+};
+
+export const throttledLogoutOfSessionToast = debounce(showOutOfSessionToast, 100);
+export const throttledInvalidTokenToast = debounce(showInvalidTokenToast, 100);
