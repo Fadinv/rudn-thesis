@@ -11,7 +11,7 @@ export default function HomePage() {
 		<>
 			{/* Hero */}
 			<Box
-				bgImage="url('/analyzer-layout.png')"
+				bgImage="url('/layout-min.png')"
 				bgSize="cover"
 				bgPos="center"
 				bgRepeat="no-repeat"
