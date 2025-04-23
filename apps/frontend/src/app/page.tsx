@@ -1,5 +1,3 @@
-"use client"
-import {useColorMode} from '@frontend/components/ui/color-mode';
 import React from 'react';
 import {
 	Box, Heading, Text, VStack, IconButton, Container, Link, SimpleGrid, Flex, Separator,
@@ -9,10 +7,6 @@ import LoginButton from '@frontend/components/loginButton/loginButton';
 import {IconType} from 'react-icons/lib';
 
 export default function HomePage() {
-	const {colorMode} = useColorMode();
-	const isDark = colorMode === 'dark';
-
-	console.log(colorMode, isDark);
 	return (
 		<>
 			{/* Hero */}
@@ -27,13 +21,13 @@ export default function HomePage() {
 					<VStack
 						gap={6}
 						textAlign="center"
-						bg={isDark ? 'rgba(22, 22, 22, 0.75)' : 'rgba(255, 255, 255, 0.75)'}
+						bg={'rgba(160, 185, 200, 0.75)'}
 						backdropFilter="blur(8px)"
 						p={8}
 						borderRadius="xl"
 					>
-						<Heading fontSize="4xl">Portfolio Analyzer</Heading>
-						<Text fontSize="lg" maxW="600px">
+						<Heading color={'black'} fontSize="4xl">Portfolio Analyzer</Heading>
+						<Text fontSize="xl" fontWeight={'600'} maxW="600px" color={'black'}>
 							Умный анализ инвестиционного портфеля по Марковицу, GBM-прогноз и поддержка MOEX.
 						</Text>
 						<LoginButton/>
@@ -58,7 +52,7 @@ export default function HomePage() {
 			<Separator maxW={'7xl'} m={'0 auto'}/>
 
 			{/* Преимущества */}
-			<Container bg={isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(22, 22, 22, 0.05)'} borderRadius="xl" mt={8} mb={8} maxW="container.lg"
+			<Container borderRadius="xl" mt={8} mb={8} maxW="container.lg"
 			           py={{base: 12, md: 16}}>
 				<VStack gap={4} textAlign="center">
 					<Heading fontSize="2xl">Как это работает?</Heading>
@@ -94,13 +88,13 @@ export default function HomePage() {
 			<Separator maxW={'7xl'} m={'0 auto'}/>
 
 			{/* Telegram */}
-			<Container bg={isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(22, 22, 22, 0.05)'} borderRadius="xl" mt={8} mb={8} maxW="container.lg"
+			<Container borderRadius="xl" mt={8} mb={8} maxW="container.lg"
 			           py={{base: 12, md: 16}}>
 				<VStack gap={2} textAlign="center">
 					<Text fontSize="md" fontWeight="medium">
 						Приложение активно разрабатывается
 					</Text>
-					<Text fontSize="sm" maxW="400px" color="gray.500">
+					<Text fontSize="sm" maxW="400px" color={'gray.500'}>
 						Вы можете запросить доступ, написав мне в Telegram. Буду рад обратной связи!
 					</Text>
 					<Link href="https://t.me/vfadrik" target={'_blank'}>
