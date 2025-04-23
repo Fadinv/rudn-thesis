@@ -1,3 +1,5 @@
+"use client"
+import {useColorMode} from '@frontend/components/ui/color-mode';
 import React from 'react';
 import {
 	Box, Heading, Text, VStack, IconButton, Container, Link, SimpleGrid, Flex, Separator,
@@ -7,6 +9,10 @@ import LoginButton from '@frontend/components/loginButton/loginButton';
 import {IconType} from 'react-icons/lib';
 
 export default function HomePage() {
+	const {colorMode} = useColorMode();
+	const isDark = colorMode === 'dark';
+
+	console.log(colorMode, isDark);
 	return (
 		<>
 			{/* Hero */}
@@ -18,8 +24,14 @@ export default function HomePage() {
 				py={{base: 24, md: 48}}
 			>
 				<Container maxW="container.lg" py={{base: 24, md: 48}}>
-					<VStack gap={6} textAlign="center" bg="rgba(255, 255, 255, 0.75)"
-					        backdropFilter="blur(8px)" p={8} borderRadius="xl">
+					<VStack
+						gap={6}
+						textAlign="center"
+						bg={isDark ? 'rgba(22, 22, 22, 0.75)' : 'rgba(255, 255, 255, 0.75)'}
+						backdropFilter="blur(8px)"
+						p={8}
+						borderRadius="xl"
+					>
 						<Heading fontSize="4xl">Portfolio Analyzer</Heading>
 						<Text fontSize="lg" maxW="600px">
 							Умный анализ инвестиционного портфеля по Марковицу, GBM-прогноз и поддержка MOEX.
@@ -46,7 +58,7 @@ export default function HomePage() {
 			<Separator maxW={'7xl'} m={'0 auto'}/>
 
 			{/* Преимущества */}
-			<Container bg="rgba(22, 22, 22, 0.05)" borderRadius="xl" mt={8} mb={8} maxW="container.lg"
+			<Container bg={isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(22, 22, 22, 0.05)'} borderRadius="xl" mt={8} mb={8} maxW="container.lg"
 			           py={{base: 12, md: 16}}>
 				<VStack gap={4} textAlign="center">
 					<Heading fontSize="2xl">Как это работает?</Heading>
@@ -82,7 +94,7 @@ export default function HomePage() {
 			<Separator maxW={'7xl'} m={'0 auto'}/>
 
 			{/* Telegram */}
-			<Container bg="rgba(22, 22, 22, 0.05)" borderRadius="xl" mt={8} mb={8} maxW="container.lg"
+			<Container bg={isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(22, 22, 22, 0.05)'} borderRadius="xl" mt={8} mb={8} maxW="container.lg"
 			           py={{base: 12, md: 16}}>
 				<VStack gap={2} textAlign="center">
 					<Text fontSize="md" fontWeight="medium">
