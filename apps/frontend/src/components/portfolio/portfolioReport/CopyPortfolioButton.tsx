@@ -88,7 +88,8 @@ const CopyPortfolioButton: React.FC<CopyPortfolioButtonProps> = ({onSave, stockT
 					colorPalette="teal"
 					variant="solid"
 					size="xs"
-					style={{margin: 'auto 0 auto 12px'}}
+					mt={2}
+					// style={{margin: 'auto 0 auto 12px'}}
 				>
 					<Icon as={FaCopy} mr={2}/> Копировать портфель
 				</Button>

@@ -116,7 +116,9 @@ const ForecastGBMViewer: FC<ForecastGBMViewerProps> = ({reportId}) => {
 					onValueChange={(e) => setSelectedStock(e.value[0] as string)}
 					collection={stockOptions}
 					size="sm"
-					width="320px"
+					maxW="320px"
+					w="100%"
+					minW="0"
 					mb={4}
 				>
 					<SelectLabel>Выберите актив</SelectLabel>
@@ -133,7 +135,7 @@ const ForecastGBMViewer: FC<ForecastGBMViewerProps> = ({reportId}) => {
 				</SelectRoot>
 			</Box>
 
-			<Box w={'1024px'} height={'1024px'} maxW={'70vw'} maxHeight={'70vh'}>
+			<Box w={'1024px'} height={'1024px'} maxW={'100vw'} maxHeight={'70vh'}>
 				<ResponsiveContainer width="100%" height={'100%'} maxHeight={700}>
 					<AreaChart data={chartData} margin={{top: 20, right: 30, left: 20, bottom: 20}}>
 						<XAxis

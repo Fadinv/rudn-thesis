@@ -31,50 +31,55 @@ const Sidebar: React.FC<SidebarProps> = ({
 	const {refetch: refetchGetUserPortfolio} = useGetUserPortfoliosQuery({initialFetchPolicy: 'cache-only'});
 
 	return (
-		<Box w="350px" p={4} bg={bgColor} borderRadius="md" boxShadow="lg">
+		<Box w={{lg: '350px', base: '100%'}} p={4} bg={bgColor} borderRadius="md" boxShadow="lg">
 			{/* Кнопка создания портфеля */}
 			<Box w="100%" pb={4}>
 				<CreatePortfolioButton onSave={() => refetchGetUserPortfolio()}/>
 			</Box>
 
 			{/* Список портфелей */}
-			<Stack align="stretch" gap={2}>
-				{portfolios?.getUserPortfolios?.map((portfolio) => {
-					const isSelected = portfolio.id === selectedPortfolioId;
+			<Box maxH="calc(100vh - 200px)" overflowY="auto" pr={2}>
+				<Stack align="stretch" gap={2}>
+					{portfolios?.getUserPortfolios?.map((portfolio) => {
+						const isSelected = portfolio.id === selectedPortfolioId;
 
-					return (
-						<Flex
-							key={portfolio.id}
-							p={3}
-							shadow="md"
-							borderRadius="lg"
-							cursor="pointer"
-							justify="space-between"
-							align="center"
-							bg={isSelected ? activeBgColor : bgColor}
-							border="2px solid"
-							borderColor={isSelected ? activeBorderColor : 'transparent'}
-							transition="all 0.2s ease-in-out"
-							_hover={isSelected ? {} : {bg: hoverBgColor}} // Отключаем hover для активного элемента
-							onClick={() => onSelectPortfolio(portfolio.id)}
-						>
-							<Text fontWeight="medium" color={textColor}>{portfolio.name}</Text>
-							<Flex gap={1}>
-								<EditPortfolioButton
-									portfolioId={portfolio.id}
-									currentName={portfolio.name}
-									onSave={() => refetchGetUserPortfolio()}
-								/>
-								<DeletePortfolioButton
-									onDelete={() => refetchGetUserPortfolio()}
-									portfolioId={portfolio.id}
-									portfolioName={portfolio.name}
-								/>
+						return (
+							<Flex
+								key={portfolio.id}
+								p={3}
+								shadow="md"
+								borderRadius="lg"
+								cursor="pointer"
+								justify="space-between"
+								align="center"
+								bg={isSelected ? activeBgColor : bgColor}
+								border="2px solid"
+								borderColor={isSelected ? activeBorderColor : 'transparent'}
+								transition="all 0.2s ease-in-out"
+								_hover={isSelected ? {} : {bg: hoverBgColor}}
+								onClick={() => onSelectPortfolio(portfolio.id)}
+							>
+								<Text fontWeight="medium" color={textColor}>
+									{portfolio.name}
+								</Text>
+								<Flex gap={1}>
+									<EditPortfolioButton
+										portfolioId={portfolio.id}
+										currentName={portfolio.name}
+										onSave={() => refetchGetUserPortfolio()}
+									/>
+									<DeletePortfolioButton
+										onDelete={() => refetchGetUserPortfolio()}
+										portfolioId={portfolio.id}
+										portfolioName={portfolio.name}
+									/>
+								</Flex>
 							</Flex>
-						</Flex>
-					);
-				})}
-			</Stack>
+						);
+					})}
+				</Stack>
+			</Box>
+
 		</Box>
 	);
 };

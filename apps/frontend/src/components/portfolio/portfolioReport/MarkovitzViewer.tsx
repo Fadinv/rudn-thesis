@@ -17,6 +17,7 @@ import {
 	FaInfoCircle,
 } from 'react-icons/fa';
 import {Tooltip} from '@frontend/components/ui/tooltip';
+import {ResponsiveContainer} from 'recharts';
 
 export type MarkovitzData = {
 	risk_annual: number;
@@ -47,7 +48,7 @@ interface MarkovitzViewerProps {
 const MarkovitzViewer: FC<MarkovitzViewerProps> = ({reportId}) => {
 	const [selectedPortfolio, setSelectedPortfolio] = useState(0);
 	const {data, loading} = useGetPortfolioReportQuery({variables: {reportId}});
-	const [tabValue, setTabValue] = useState<'frontier' | 'portfolio' | 'metrics'>('frontier');
+	const [tabValue, setTabValue] = useState<'frontier' | 'portfolio' | 'metrics'>('portfolio');
 	const {refetch} = useGetUserPortfoliosQuery({fetchPolicy: 'cache-only'});
 
 	const reports = data?.getPortfolioReport?.data as MarkovitzData | undefined;
@@ -145,7 +146,7 @@ const MarkovitzViewer: FC<MarkovitzViewerProps> = ({reportId}) => {
 	);
 
 	return (
-		<Box maxW="600px" mx="auto" textAlign="center" p={5}>
+		<Box maxW="600px" mx="auto" textAlign="center">
 			{loading ? (
 				<Spinner size="xl" color="blue.500"/>
 			) : (
@@ -177,26 +178,23 @@ const MarkovitzViewer: FC<MarkovitzViewerProps> = ({reportId}) => {
 						}}
 						variant="plain"
 					>
-						<Tabs.List bg="bg.muted" rounded="l3" p="1">
-							<Tabs.Trigger value="frontier">
-								<LuChartNoAxesCombined/>
-								Граница
-							</Tabs.Trigger>
-							<Tabs.Trigger value="portfolio">
-								<LuFolder/>
-								Портфель
-							</Tabs.Trigger>
-							<Tabs.Trigger value="metrics">
-								<LuSquareCheck/>
-								Метрика
-							</Tabs.Trigger>
-							<Tabs.Indicator rounded="l2"/>
-							<CopyPortfolioButton
-								stockTickerList={stockTickers}
-								weights={weights}
-								onSave={() => refetch()}
-							/>
-						</Tabs.List>
+						<Box overflowX="auto" w="100%">
+							<Tabs.List bg="bg.muted" rounded="l3" p="1">
+								<Tabs.Trigger value="portfolio">
+									<LuFolder/>
+									Портфель
+								</Tabs.Trigger>
+								<Tabs.Trigger value="frontier">
+									<LuChartNoAxesCombined/>
+									Граница
+								</Tabs.Trigger>
+								<Tabs.Trigger value="metrics">
+									<LuSquareCheck/>
+									Метрика
+								</Tabs.Trigger>
+								<Tabs.Indicator rounded="l2"/>
+							</Tabs.List>
+						</Box>
 						<Tabs.Content value={'frontier'}>
 							<EfficientFrontierChart
 								onSelect={(index) => {
@@ -209,16 +207,19 @@ const MarkovitzViewer: FC<MarkovitzViewerProps> = ({reportId}) => {
 						</Tabs.Content>
 						<Tabs.Content value="portfolio">
 							{/* Pie Chart */}
-							<PieChart width={400} height={250} style={{width: '100%', height: 400}}>
-								<Pie data={allocation} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80}
-								     label>
-									{allocation.map((_, index) => (
-										<Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]}/>
-									))}
-								</Pie>
-								<RechartsTooltip/>
-								<Legend/>
-							</PieChart>
+							<ResponsiveContainer width="100%" height={300}>
+								<PieChart width={400} height={250} style={{width: '100%', height: 400}}>
+									<Pie data={allocation} dataKey="value" nameKey="name" cx="50%" cy="50%"
+									     outerRadius={80}
+									     label>
+										{allocation.map((_, index) => (
+											<Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]}/>
+										))}
+									</Pie>
+									<RechartsTooltip/>
+									<Legend max={'100vw'}/>
+								</PieChart>
+							</ResponsiveContainer>
 
 							<Table.Root mt={4} border="1px solid" borderColor="gray.200" borderRadius="md">
 								<Table.Header>
@@ -323,6 +324,11 @@ const MarkovitzViewer: FC<MarkovitzViewerProps> = ({reportId}) => {
 					</Tabs.Root>
 				</>
 			)}
+			<CopyPortfolioButton
+				stockTickerList={stockTickers}
+				weights={weights}
+				onSave={() => refetch()}
+			/>
 		</Box>
 	);
 };

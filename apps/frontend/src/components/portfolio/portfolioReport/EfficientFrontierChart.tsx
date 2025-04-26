@@ -11,6 +11,7 @@ import {
 	CartesianGrid, Cell,
 } from 'recharts';
 import {Box, Text} from '@chakra-ui/react';
+import {ResponsiveContainer} from 'recharts';
 
 interface EfficientFrontierChartProps {
 	portfolios: MarkovitzData;
@@ -45,7 +46,7 @@ const EfficientFrontierChart: FC<EfficientFrontierChartProps> = ({portfolios, se
 
 	return (
 		<Box width="100%" minH="520px" overflowX="auto">
-			<Box width="700px" height="520px"> {/* фиксированный размер */}
+			<ResponsiveContainer width="100%" height={400}>
 				<ScatterChart width={500} height={500} margin={{top: 20, right: 30, bottom: 20, left: 30}}>
 					<CartesianGrid strokeDasharray="3 3"/>
 					<XAxis
@@ -87,7 +88,7 @@ const EfficientFrontierChart: FC<EfficientFrontierChartProps> = ({portfolios, se
 						))}
 					</Scatter>
 				</ScatterChart>
-			</Box>
+			</ResponsiveContainer>
 		</Box>
 	);
 };

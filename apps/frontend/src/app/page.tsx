@@ -37,6 +37,32 @@ export default function HomePage() {
 
 			<Separator maxW={'7xl'} m={'0 auto'}/>
 
+			{/* Telegram */}
+			<Container borderRadius="xl" mt={8} mb={8} maxW="container.lg"
+			           py={{base: 12, md: 16}}>
+				<VStack gap={2} textAlign="center">
+					<Text fontSize="md" fontWeight="medium">
+						Приложение активно разрабатывается
+					</Text>
+					<Text fontSize="sm" maxW="400px" color={'gray.500'}>
+						Вы можете запросить доступ, написав мне в Telegram. Буду рад обратной связи!
+					</Text>
+					<Link href="https://t.me/vfadrik" target={'_blank'}>
+						<IconButton
+							aria-label="Написать в Telegram"
+							variant="solid"
+							colorPalette="blue"
+							size="xs"
+							rounded="full"
+						>
+							<FaTelegramPlane/>
+						</IconButton>
+					</Link>
+				</VStack>
+			</Container>
+
+			<Separator maxW={'7xl'} m={'0 auto'}/>
+
 			{/* О приложении */}
 			<Container py={{base: 12, md: 16}}>
 				<VStack gap={4} textAlign="center">
@@ -83,32 +109,6 @@ export default function HomePage() {
 					<UserCard icon={FaRobot} label="Алго-трейдерам"/>
 					<UserCard icon={FaLock} label="Аналитикам и студентам"/>
 				</SimpleGrid>
-			</Container>
-
-			<Separator maxW={'7xl'} m={'0 auto'}/>
-
-			{/* Telegram */}
-			<Container borderRadius="xl" mt={8} mb={8} maxW="container.lg"
-			           py={{base: 12, md: 16}}>
-				<VStack gap={2} textAlign="center">
-					<Text fontSize="md" fontWeight="medium">
-						Приложение активно разрабатывается
-					</Text>
-					<Text fontSize="sm" maxW="400px" color={'gray.500'}>
-						Вы можете запросить доступ, написав мне в Telegram. Буду рад обратной связи!
-					</Text>
-					<Link href="https://t.me/vfadrik" target={'_blank'}>
-						<IconButton
-							aria-label="Написать в Telegram"
-							variant="solid"
-							colorPalette="blue"
-							size="xs"
-							rounded="full"
-						>
-							<FaTelegramPlane/>
-						</IconButton>
-					</Link>
-				</VStack>
 			</Container>
 
 			<Separator maxW={'7xl'} m={'0 auto'}/>
