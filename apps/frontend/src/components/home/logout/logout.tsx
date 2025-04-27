@@ -13,11 +13,11 @@ export const Logout = () => {
 		e.preventDefault();
 		try {
 			router.push('/');
-			await logout();
 			client.writeQuery({
 				query: CurrentUserDocument,
 				data: {currentUser: null},
 			});
+			await logout();
 			// Дать React перерендерить компоненты, чтобы не вызывать GetUserPortfolios
 			await new Promise((resolve) => setTimeout(resolve, 30));
 			// В худшем случае мы покажем выпадашку "Сессия завершена"
