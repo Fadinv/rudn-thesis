@@ -27,7 +27,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 	const activeBgColor = useColorModeValue('blue.100', 'blue.900');
 	const activeBorderColor = useColorModeValue('blue.500', 'blue.300');
 	const textColor = useColorModeValue('gray.800', 'gray.200');
-	const {data: portfolios} = useGetUserPortfoliosQuery();
+	const {data: portfolios, loading, called} = useGetUserPortfoliosQuery();
 
 	return (
 		<Box minW={'350px'} w={{lg: '350px', base: '100%'}} p={4} bg={bgColor} borderRadius="md" boxShadow="lg">
@@ -39,7 +39,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 			{/* Список портфелей */}
 			<Box maxH="calc(100vh - 200px)" overflowY="auto" pr={2}>
 				<Stack align="stretch" gap={2}>
-					{!portfolios?.getUserPortfolios?.length && (
+					{!portfolios?.getUserPortfolios?.length && !loading && called && (
 						<CreateDefaultPortfolioButton
 							onCreated={(portfolio) => onSelectPortfolio(portfolio.id)}
 						/>
