@@ -9,7 +9,7 @@ import {
 	DrawerTrigger,
 } from '@frontend/components/ui/drawer';
 import {toaster} from '@frontend/components/ui/toaster';
-import {useCreatePortfolioMutation} from '@frontend/generated/graphql-hooks';
+import {CreatePortfolioMutation, useCreatePortfolioMutation} from '@frontend/generated/graphql-hooks';
 import React, {useEffect, useState} from 'react';
 import {
 	Button, Icon,
@@ -19,7 +19,7 @@ import {
 import {FaPlus, FaUpload} from 'react-icons/fa';
 
 interface CreatePortfolioModalProps {
-	onSave?: () => void;
+	onSave?: (data?: CreatePortfolioMutation | null) => void;
 }
 
 interface CsvPortfolioEntry {
@@ -66,7 +66,7 @@ const CreatePortfolioButton: React.FC<CreatePortfolioModalProps> = (props) => {
 
 		if (portfolio?.data) {
 			setOpen(false);
-			props.onSave?.();
+			props.onSave?.(portfolio?.data);
 		}
 	};
 
@@ -192,7 +192,7 @@ const CreatePortfolioButton: React.FC<CreatePortfolioModalProps> = (props) => {
 								</label>
 
 								<Link href="/example_portfolio.csv" download>
-									<Button as="a" variant="ghost" size="sm">
+									<Button variant="ghost" size="sm">
 										Скачать пример CSV
 									</Button>
 								</Link>

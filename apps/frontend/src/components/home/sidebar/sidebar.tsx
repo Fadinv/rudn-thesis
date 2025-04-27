@@ -33,7 +33,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 		<Box minW={'350px'} w={{lg: '350px', base: '100%'}} p={4} bg={bgColor} borderRadius="md" boxShadow="lg">
 			{/* Кнопка создания портфеля */}
 			<Box w="100%" pb={4}>
-				<CreatePortfolioButton/>
+				<CreatePortfolioButton onSave={(item) => onSelectPortfolio(item?.createPortfolio.id ?? null)}/>
 			</Box>
 
 			{/* Список портфелей */}
