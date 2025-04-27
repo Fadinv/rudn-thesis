@@ -1,5 +1,5 @@
 import HomeButton from '@frontend/components/header/homeButton/homeButton';
-import ProfileButton from '@frontend/components/header/profileButton/profileButton';
+// import ProfileButton from '@frontend/components/header/profileButton/profileButton';
 import {Logout} from '@frontend/components/home/logout/logout';
 import {ColorModeButton} from '@frontend/components/ui/color-mode';
 import {Flex} from '@chakra-ui/react';
@@ -13,7 +13,7 @@ const Header = () => {
 			</Flex>
 			<Flex gap={4}>
 				<ColorModeButton/>
-				<ProfileButton/>
+				{/*<ProfileButton/>*/}
 				<Logout/>
 			</Flex>
 		</Flex>

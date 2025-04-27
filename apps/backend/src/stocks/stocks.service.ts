@@ -1,7 +1,7 @@
 import {Injectable} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {Stock} from '@service/orm';
-import {ILike, Repository} from 'typeorm';
+import {ILike, In, Not, Repository} from 'typeorm';
 
 @Injectable()
 export class StocksService {
@@ -43,13 +43,14 @@ export class StocksService {
 	}
 
 	// Поиск акций по тикеру или названию (регистр не учитывается)
-	async searchStocks(search: string): Promise<Stock[]> {
-		return this.stockRepository.find({
-			where: [
-				{ticker: ILike(`%${search}%`)},
-				{name: ILike(`%${search}%`)},
-			],
-			take: 10, // Ограничиваем результат 10 акциями
-		});
+	async searchStocks(search: string, includedStocks?: string[]): Promise<Stock[]> {
+		const query = this.stockRepository.createQueryBuilder('stock')
+			.where('(stock.ticker ILIKE :search OR stock.name ILIKE :search)', {search: `%${search}%`});
+
+		if (includedStocks?.length) {
+			query.andWhere('stock.ticker NOT IN (:...includedStocks)', {includedStocks});
+		}
+
+		return query.take(10).getMany();
 	}
 }

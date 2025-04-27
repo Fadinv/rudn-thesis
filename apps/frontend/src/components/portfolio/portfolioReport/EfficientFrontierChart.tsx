@@ -10,7 +10,7 @@ import {
 	ZAxis,
 	CartesianGrid, Cell,
 } from 'recharts';
-import {Box, Text} from '@chakra-ui/react';
+import {Box, Flex, Text} from '@chakra-ui/react';
 import {ResponsiveContainer} from 'recharts';
 
 interface EfficientFrontierChartProps {
@@ -89,6 +89,21 @@ const EfficientFrontierChart: FC<EfficientFrontierChartProps> = ({portfolios, se
 					</Scatter>
 				</ScatterChart>
 			</ResponsiveContainer>
+			{/* Легенда внизу */}
+			<Flex justify="center" align="center" gap="6" mt="4">
+				<Flex align="center" gap="2">
+					<Box w="10px" h="10px" borderRadius="full" bg={riskCategoryColors.conservative}/>
+					<Text fontSize="sm">Консервативный</Text>
+				</Flex>
+				<Flex align="center" gap="2">
+					<Box w="10px" h="10px" borderRadius="full" bg={riskCategoryColors.standard}/>
+					<Text fontSize="sm">Сбалансированный</Text>
+				</Flex>
+				<Flex align="center" gap="2">
+					<Box w="10px" h="10px" borderRadius="full" bg={riskCategoryColors.aggressive}/>
+					<Text fontSize="sm">Агрессивный</Text>
+				</Flex>
+			</Flex>
 		</Box>
 	);
 };

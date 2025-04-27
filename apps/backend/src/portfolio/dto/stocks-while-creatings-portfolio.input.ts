@@ -8,7 +8,7 @@ export class StocksWhileCreatingPortfolio {
 	@Field(() => Int)
 	quantity!: number;
 
-	@Field(() => Float)
-	averagePrice!: number;
+	@Field(() => Float, {nullable: true})
+	averagePrice?: number;
 }
 

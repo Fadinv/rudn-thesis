@@ -3,9 +3,11 @@ import React, {useState} from 'react';
 import {Fieldset, Input, Button, Box, Text, Heading} from '@chakra-ui/react';
 import {Field} from '@frontend/components/ui/field';
 import {useCurrentUserQuery, useLoginMutation} from '@frontend/generated/graphql-hooks';
+import {PasswordInput} from '@frontend/components/ui/password-input';
 
 const LoginForm = () => {
 	const [email, setEmail] = useState('');
+	const [waitingForRedirect, setWaitingForRedirect] = useState(false);
 	const [password, setPassword] = useState('');
 	const [login, {loading, error}] = useLoginMutation();
 	const {refetch: refetchCurrentUser} = useCurrentUserQuery({fetchPolicy: 'cache-only'});
@@ -17,6 +19,8 @@ const LoginForm = () => {
 			const {data} = await login({variables: {email, password}});
 
 			if (data?.login) {
+				setWaitingForRedirect(true);
+				console.log('redirect to home');
 				router.push('/home');
 				await refetchCurrentUser();
 			}
@@ -36,20 +40,18 @@ const LoginForm = () => {
 							name="email"
 							value={email}
 							onChange={(e) => setEmail(e.target.value)}
-							placeholder="Enter your email"
+							placeholder="Введите ваш email"
 						/>
 					</Field>
 					<Field label="Пароль">
-						<Input
-							type="password"
-							name="password"
+						<PasswordInput
 							value={password}
 							onChange={(e) => setPassword(e.target.value)}
-							placeholder="Enter your password"
+							placeholder="Введите пароль"
 						/>
 					</Field>
 					{error && <Text color="red.500">Не удалось выполнить вход</Text>}
-					<Button colorScheme="blue" width="full" type="submit" loading={loading}>
+					<Button colorScheme="blue" width="full" type="submit" loading={loading || waitingForRedirect}>
 						Далее
 					</Button>
 				</Fieldset.Root>

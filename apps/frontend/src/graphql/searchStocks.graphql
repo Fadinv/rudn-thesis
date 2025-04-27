@@ -1,5 +1,5 @@
-query SearchStocks($search: String!) {
-    searchStocks(search: $search) {
+query SearchStocks($search: String!, $includedStocks: [String!]) {
+    searchStocks(search: $search, includedStocks: $includedStocks) {
         id
         ticker
         name

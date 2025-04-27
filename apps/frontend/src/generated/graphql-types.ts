@@ -41,13 +41,11 @@ export type Mutation = {
   createMarkovitzReport: PortfolioReport;
   createPortfolio: Portfolio;
   createStock: Stock;
-  createUser: User;
   deleteAllStocks: Scalars['Boolean']['output'];
   deletePortfolio: Scalars['Boolean']['output'];
   deletePortfolioReport: Scalars['Boolean']['output'];
   deletePortfolioStock: Scalars['Boolean']['output'];
   deleteStock: Scalars['Boolean']['output'];
-  deleteUser: Scalars['Boolean']['output'];
   login: Scalars['String']['output'];
   loginByToken: Scalars['String']['output'];
   logout: Scalars['Boolean']['output'];
@@ -56,12 +54,11 @@ export type Mutation = {
   updatePortfolioStock: PortfolioStock;
   updatePortfolioStocks: Array<PortfolioStock>;
   updateStock: Stock;
-  updateUser: User;
 };
 
 
 export type MutationAddStockToPortfolioArgs = {
-  averagePrice: Scalars['Float']['input'];
+  averagePrice?: InputMaybe<Scalars['Float']['input']>;
   portfolioId: Scalars['Int']['input'];
   quantity: Scalars['Int']['input'];
   stockId: Scalars['Int']['input'];
@@ -91,12 +88,6 @@ export type MutationCreateStockArgs = {
 };
 
 
-export type MutationCreateUserArgs = {
-  email: Scalars['String']['input'];
-  password: Scalars['String']['input'];
-};
-
-
 export type MutationDeletePortfolioArgs = {
   portfolioId: Scalars['Int']['input'];
 };
@@ -113,11 +104,6 @@ export type MutationDeletePortfolioStockArgs = {
 
 
 export type MutationDeleteStockArgs = {
-  id: Scalars['Float']['input'];
-};
-
-
-export type MutationDeleteUserArgs = {
   id: Scalars['Float']['input'];
 };
 
@@ -160,13 +146,6 @@ export type MutationUpdatePortfolioStocksArgs = {
 export type MutationUpdateStockArgs = {
   data: StockInput;
   id: Scalars['Float']['input'];
-};
-
-
-export type MutationUpdateUserArgs = {
-  email: Scalars['String']['input'];
-  id: Scalars['Float']['input'];
-  password?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type Portfolio = {
@@ -227,10 +206,7 @@ export type Query = {
   getStockByTicker?: Maybe<Stock>;
   getStockPrices: Array<StockPrice>;
   getStocks: Array<Stock>;
-  getUserByEmail?: Maybe<User>;
-  getUserById?: Maybe<User>;
   getUserPortfolios: Array<Portfolio>;
-  getUsers: Array<User>;
   searchStocks: Array<Stock>;
 };
 
@@ -274,17 +250,8 @@ export type QueryGetStockPricesArgs = {
 };
 
 
-export type QueryGetUserByEmailArgs = {
-  email: Scalars['String']['input'];
-};
-
-
-export type QueryGetUserByIdArgs = {
-  id: Scalars['Float']['input'];
-};
-
-
 export type QuerySearchStocksArgs = {
+  includedStocks?: InputMaybe<Array<Scalars['String']['input']>>;
   search: Scalars['String']['input'];
 };
 
@@ -340,7 +307,7 @@ export type StockPrice = {
 };
 
 export type StocksWhileCreatingPortfolio = {
-  averagePrice: Scalars['Float']['input'];
+  averagePrice?: InputMaybe<Scalars['Float']['input']>;
   quantity: Scalars['Int']['input'];
   stockTicker: Scalars['String']['input'];
 };
@@ -478,18 +445,16 @@ export interface JsonScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes
 }
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
-  addStockToPortfolio?: Resolver<ResolversTypes['PortfolioStock'], ParentType, ContextType, RequireFields<MutationAddStockToPortfolioArgs, 'averagePrice' | 'portfolioId' | 'quantity' | 'stockId'>>;
+  addStockToPortfolio?: Resolver<ResolversTypes['PortfolioStock'], ParentType, ContextType, RequireFields<MutationAddStockToPortfolioArgs, 'portfolioId' | 'quantity' | 'stockId'>>;
   createFutureReturnForecastGBMReport?: Resolver<ResolversTypes['PortfolioReport'], ParentType, ContextType, RequireFields<MutationCreateFutureReturnForecastGbmReportArgs, 'input' | 'portfolioId'>>;
   createMarkovitzReport?: Resolver<ResolversTypes['PortfolioReport'], ParentType, ContextType, RequireFields<MutationCreateMarkovitzReportArgs, 'input' | 'portfolioId'>>;
   createPortfolio?: Resolver<ResolversTypes['Portfolio'], ParentType, ContextType, RequireFields<MutationCreatePortfolioArgs, 'name'>>;
   createStock?: Resolver<ResolversTypes['Stock'], ParentType, ContextType, RequireFields<MutationCreateStockArgs, 'data'>>;
-  createUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'email' | 'password'>>;
   deleteAllStocks?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   deletePortfolio?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeletePortfolioArgs, 'portfolioId'>>;
   deletePortfolioReport?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeletePortfolioReportArgs, 'reportId'>>;
   deletePortfolioStock?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeletePortfolioStockArgs, 'portfolioStockId'>>;
   deleteStock?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteStockArgs, 'id'>>;
-  deleteUser?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteUserArgs, 'id'>>;
   login?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationLoginArgs, 'email' | 'password'>>;
   loginByToken?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationLoginByTokenArgs, 'token'>>;
   logout?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
@@ -498,7 +463,6 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   updatePortfolioStock?: Resolver<ResolversTypes['PortfolioStock'], ParentType, ContextType, RequireFields<MutationUpdatePortfolioStockArgs, 'portfolioStockId'>>;
   updatePortfolioStocks?: Resolver<Array<ResolversTypes['PortfolioStock']>, ParentType, ContextType, RequireFields<MutationUpdatePortfolioStocksArgs, 'updates'>>;
   updateStock?: Resolver<ResolversTypes['Stock'], ParentType, ContextType, RequireFields<MutationUpdateStockArgs, 'data' | 'id'>>;
-  updateUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationUpdateUserArgs, 'email' | 'id'>>;
 };
 
 export type PortfolioResolvers<ContextType = any, ParentType extends ResolversParentTypes['Portfolio'] = ResolversParentTypes['Portfolio']> = {
@@ -552,10 +516,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   getStockByTicker?: Resolver<Maybe<ResolversTypes['Stock']>, ParentType, ContextType, RequireFields<QueryGetStockByTickerArgs, 'ticker'>>;
   getStockPrices?: Resolver<Array<ResolversTypes['StockPrice']>, ParentType, ContextType, RequireFields<QueryGetStockPricesArgs, 'ticker'>>;
   getStocks?: Resolver<Array<ResolversTypes['Stock']>, ParentType, ContextType>;
-  getUserByEmail?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryGetUserByEmailArgs, 'email'>>;
-  getUserById?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryGetUserByIdArgs, 'id'>>;
   getUserPortfolios?: Resolver<Array<ResolversTypes['Portfolio']>, ParentType, ContextType>;
-  getUsers?: Resolver<Array<ResolversTypes['User']>, ParentType, ContextType>;
   searchStocks?: Resolver<Array<ResolversTypes['Stock']>, ParentType, ContextType, RequireFields<QuerySearchStocksArgs, 'search'>>;
 };
 

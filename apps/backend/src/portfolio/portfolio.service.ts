@@ -167,7 +167,10 @@ export class PortfolioService {
 
 	// Получение всех портфелей пользователя (без акций)
 	async getUserPortfolios(user: User): Promise<Portfolio[]> {
-		return this.portfolioRepository.find({where: {user}});
+		return this.portfolioRepository.find({
+			where: {user},
+			order: {id: 'ASC'}, // сортировка по возрастанию ID
+		});
 	}
 
 	// Получение всех акций портфеля
@@ -175,7 +178,11 @@ export class PortfolioService {
 		const portfolio = await this.portfolioRepository.findOne({where: {id: portfolioId, user}});
 		if (!portfolio) throw new ForbiddenException('Портфель не найден');
 
-		return this.portfolioStockRepository.find({where: {portfolio: {id: portfolioId}}, relations: ['stock']});
+		return this.portfolioStockRepository.find({
+			where: {portfolio: {id: portfolioId}},
+			relations: ['stock'],
+			order: {id: 'DESC'}, // сортировка по возрастанию ID
+		});
 	}
 
 	// Удаление портфеля

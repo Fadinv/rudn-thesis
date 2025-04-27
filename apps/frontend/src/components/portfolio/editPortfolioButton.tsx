@@ -10,7 +10,7 @@ import {
 	DrawerTitle,
 	DrawerTrigger,
 } from '@frontend/components/ui/drawer';
-import {useUpdatePortfolioMutation} from '@frontend/generated/graphql-hooks';
+import {UpdatePortfolioMutation, useUpdatePortfolioMutation} from '@frontend/generated/graphql-hooks';
 import React, {useState} from 'react';
 import {Button, Icon, Input, Field, IconButton} from '@chakra-ui/react';
 import {FaEdit} from 'react-icons/fa';
@@ -18,7 +18,7 @@ import {FaEdit} from 'react-icons/fa';
 interface EditPortfolioButtonProps {
 	portfolioId: number;
 	currentName: string;
-	onSave: () => void;
+	onSave?: (data?: UpdatePortfolioMutation | null | undefined) => void;
 }
 
 const EditPortfolioButton: React.FC<EditPortfolioButtonProps> = ({portfolioId, currentName, onSave}) => {
@@ -29,10 +29,9 @@ const EditPortfolioButton: React.FC<EditPortfolioButtonProps> = ({portfolioId, c
 
 	const handleSave = async () => {
 		const result = await updatePortfolio({variables: {portfolioId, newName: portfolioName}});
-		if (result?.data) {
-			setOpen(false);
-			onSave();
-		}
+
+		if (result?.data) setOpen(false);
+		onSave?.(result?.data);
 	};
 
 	return (

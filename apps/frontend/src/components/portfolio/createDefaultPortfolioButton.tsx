@@ -1,0 +1,71 @@
+import {Reference} from '@apollo/client';
+import {Button, Icon} from '@chakra-ui/react';
+import {FaPlus} from 'react-icons/fa';
+import {useCreatePortfolioMutation} from '@frontend/generated/graphql-hooks';
+import {toaster} from '@frontend/components/ui/toaster';
+import React from 'react';
+
+interface CreateDefaultPortfolioButtonProps {
+	onCreated: (portfolio: { id: number; name: string }) => void;
+}
+
+const CreateDefaultPortfolioButton: React.FC<CreateDefaultPortfolioButtonProps> = ({onCreated}) => {
+	const [createPortfolio, {loading}] = useCreatePortfolioMutation();
+
+	const handleClick = async () => {
+		const portfolio = await createPortfolio({
+			variables: {
+				name: 'Мой первый портфель',
+				stocks: [
+					{averagePrice: null, stockTicker: 'AAPL', quantity: 5},
+					{averagePrice: null, stockTicker: 'MSFT', quantity: 3},
+					{averagePrice: null, stockTicker: 'GOOG', quantity: 2},
+					{averagePrice: null, stockTicker: 'TSLA', quantity: 4},
+					{averagePrice: null, stockTicker: 'NFLX', quantity: 5},
+				],
+			},
+			update: (cache, {data}) => {
+				if (!data?.createPortfolio) return;
+
+				cache.modify({
+					fields: {
+						getUserPortfolios(existingRefs: ReadonlyArray<Reference> = []) {
+							return [...existingRefs, {__ref: `Portfolio:${data.createPortfolio.id}`}];
+						},
+					},
+				});
+			},
+		});
+
+		if (portfolio?.data?.createPortfolio) {
+			toaster.create({
+				title: 'Портфель создан',
+				description: 'Ваш первый портфель успешно создан!',
+				type: 'success',
+			});
+			onCreated(portfolio.data.createPortfolio);
+		} else {
+			toaster.create({
+				title: 'Ошибка',
+				description: 'Не удалось создать портфель. Попробуйте ещё раз.',
+				type: 'error',
+			});
+		}
+	};
+
+	return (
+		<Button
+			w="100%"
+			variant="solid"
+			size="lg"
+			colorPalette="blue"
+			onClick={handleClick}
+			loading={loading}
+		>
+			<Icon as={FaPlus}/>
+			Создать мой первый портфель
+		</Button>
+	);
+};
+
+export default CreateDefaultPortfolioButton;

@@ -1,3 +1,4 @@
+import {Reference} from '@apollo/client';
 import React, {useState} from 'react';
 import {Button, Icon, IconButton, Text} from '@chakra-ui/react';
 import {FaTrash} from 'react-icons/fa';
@@ -16,7 +17,7 @@ import {
 interface DeletePortfolioStockButtonProps {
 	portfolioStockId: number;
 	stockName: string;
-	onDelete: () => void;
+	onDelete?: (deleted: boolean) => void;
 }
 
 const DeletePortfolioStockButton: React.FC<DeletePortfolioStockButtonProps> = ({
@@ -28,10 +29,28 @@ const DeletePortfolioStockButton: React.FC<DeletePortfolioStockButtonProps> = ({
 	const [deletePortfolioStock, {loading}] = useDeletePortfolioStockMutation();
 
 	const handleDelete = async () => {
+		const id = portfolioStockId;
 		try {
-			await deletePortfolioStock({variables: {portfolioStockId}});
+			await deletePortfolioStock({
+				variables: {portfolioStockId},
+				update: (cache, result) => {
+					console.log('result', result.data);
+					if (result?.data) {
+						cache.modify({
+							fields: {
+								getPortfolioStocks(existingRefs: ReadonlyArray<Reference> = [], {readField}) {
+									console.log(existingRefs);
+									return existingRefs.filter((ref) => {
+										return readField<number>('id', ref) !== id;
+									});
+								},
+							},
+						});
+					}
+				}
+			});
 			setOpen(false);
-			onDelete();
+			onDelete?.(true);
 		} catch (err) {
 			console.error('Ошибка удаления акции из портфеля:', err);
 		}

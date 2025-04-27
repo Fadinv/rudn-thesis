@@ -96,7 +96,7 @@ type Query {
   getStocks: [Stock!]!
   getStockById(id: Int!): Stock
   getStockByTicker(ticker: String!): Stock
-  searchStocks(search: String!): [Stock!]!
+  searchStocks(search: String!, includedStocks: [String!]): [Stock!]!
   getUserPortfolios: [Portfolio!]!
   getPortfolioStocks(portfolioId: Int!): [PortfolioStock!]!
   getStockPrices(ticker: String!, from: Float, to: Float): [StockPrice!]!
@@ -115,7 +115,7 @@ type Mutation {
   deleteStock(id: Float!): Boolean!
   deleteAllStocks: Boolean!
   createPortfolio(name: String!, stocks: [StocksWhileCreatingPortfolio!]): Portfolio!
-  addStockToPortfolio(portfolioId: Int!, stockId: Int!, quantity: Int!, averagePrice: Float!): PortfolioStock!
+  addStockToPortfolio(portfolioId: Int!, stockId: Int!, quantity: Int!, averagePrice: Float): PortfolioStock!
   updatePortfolioStock(portfolioStockId: Int!, quantity: Int, averagePrice: Float): PortfolioStock!
   deletePortfolioStock(portfolioStockId: Int!): Boolean!
   updatePortfolioStocks(updates: [PortfolioStockUpdateInput!]!): [PortfolioStock!]!
@@ -145,7 +145,7 @@ input StockInput {
 input StocksWhileCreatingPortfolio {
   stockTicker: String!
   quantity: Int!
-  averagePrice: Float!
+  averagePrice: Float
 }
 
 input PortfolioStockUpdateInput {

@@ -10,9 +10,9 @@ import {
 	DrawerTitle,
 	DrawerTrigger,
 } from '@frontend/components/ui/drawer';
-import {useUpdatePortfolioStockMutation} from '@frontend/generated/graphql-hooks';
+import {UpdatePortfolioStockMutation, useUpdatePortfolioStockMutation} from '@frontend/generated/graphql-hooks';
 import React, {useState} from 'react';
-import {Button, Icon, IconButton, Input, Text} from '@chakra-ui/react';
+import {Button, Icon, IconButton, Text} from '@chakra-ui/react';
 import {Field} from '@frontend/components/ui/field';
 import {
 	NumberInputField,
@@ -24,33 +24,39 @@ interface EditPortfolioStockButtonProps {
 	portfolioStockId: number;
 	currentQuantity?: number | null;
 	currentAveragePrice?: number | null;
-	onSave: () => void;
+	onSave?: (data?: UpdatePortfolioStockMutation | null | undefined) => void;
 }
 
 const EditPortfolioStockButton: React.FC<EditPortfolioStockButtonProps> = ({
 	                                                                           portfolioStockId,
 	                                                                           currentQuantity,
-	                                                                           currentAveragePrice,
+	                                                                           // currentAveragePrice,
 	                                                                           onSave,
                                                                            }) => {
 	const [quantity, setQuantity] = useState(currentQuantity);
-	const [averagePrice, setAveragePrice] = useState(currentAveragePrice);
+	// const [averagePrice, setAveragePrice] = useState(currentAveragePrice);
 	const [open, setOpen] = useState(false);
 
 	const [updatePortfolioStock, {error, loading}] = useUpdatePortfolioStockMutation();
 
 	const handleSave = async () => {
 		const result = await updatePortfolioStock({
-			variables: {portfolioStockId, quantity, averagePrice},
+			variables: {
+				portfolioStockId,
+				quantity,
+				// averagePrice,
+			},
 		});
-		if (result?.data) {
-			setOpen(false);
-			onSave();
-		}
+
+		if (result?.data) setOpen(false);
+		onSave?.(result?.data);
 	};
 
 	return (
-		<DrawerRoot size="lg" open={open} onOpenChange={(e) => setOpen(e.open)}>
+		<DrawerRoot size="lg" open={open} onOpenChange={(e) => {
+			console.log('onOpenChange', e.open);
+			setOpen(e.open);
+		}}>
 			<DrawerBackdrop/>
 			<DrawerTrigger asChild>
 				<IconButton colorPalette="teal" size="xs">
@@ -75,17 +81,17 @@ const EditPortfolioStockButton: React.FC<EditPortfolioStockButtonProps> = ({
 						</NumberInputRoot>
 					</Field>
 
-					<Field
-						mt={4}
-						label={'Средняя цена'}
-					>
-						<Input
-							type="number"
-							placeholder="Введите среднюю цену"
-							value={averagePrice ?? ''}
-							onChange={(e) => setAveragePrice(parseFloat(e.target.value))}
-						/>
-					</Field>
+					{/*<Field*/}
+					{/*	mt={4}*/}
+					{/*	label={'Средняя цена'}*/}
+					{/*>*/}
+					{/*	<Input*/}
+					{/*		type="number"*/}
+					{/*		placeholder="Введите среднюю цену"*/}
+					{/*		value={averagePrice ?? ''}*/}
+					{/*		onChange={(e) => setAveragePrice(parseFloat(e.target.value))}*/}
+					{/*	/>*/}
+					{/*</Field>*/}
 
 					{error && <Text colorPalette="red">{error.message}</Text>}
 				</DrawerBody>

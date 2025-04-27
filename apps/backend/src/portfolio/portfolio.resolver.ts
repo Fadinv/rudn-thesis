@@ -1,9 +1,9 @@
-import {Resolver, Query, Mutation, Args, Int} from '@nestjs/graphql';
+import {Resolver, Query, Mutation, Args, Int, Float} from '@nestjs/graphql';
 import {Portfolio, PortfolioStock, User} from '@service/orm';
 import {AuthUser} from '@backend/auth';
-import {PortfolioService, } from './portfolio.service';
+import {PortfolioService} from './portfolio.service';
 import {PortfolioStockUpdateInput} from './portfolio.inputs';
-import { StocksWhileCreatingPortfolio } from './dto/stocks-while-creatings-portfolio.input';
+import {StocksWhileCreatingPortfolio} from './dto/stocks-while-creatings-portfolio.input';
 
 @Resolver(() => Portfolio)
 export class PortfolioResolver {
@@ -37,7 +37,7 @@ export class PortfolioResolver {
 		@Args('portfolioId', {type: () => Int}) portfolioId: number,
 		@Args('stockId', {type: () => Int}) stockId: number,
 		@Args('quantity', {type: () => Int}) quantity: number,
-		@Args('averagePrice') averagePrice: number,
+		@Args('averagePrice', {nullable: true, type: () => Float}) averagePrice?: number,
 	): Promise<PortfolioStock> {
 		return this.portfolioService.addStockToPortfolio(user, portfolioId, stockId, quantity, averagePrice);
 	}

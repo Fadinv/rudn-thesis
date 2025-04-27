@@ -15,9 +15,10 @@ import {FaSearch} from 'react-icons/fa';
 interface StockSearchProps {
 	onSelectStock: (stockId: number, stockName: string, stockTicker: string) => void;
 	stockData?: GetStockByIdQuery;
+	includedStocks?: string[];
 }
 
-const StockSearch: React.FC<StockSearchProps> = ({onSelectStock, stockData}) => {
+const StockSearch: React.FC<StockSearchProps> = ({onSelectStock, stockData, includedStocks}) => {
 	const [searchTerm, setSearchTerm] = useState('');
 	const [open, setOpen] = useState(false);
 
@@ -26,8 +27,8 @@ const StockSearch: React.FC<StockSearchProps> = ({onSelectStock, stockData}) => 
 	});
 
 	const doSearch = useCallback(() => {
-		return search({variables: {search: searchTerm}});
-	}, [searchTerm, search]);
+		return search({variables: {search: searchTerm, includedStocks}});
+	}, [searchTerm, search, includedStocks]);
 
 	useEffect(() => {
 		if (searchTerm.length > 1) void doSearch();

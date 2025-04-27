@@ -43,13 +43,11 @@ export type Mutation = {
   createMarkovitzReport: PortfolioReport;
   createPortfolio: Portfolio;
   createStock: Stock;
-  createUser: User;
   deleteAllStocks: Scalars['Boolean']['output'];
   deletePortfolio: Scalars['Boolean']['output'];
   deletePortfolioReport: Scalars['Boolean']['output'];
   deletePortfolioStock: Scalars['Boolean']['output'];
   deleteStock: Scalars['Boolean']['output'];
-  deleteUser: Scalars['Boolean']['output'];
   login: Scalars['String']['output'];
   loginByToken: Scalars['String']['output'];
   logout: Scalars['Boolean']['output'];
@@ -58,12 +56,11 @@ export type Mutation = {
   updatePortfolioStock: PortfolioStock;
   updatePortfolioStocks: Array<PortfolioStock>;
   updateStock: Stock;
-  updateUser: User;
 };
 
 
 export type MutationAddStockToPortfolioArgs = {
-  averagePrice: Scalars['Float']['input'];
+  averagePrice?: InputMaybe<Scalars['Float']['input']>;
   portfolioId: Scalars['Int']['input'];
   quantity: Scalars['Int']['input'];
   stockId: Scalars['Int']['input'];
@@ -93,12 +90,6 @@ export type MutationCreateStockArgs = {
 };
 
 
-export type MutationCreateUserArgs = {
-  email: Scalars['String']['input'];
-  password: Scalars['String']['input'];
-};
-
-
 export type MutationDeletePortfolioArgs = {
   portfolioId: Scalars['Int']['input'];
 };
@@ -115,11 +106,6 @@ export type MutationDeletePortfolioStockArgs = {
 
 
 export type MutationDeleteStockArgs = {
-  id: Scalars['Float']['input'];
-};
-
-
-export type MutationDeleteUserArgs = {
   id: Scalars['Float']['input'];
 };
 
@@ -162,13 +148,6 @@ export type MutationUpdatePortfolioStocksArgs = {
 export type MutationUpdateStockArgs = {
   data: StockInput;
   id: Scalars['Float']['input'];
-};
-
-
-export type MutationUpdateUserArgs = {
-  email: Scalars['String']['input'];
-  id: Scalars['Float']['input'];
-  password?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type Portfolio = {
@@ -229,10 +208,7 @@ export type Query = {
   getStockByTicker?: Maybe<Stock>;
   getStockPrices: Array<StockPrice>;
   getStocks: Array<Stock>;
-  getUserByEmail?: Maybe<User>;
-  getUserById?: Maybe<User>;
   getUserPortfolios: Array<Portfolio>;
-  getUsers: Array<User>;
   searchStocks: Array<Stock>;
 };
 
@@ -276,17 +252,8 @@ export type QueryGetStockPricesArgs = {
 };
 
 
-export type QueryGetUserByEmailArgs = {
-  email: Scalars['String']['input'];
-};
-
-
-export type QueryGetUserByIdArgs = {
-  id: Scalars['Float']['input'];
-};
-
-
 export type QuerySearchStocksArgs = {
+  includedStocks?: InputMaybe<Array<Scalars['String']['input']>>;
   search: Scalars['String']['input'];
 };
 
@@ -342,7 +309,7 @@ export type StockPrice = {
 };
 
 export type StocksWhileCreatingPortfolio = {
-  averagePrice: Scalars['Float']['input'];
+  averagePrice?: InputMaybe<Scalars['Float']['input']>;
   quantity: Scalars['Int']['input'];
   stockTicker: Scalars['String']['input'];
 };
@@ -358,7 +325,7 @@ export type AddStockToPortfolioMutationVariables = Exact<{
   portfolioId: Scalars['Int']['input'];
   stockId: Scalars['Int']['input'];
   quantity: Scalars['Int']['input'];
-  averagePrice: Scalars['Float']['input'];
+  averagePrice?: InputMaybe<Scalars['Float']['input']>;
 }>;
 
 
@@ -485,6 +452,7 @@ export type LogoutMutation = { __typename?: 'Mutation', logout: boolean };
 
 export type SearchStocksQueryVariables = Exact<{
   search: Scalars['String']['input'];
+  includedStocks?: InputMaybe<Array<Scalars['String']['input']> | Scalars['String']['input']>;
 }>;
 
 
@@ -516,7 +484,7 @@ export type UpdatePortfolioStocksMutation = { __typename?: 'Mutation', updatePor
 
 
 export const AddStockToPortfolioDocument = gql`
-    mutation AddStockToPortfolio($portfolioId: Int!, $stockId: Int!, $quantity: Int!, $averagePrice: Float!) {
+    mutation AddStockToPortfolio($portfolioId: Int!, $stockId: Int!, $quantity: Int!, $averagePrice: Float) {
   addStockToPortfolio(
     portfolioId: $portfolioId
     stockId: $stockId
@@ -1219,8 +1187,8 @@ export type LogoutMutationHookResult = ReturnType<typeof useLogoutMutation>;
 export type LogoutMutationResult = Apollo.MutationResult<LogoutMutation>;
 export type LogoutMutationOptions = Apollo.BaseMutationOptions<LogoutMutation, LogoutMutationVariables>;
 export const SearchStocksDocument = gql`
-    query SearchStocks($search: String!) {
-  searchStocks(search: $search) {
+    query SearchStocks($search: String!, $includedStocks: [String!]) {
+  searchStocks(search: $search, includedStocks: $includedStocks) {
     id
     ticker
     name
@@ -1241,6 +1209,7 @@ export const SearchStocksDocument = gql`
  * const { data, loading, error } = useSearchStocksQuery({
  *   variables: {
  *      search: // value for 'search'
+ *      includedStocks: // value for 'includedStocks'
  *   },
  * });
  */

@@ -26,17 +26,19 @@ const Page: React.FC = () => {
 						/>
 					</Box>
 				)}
-				<Box flex="1" p={4} display={{lg: 'flex', base: 'none'}}>
-					{selectedPortfolioId ? (
-						<PortfolioView
-							portfolioId={selectedPortfolioId}
-						/>
-					) : (
-						<Box textAlign="center" color="gray.500" fontSize="xl">
-							Выберите портфель для просмотра
-						</Box>
-					)}
-				</Box>
+				{isMobile ? null : (
+					<Box flex="1" p={4} overflow={'hidden'} display={{lg: 'flex', base: 'none'}}>
+						{selectedPortfolioId ? (
+							<PortfolioView
+								portfolioId={selectedPortfolioId}
+							/>
+						) : (
+							<Box textAlign="center" color="gray.500" fontSize="xl">
+								Выберите портфель для просмотра
+							</Box>
+						)}
+					</Box>
+				)}
 			</Flex>
 		</MainLayout>
 	);

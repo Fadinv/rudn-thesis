@@ -1,12 +1,28 @@
+'use client';
+import {ServerErrorFallback} from '@frontend/components/mainLayout/serverErrorFallback';
+import {useCurrentUserQuery} from '@frontend/generated/graphql-hooks';
 import React from 'react';
 import {
-	Box, Heading, Text, VStack, IconButton, Container, Link, SimpleGrid, Flex, Separator,
+	Box, Heading, Text, VStack, IconButton, Container, Link, SimpleGrid, Flex, Separator, Center, Spinner,
 } from '@chakra-ui/react';
 import {FaTelegramPlane, FaChartLine, FaRobot, FaLock} from 'react-icons/fa';
 import LoginButton from '@frontend/components/loginButton/loginButton';
 import {IconType} from 'react-icons/lib';
 
 export default function HomePage() {
+	const {error, loading} = useCurrentUserQuery({fetchPolicy: 'network-only'});
+
+	if (loading) {
+		return (
+			<Center h="100vh">
+				<Spinner size="xl" color="blue.500"/>
+			</Center>
+		);
+	}
+
+	if (error) {
+		return <ServerErrorFallback/>;
+	}
 	return (
 		<>
 			{/* Hero */}

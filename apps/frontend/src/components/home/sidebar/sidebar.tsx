@@ -1,3 +1,4 @@
+import CreateDefaultPortfolioButton from '@frontend/components/portfolio/createDefaultPortfolioButton';
 import {useColorModeValue} from '@frontend/components/ui/color-mode';
 import React from 'react';
 import DeletePortfolioButton from '@frontend/components/portfolio/deletePortfolioButton';
@@ -12,7 +13,7 @@ import {
 import CreatePortfolioButton from '@frontend/components/portfolio/createPortfolioButton';
 
 interface SidebarProps {
-	onSelectPortfolio: (id: number) => void;
+	onSelectPortfolio: (id: number | null) => void;
 	selectedPortfolioId: number | null;
 }
 
@@ -28,18 +29,21 @@ const Sidebar: React.FC<SidebarProps> = ({
 	const textColor = useColorModeValue('gray.800', 'gray.200');
 	const {data: portfolios} = useGetUserPortfoliosQuery();
 
-	const {refetch: refetchGetUserPortfolio} = useGetUserPortfoliosQuery({initialFetchPolicy: 'cache-only'});
-
 	return (
-		<Box w={{lg: '350px', base: '100%'}} p={4} bg={bgColor} borderRadius="md" boxShadow="lg">
+		<Box minW={'350px'} w={{lg: '350px', base: '100%'}} p={4} bg={bgColor} borderRadius="md" boxShadow="lg">
 			{/* Кнопка создания портфеля */}
 			<Box w="100%" pb={4}>
-				<CreatePortfolioButton onSave={() => refetchGetUserPortfolio()}/>
+				<CreatePortfolioButton/>
 			</Box>
 
 			{/* Список портфелей */}
 			<Box maxH="calc(100vh - 200px)" overflowY="auto" pr={2}>
 				<Stack align="stretch" gap={2}>
+					{!portfolios?.getUserPortfolios?.length && (
+						<CreateDefaultPortfolioButton
+							onCreated={(portfolio) => onSelectPortfolio(portfolio.id)}
+						/>
+					)}
 					{portfolios?.getUserPortfolios?.map((portfolio) => {
 						const isSelected = portfolio.id === selectedPortfolioId;
 
@@ -66,12 +70,11 @@ const Sidebar: React.FC<SidebarProps> = ({
 									<EditPortfolioButton
 										portfolioId={portfolio.id}
 										currentName={portfolio.name}
-										onSave={() => refetchGetUserPortfolio()}
 									/>
 									<DeletePortfolioButton
-										onDelete={() => refetchGetUserPortfolio()}
 										portfolioId={portfolio.id}
 										portfolioName={portfolio.name}
+										onDelete={() => onSelectPortfolio(null)}
 									/>
 								</Flex>
 							</Flex>

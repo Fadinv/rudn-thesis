@@ -2,7 +2,7 @@ mutation AddStockToPortfolio(
     $portfolioId: Int!
     $stockId: Int!
     $quantity: Int!
-    $averagePrice: Float!
+    $averagePrice: Float
 ) {
     addStockToPortfolio(
         portfolioId: $portfolioId

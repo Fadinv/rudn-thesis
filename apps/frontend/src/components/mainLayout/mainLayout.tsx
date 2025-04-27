@@ -2,7 +2,6 @@ import {ServerErrorFallback} from '@frontend/components/mainLayout/serverErrorFa
 import {useRouter} from 'next/navigation';
 import React, {useEffect} from 'react';
 import Header from '@frontend/components/header/header';
-import LoginForm from '@frontend/components/loginForm/loginForm';
 import {ColorModeProvider, useColorMode} from '@frontend/components/ui/color-mode';
 import {useCurrentUserQuery} from '@frontend/generated/graphql-hooks';
 import {Spinner, Center, Theme, defaultSystem, ChakraProvider, Flex} from '@chakra-ui/react';
@@ -31,11 +30,9 @@ const Layout = ({children}: { children: React.ReactNode }) => {
 
 	if (!data?.currentUser) {
 		return (
-			<Theme appearance={colorMode} colorPalette={colorPalette}>
-				<Center h="100vh">
-					<LoginForm/>
-				</Center>
-			</Theme>
+			<Center h="100vh">
+				<Spinner size="xl" color="blue.500"/>
+			</Center>
 		);
 	}
 	return (

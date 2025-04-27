@@ -56,7 +56,10 @@ export class StocksResolver {
 
 	@Query(() => [Stock])
 	@UseGuards(GqlAuthGuard)
-	async searchStocks(@Args('search', {type: () => String}) search: string): Promise<Stock[]> {
-		return this.stocksService.searchStocks(search);
+	async searchStocks(
+		@Args('search', {type: () => String}) search: string,
+		@Args('includedStocks', {type: () => [String], nullable: true}) includedStocks?: string[],
+	): Promise<Stock[]> {
+		return this.stocksService.searchStocks(search, includedStocks);
 	}
 }
