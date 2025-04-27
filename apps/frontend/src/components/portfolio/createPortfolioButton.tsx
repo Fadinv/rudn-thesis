@@ -14,6 +14,7 @@ import React, {useEffect, useState} from 'react';
 import {
 	Button, Icon,
 	Input, Field, VStack, Text,
+	Link, Flex,
 } from '@chakra-ui/react';
 import {FaPlus, FaUpload} from 'react-icons/fa';
 
@@ -178,17 +179,24 @@ const CreatePortfolioButton: React.FC<CreatePortfolioModalProps> = (props) => {
 								display="none"
 							/>
 
-							{/* Красивая кнопка загрузки */}
-							<label htmlFor="file-upload">
-								<Button
-									as="span"
-									variant="outline"
-									size="md"
-								>
-									<Icon as={FaUpload}/>
-									Выбрать CSV файл
-								</Button>
-							</label>
+							<Flex align="start" direction="row" gap="2">
+								<label htmlFor="file-upload">
+									<Button
+										as="span"
+										variant="outline"
+										size="md"
+									>
+										<Icon as={FaUpload}/>
+										Выбрать CSV файл
+									</Button>
+								</label>
+
+								<Link href="/example_portfolio.csv" download>
+									<Button as="a" variant="ghost" size="sm">
+										Скачать пример CSV
+									</Button>
+								</Link>
+							</Flex>
 
 							{csvData.length > 0 && (
 								<VStack align="start" gap="1" mt="2">
