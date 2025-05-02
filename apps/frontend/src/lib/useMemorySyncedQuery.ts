@@ -43,7 +43,7 @@ export function useMemorySyncedQuery<
 		if (data && called && !loading) {
 			initialLoad();
 		}
-	}, [data]);
+	}, [data, called, loading]);
 
 	const fetchAll = async () => {
 		if (!data) return;
@@ -89,7 +89,7 @@ export function useMemorySyncedQuery<
 		if (externalMaxVersion !== undefined && externalMaxVersion > localMaxVersion) {
 			void refetchFromCurrentVersion();
 		}
-	}, [externalMaxVersion, localMaxVersion]);
+	}, [externalMaxVersion, localMaxVersion, refetchFromCurrentVersion]);
 
 	return {
 		items: allItems,
