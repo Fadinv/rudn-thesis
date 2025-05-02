@@ -103,14 +103,4 @@ export class PortfolioResolver {
 	): Promise<Portfolio> {
 		return this.portfolioService.updatePortfolio(user, portfolioId, newName);
 	}
-
-	@Query(() => [Portfolio])
-	async getAllPortfolios(): Promise<Portfolio[]> {
-		return this.portfolioService.getAllPortfolios();
-	}
-
-	@Query(() => [Portfolio])
-	async getUserPortfoliosAll(): Promise<Portfolio[]> {
-		return this.portfolioService.getUserPortfoliosAll();
-	}
 }

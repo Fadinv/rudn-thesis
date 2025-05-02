@@ -107,8 +107,6 @@ type Query {
   searchStocks(search: String!, includedStocks: [String!]): [Stock!]!
   getUserPortfolios(fromVersion: Int): GetUserPortfoliosResponse!
   getPortfolioStocks(portfolioId: Int!): [PortfolioStock!]!
-  getAllPortfolios: [Portfolio!]!
-  getUserPortfoliosAll: [Portfolio!]!
   getStockPrices(ticker: String!, from: Float, to: Float): [StockPrice!]!
   getDistributedPortfolioAssets(capital: Float!, stockTickerList: [String!]!, weights: [Float!]!): PortfolioDistribution!
   getPortfolioReport(reportId: String!): PortfolioReport
