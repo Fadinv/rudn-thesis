@@ -75,7 +75,7 @@ export default function HomePage() {
 					<Image src="/illustrations/success_factors.svg" alt="Функции"/>
 					<VStack gap={4} textAlign="left">
 						<Heading fontSize="2xl">Что делает приложение?</Heading>
-						<Text align="center" fontSize="md" maxW="700px">
+						<Text textAlign="center" fontSize="md" maxW="700px">
 							Portfolio Analyzer — независимый сервис, который анализирует риски и прогнозирует доходность
 							инвестиционного портфеля на основе исторических данных. Поддерживает мультивалютность и
 							работает с активами, представленными на MOEX и NASDAQ.
