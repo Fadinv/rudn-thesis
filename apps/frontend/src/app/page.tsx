@@ -25,7 +25,7 @@ export default function HomePage() {
 						<VStack gap={6} textAlign={{base: 'center', md: 'left'}}>
 							<Heading fontSize="4xl">Portfolio Analyzer</Heading>
 							<Text fontSize="xl" fontWeight="600" maxW="600px" color="gray.700">
-								Умный анализ инвестиционного портфеля по Марковицу, GBM-прогноз и поддержка MOEX.
+								Умный анализ инвестиционного портфеля по Марковицу и GBM-прогноз.
 							</Text>
 							<LoginButton/>
 						</VStack>
