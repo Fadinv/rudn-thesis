@@ -36,7 +36,10 @@ def process_markovitz_report(
         index_ticker = EXCHANGE_INDEX_MAP.get(exchange)
 
         if index_ticker:
-            market_returns = get_market_returns(portfolio_data["start_date"], end_date, index_ticker, target_currency)
+            expected_len = portfolio_data["returns"].shape[0]
+            print('-->', expected_len)
+            market_returns = get_market_returns(portfolio_data["start_date"], end_date, index_ticker, target_currency, expected_len)
+            print('market_returns shape', market_returns.shape[0])
         else:
             market_returns = None
 
@@ -79,6 +82,7 @@ def postprocess_markovitz_results(
 
         # Опционально считаем beta и treynor только если есть рыночные доходности
         if market_returns is not None:
+            print(portfolio_data["returns"].shape, market_returns.shape)
             beta = calculate_beta(portfolio_data["returns"], market_returns, weights_array)
             treynor_ratio_daily = (daily_return - daily_risk_free_rate) / beta if beta > 0 else 0
             treynor_ratio_annual = (annual_return - risk_free_rate) / beta if beta > 0 else 0

@@ -1,8 +1,8 @@
-import {Reference} from '@apollo/client';
+import {Portfolio} from '@frontend/generated/graphql-types';
 import React, {useState} from 'react';
 import {Button, Icon, IconButton, Text} from '@chakra-ui/react';
 import {FaTrash} from 'react-icons/fa';
-import {useDeletePortfolioMutation} from '@frontend/generated/graphql-hooks';
+import {GetUserPortfoliosDocument, useDeletePortfolioMutation} from '@frontend/generated/graphql-hooks';
 import {
 	DialogRoot,
 	DialogTrigger,
@@ -29,19 +29,29 @@ const DeletePortfolioButton: React.FC<DeletePortfolioButtonProps> = ({
 	const [deletePortfolio, {loading}] = useDeletePortfolioMutation();
 
 	const handleDelete = async () => {
+		const targetId = portfolioId;
 		try {
 			await deletePortfolio({
-				variables: {portfolioId},
-				update: (cache) => {
-					cache.modify({
-						fields: {
-							getUserPortfolios(existingRefs: ReadonlyArray<Reference> = [], {readField}) {
-								return existingRefs.filter((ref) => {
-									return readField<number>('id', ref) !== portfolioId;
-								});
+				variables: {portfolioId: targetId},
+				update: (cache, result) => {
+					const deleted = result.data?.deletePortfolio;
+					if (!deleted) return;
+
+					cache.updateQuery({query: GetUserPortfoliosDocument, overwrite: true}, (data) => {
+						console.log(data.getUserPortfolios.items, targetId);
+						console.log(data.getUserPortfolios.items, targetId);
+						const items = (data.getUserPortfolios.items || []).filter((item: Portfolio) => item.id !== targetId);
+
+						console.log('items', items);
+						return ({
+							getUserPortfolios: {
+								...data.getUserPortfolios,
+								items,
+								maxVersion: data.getUserPortfolios.maxVersion + 1,
 							},
-						},
+						});
 					});
+					console.log('CACHE', cache);
 				},
 			});
 			setOpen(false);

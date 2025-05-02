@@ -15,9 +15,9 @@ interface PortfolioViewProps {
 
 const PortfolioView: React.FC<PortfolioViewProps> = ({portfolioId, onBack}) => {
 	const {data, loading, error, refetch} = useGetPortfolioStocksQuery({variables: {portfolioId}});
-	const {data: portfolios} = useGetUserPortfoliosQuery({fetchPolicy: 'cache-only'});
+	const {data: userPortfolio} = useGetUserPortfoliosQuery({fetchPolicy: 'cache-only'});
 
-	const currentPortfolio = portfolios?.getUserPortfolios.find((portfolio) => portfolio.id === portfolioId);
+	const currentPortfolio = (userPortfolio?.getUserPortfolios.items || []).find((portfolio) => portfolio.id === portfolioId);
 
 	// TODO: Раскомментировать, когда нужно будет отображать цены
 	// const getCurrencyByExchange = (exchange: string) => {

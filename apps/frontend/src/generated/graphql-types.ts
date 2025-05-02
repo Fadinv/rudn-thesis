@@ -25,6 +25,13 @@ export type FutureReturnForecastInput = {
   selectedPercentiles: Array<Scalars['Float']['input']>;
 };
 
+export type GetUserPortfoliosResponse = {
+  __typename?: 'GetUserPortfoliosResponse';
+  hasMoreData: Scalars['Boolean']['output'];
+  items: Array<Portfolio>;
+  maxVersion: Scalars['Int']['output'];
+};
+
 export type MarkovitzReportInput = {
   additionalTickers?: InputMaybe<Array<Scalars['String']['input']>>;
   covMethod?: InputMaybe<Scalars['String']['input']>;
@@ -151,6 +158,7 @@ export type MutationUpdateStockArgs = {
 export type Portfolio = {
   __typename?: 'Portfolio';
   createdAt: Scalars['DateTime']['output'];
+  deleted: Scalars['Boolean']['output'];
   id: Scalars['Int']['output'];
   isReadyForAnalysis: Scalars['Boolean']['output'];
   name: Scalars['String']['output'];
@@ -158,6 +166,7 @@ export type Portfolio = {
   stocks: Array<PortfolioStock>;
   updatedAt: Scalars['DateTime']['output'];
   user: User;
+  version: Scalars['Int']['output'];
 };
 
 export type PortfolioDistribution = {
@@ -198,6 +207,8 @@ export type PortfolioStockUpdateInput = {
 export type Query = {
   __typename?: 'Query';
   currentUser?: Maybe<User>;
+  getAllPortfolios: Array<Portfolio>;
+  getAllPortfolios2: Array<Array<Portfolio>>;
   getDistributedPortfolioAssets: PortfolioDistribution;
   getPortfolioReport?: Maybe<PortfolioReport>;
   getPortfolioReports: Array<PortfolioReport>;
@@ -206,7 +217,8 @@ export type Query = {
   getStockByTicker?: Maybe<Stock>;
   getStockPrices: Array<StockPrice>;
   getStocks: Array<Stock>;
-  getUserPortfolios: Array<Portfolio>;
+  getUserPortfolios: GetUserPortfoliosResponse;
+  getUserPortfoliosAll: Array<Portfolio>;
   searchStocks: Array<Stock>;
 };
 
@@ -247,6 +259,11 @@ export type QueryGetStockPricesArgs = {
   from?: InputMaybe<Scalars['Float']['input']>;
   ticker: Scalars['String']['input'];
   to?: InputMaybe<Scalars['Float']['input']>;
+};
+
+
+export type QueryGetUserPortfoliosArgs = {
+  fromVersion?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -394,6 +411,7 @@ export type ResolversTypes = {
   DateTime: ResolverTypeWrapper<Scalars['DateTime']['output']>;
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   FutureReturnForecastInput: FutureReturnForecastInput;
+  GetUserPortfoliosResponse: ResolverTypeWrapper<GetUserPortfoliosResponse>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   JSON: ResolverTypeWrapper<Scalars['JSON']['output']>;
   MarkovitzReportInput: MarkovitzReportInput;
@@ -418,6 +436,7 @@ export type ResolversParentTypes = {
   DateTime: Scalars['DateTime']['output'];
   Float: Scalars['Float']['output'];
   FutureReturnForecastInput: FutureReturnForecastInput;
+  GetUserPortfoliosResponse: GetUserPortfoliosResponse;
   Int: Scalars['Int']['output'];
   JSON: Scalars['JSON']['output'];
   MarkovitzReportInput: MarkovitzReportInput;
@@ -439,6 +458,13 @@ export type ResolversParentTypes = {
 export interface DateTimeScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['DateTime'], any> {
   name: 'DateTime';
 }
+
+export type GetUserPortfoliosResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['GetUserPortfoliosResponse'] = ResolversParentTypes['GetUserPortfoliosResponse']> = {
+  hasMoreData?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  items?: Resolver<Array<ResolversTypes['Portfolio']>, ParentType, ContextType>;
+  maxVersion?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
 
 export interface JsonScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['JSON'], any> {
   name: 'JSON';
@@ -467,6 +493,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 
 export type PortfolioResolvers<ContextType = any, ParentType extends ResolversParentTypes['Portfolio'] = ResolversParentTypes['Portfolio']> = {
   createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  deleted?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   isReadyForAnalysis?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -474,6 +501,7 @@ export type PortfolioResolvers<ContextType = any, ParentType extends ResolversPa
   stocks?: Resolver<Array<ResolversTypes['PortfolioStock']>, ParentType, ContextType>;
   updatedAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   user?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
+  version?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -508,6 +536,8 @@ export type PortfolioStockResolvers<ContextType = any, ParentType extends Resolv
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   currentUser?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
+  getAllPortfolios?: Resolver<Array<ResolversTypes['Portfolio']>, ParentType, ContextType>;
+  getAllPortfolios2?: Resolver<Array<Array<ResolversTypes['Portfolio']>>, ParentType, ContextType>;
   getDistributedPortfolioAssets?: Resolver<ResolversTypes['PortfolioDistribution'], ParentType, ContextType, RequireFields<QueryGetDistributedPortfolioAssetsArgs, 'capital' | 'stockTickerList' | 'weights'>>;
   getPortfolioReport?: Resolver<Maybe<ResolversTypes['PortfolioReport']>, ParentType, ContextType, RequireFields<QueryGetPortfolioReportArgs, 'reportId'>>;
   getPortfolioReports?: Resolver<Array<ResolversTypes['PortfolioReport']>, ParentType, ContextType, RequireFields<QueryGetPortfolioReportsArgs, 'portfolioId'>>;
@@ -516,7 +546,8 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   getStockByTicker?: Resolver<Maybe<ResolversTypes['Stock']>, ParentType, ContextType, RequireFields<QueryGetStockByTickerArgs, 'ticker'>>;
   getStockPrices?: Resolver<Array<ResolversTypes['StockPrice']>, ParentType, ContextType, RequireFields<QueryGetStockPricesArgs, 'ticker'>>;
   getStocks?: Resolver<Array<ResolversTypes['Stock']>, ParentType, ContextType>;
-  getUserPortfolios?: Resolver<Array<ResolversTypes['Portfolio']>, ParentType, ContextType>;
+  getUserPortfolios?: Resolver<ResolversTypes['GetUserPortfoliosResponse'], ParentType, ContextType, Partial<QueryGetUserPortfoliosArgs>>;
+  getUserPortfoliosAll?: Resolver<Array<ResolversTypes['Portfolio']>, ParentType, ContextType>;
   searchStocks?: Resolver<Array<ResolversTypes['Stock']>, ParentType, ContextType, RequireFields<QuerySearchStocksArgs, 'search'>>;
 };
 
@@ -561,6 +592,7 @@ export type UserResolvers<ContextType = any, ParentType extends ResolversParentT
 
 export type Resolvers<ContextType = any> = {
   DateTime?: GraphQLScalarType;
+  GetUserPortfoliosResponse?: GetUserPortfoliosResponseResolvers<ContextType>;
   JSON?: GraphQLScalarType;
   Mutation?: MutationResolvers<ContextType>;
   Portfolio?: PortfolioResolvers<ContextType>;

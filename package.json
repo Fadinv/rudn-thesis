@@ -11,6 +11,7 @@
 		"build:frontend": "cd apps/frontend && npm run build",
 		"build:orm": "cd packages/orm && npm run build",
 		"build": "turbo run build",
+		"test:backend": "npm run test --workspace apps/backend",
 		"start": "docker compose up --build",
 		"restart": "docker compose down && docker compose up --build",
 		"clean": "rm -rf node_modules package-lock.json apps/backend/node_modules apps/frontend/node_modules && npm cache clean --force",

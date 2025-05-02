@@ -67,7 +67,7 @@ const CopyPortfolioButton: React.FC<CopyPortfolioButtonProps> = ({onSave, stockT
 		const portfolio = await createPortfolio({
 			variables: {
 				name: portfolioName,
-				stocks,
+				stocks: stocks.filter((s) => s.quantity),
 			},
 		});
 		if (portfolio?.data) {

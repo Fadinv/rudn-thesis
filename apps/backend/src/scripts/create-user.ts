@@ -1,6 +1,6 @@
 import {NestFactory} from '@nestjs/core';
-import {AppModule} from '@backend/app.module';
-import {UsersService} from '@backend/users/users.service';
+import {AppModule} from '@backend/app/app.module';
+import {UsersService} from '@backend/modules/users/users.service';
 import {randomBytes, randomUUID} from 'crypto';
 import {Redis} from 'ioredis';
 import {getRedisConnectionToken} from '@nestjs-modules/ioredis';

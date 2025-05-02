@@ -61,7 +61,14 @@ const EditPortfolioButton: React.FC<EditPortfolioButtonProps> = ({portfolioId, c
 					<DrawerActionTrigger asChild>
 						<Button disabled={loading} variant="outline">Отмена</Button>
 					</DrawerActionTrigger>
-					<Button onClick={handleSave} colorPalette="blue" loading={loading}>Сохранить</Button>
+					<Button
+						onClick={handleSave}
+						colorPalette="blue"
+						loading={loading}
+						disabled={!portfolioName}
+					>
+						Сохранить
+					</Button>
 				</DrawerFooter>
 				<DrawerCloseTrigger/>
 			</DrawerContent>

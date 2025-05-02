@@ -6,5 +6,7 @@ mutation CreatePortfolio(
         id
         name
         createdAt
+        deleted
+        version
     }
 }

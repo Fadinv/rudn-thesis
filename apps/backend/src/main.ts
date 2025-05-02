@@ -1,8 +1,9 @@
-import {GqlTokenThrottleGuard} from '@backend/comon/guards/gql-token-throttle.guard';
+import {GqlTokenThrottleGuard} from '@backend/shared/guards/gql-token-throttle.guard';
+import {syncPortfolioVersions} from '@backend/initializations/update-portfolio-version';
 import {NestFactory} from '@nestjs/core';
 import {ValidationPipe} from '@nestjs/common';
 import cookieParser from 'cookie-parser';
-import {AppModule} from './app.module';
+import {AppModule} from '@backend/app/app.module';
 import rateLimit from 'express-rate-limit';
 
 async function bootstrap() {
@@ -41,6 +42,8 @@ async function bootstrap() {
 	);
 
 	app.useGlobalGuards(new GqlTokenThrottleGuard());
+
+	await syncPortfolioVersions(app);
 
 	await app.listen(4000, '0.0.0.0');
 }

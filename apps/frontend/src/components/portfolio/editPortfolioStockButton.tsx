@@ -53,10 +53,11 @@ const EditPortfolioStockButton: React.FC<EditPortfolioStockButtonProps> = ({
 	};
 
 	return (
-		<DrawerRoot size="lg" open={open} onOpenChange={(e) => {
-			console.log('onOpenChange', e.open);
-			setOpen(e.open);
-		}}>
+		<DrawerRoot
+			size="lg"
+			open={open}
+			onOpenChange={(e) => setOpen(e.open)}
+		>
 			<DrawerBackdrop/>
 			<DrawerTrigger asChild>
 				<IconButton colorPalette="teal" size="xs">
@@ -80,26 +81,15 @@ const EditPortfolioStockButton: React.FC<EditPortfolioStockButtonProps> = ({
 							/>
 						</NumberInputRoot>
 					</Field>
-
-					{/*<Field*/}
-					{/*	mt={4}*/}
-					{/*	label={'Средняя цена'}*/}
-					{/*>*/}
-					{/*	<Input*/}
-					{/*		type="number"*/}
-					{/*		placeholder="Введите среднюю цену"*/}
-					{/*		value={averagePrice ?? ''}*/}
-					{/*		onChange={(e) => setAveragePrice(parseFloat(e.target.value))}*/}
-					{/*	/>*/}
-					{/*</Field>*/}
-
 					{error && <Text colorPalette="red">{error.message}</Text>}
 				</DrawerBody>
 				<DrawerFooter>
 					<DrawerActionTrigger asChild>
 						<Button disabled={loading} variant="outline">Отмена</Button>
 					</DrawerActionTrigger>
-					<Button onClick={handleSave} colorPalette="blue" loading={loading}>Сохранить</Button>
+					<Button onClick={handleSave} colorPalette="blue"
+					        disabled={typeof quantity !== 'number' || quantity <= 0}
+					        loading={loading}>Сохранить</Button>
 				</DrawerFooter>
 				<DrawerCloseTrigger/>
 			</DrawerContent>

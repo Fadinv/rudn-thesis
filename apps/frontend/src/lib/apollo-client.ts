@@ -36,5 +36,41 @@ const httpLink = new HttpLink({
 
 export const client = new ApolloClient({
 	link: from([errorLink, httpLink]),
-	cache: new InMemoryCache(),
+	cache: new InMemoryCache({
+		typePolicies: {
+			GetUserPortfoliosResponse: {
+				fields: {
+					items: {
+						// eslint-disable-next-line @typescript-eslint/no-explicit-any
+						merge(existing: any[], incoming: any[], { readField, mergeObjects }) {
+							// eslint-disable-next-line @typescript-eslint/no-explicit-any
+							const merged: any[] = existing ? existing.slice(0) : [];
+							const authorNameToIndex: Record<string, number> = Object.create(null);
+							if (existing) {
+								existing.forEach((portfolio, index) => {
+									const id = readField<string>("id", portfolio);
+									if (!id) return;
+									authorNameToIndex[id] = index;
+								});
+							}
+							incoming.forEach(portfolio => {
+								const id = readField<string>("id", portfolio);
+								if (!id) return;
+								const index = authorNameToIndex[id];
+								if (typeof index === "number") {
+									// Merge the new author data with the existing author data.
+									merged[index] = mergeObjects(merged[index], portfolio);
+								} else {
+									// First time we've seen this author in this array.
+									authorNameToIndex[id] = merged.length;
+									merged.push(portfolio);
+								}
+							});
+							return merged;
+						},
+					},
+				},
+			},
+		},
+	}),
 });

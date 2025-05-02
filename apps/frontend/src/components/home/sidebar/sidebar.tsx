@@ -1,9 +1,15 @@
 import CreateDefaultPortfolioButton from '@frontend/components/portfolio/createDefaultPortfolioButton';
 import {useColorModeValue} from '@frontend/components/ui/color-mode';
+import {Portfolio} from '@frontend/generated/graphql-types';
+import {useMemorySyncedQuery} from '@frontend/lib/useMemorySyncedQuery';
 import React from 'react';
 import DeletePortfolioButton from '@frontend/components/portfolio/deletePortfolioButton';
 import EditPortfolioButton from '@frontend/components/portfolio/editPortfolioButton';
-import {useGetUserPortfoliosQuery} from '@frontend/generated/graphql-hooks';
+import {
+	GetUserPortfoliosQuery,
+	GetUserPortfoliosQueryVariables,
+	useGetUserPortfoliosQuery,
+} from '@frontend/generated/graphql-hooks';
 import {
 	Box,
 	Stack,
@@ -27,7 +33,14 @@ const Sidebar: React.FC<SidebarProps> = ({
 	const activeBgColor = useColorModeValue('blue.100', 'blue.900');
 	const activeBorderColor = useColorModeValue('blue.500', 'blue.300');
 	const textColor = useColorModeValue('gray.800', 'gray.200');
-	const {data: portfolios, loading, called} = useGetUserPortfoliosQuery();
+	const {
+		items: portfolios,
+		loading,
+		called,
+	} = useMemorySyncedQuery<GetUserPortfoliosQuery, GetUserPortfoliosQueryVariables, Pick<Portfolio, 'id' | 'name' | 'createdAt' | 'deleted'>>(
+		useGetUserPortfoliosQuery,
+		(selectSyncData) => selectSyncData.getUserPortfolios,
+	);
 
 	return (
 		<Box minW={'350px'} w={{lg: '350px', base: '100%'}} p={4} bg={bgColor} borderRadius="md" boxShadow="lg">
@@ -39,12 +52,12 @@ const Sidebar: React.FC<SidebarProps> = ({
 			{/* Список портфелей */}
 			<Box maxH="calc(100vh - 200px)" overflowY="auto" pr={2}>
 				<Stack align="stretch" gap={2}>
-					{!portfolios?.getUserPortfolios?.length && !loading && called && (
+					{!portfolios?.length && !loading && called && (
 						<CreateDefaultPortfolioButton
 							onCreated={(portfolio) => onSelectPortfolio(portfolio.id)}
 						/>
 					)}
-					{portfolios?.getUserPortfolios?.map((portfolio) => {
+					{portfolios.sort((a, b) => a.id - b.id)?.map((portfolio) => {
 						const isSelected = portfolio.id === selectedPortfolioId;
 
 						return (

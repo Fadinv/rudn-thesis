@@ -59,6 +59,8 @@ scalar DateTime
 
 type Portfolio {
   id: Int!
+  version: Int!
+  deleted: Boolean!
   name: String!
   user: User!
   stocks: [PortfolioStock!]!
@@ -91,14 +93,22 @@ type PortfolioDistribution {
   remainingCapital: Float!
 }
 
+type GetUserPortfoliosResponse {
+  items: [Portfolio!]!
+  maxVersion: Int!
+  hasMoreData: Boolean!
+}
+
 type Query {
   currentUser: User
   getStocks: [Stock!]!
   getStockById(id: Int!): Stock
   getStockByTicker(ticker: String!): Stock
   searchStocks(search: String!, includedStocks: [String!]): [Stock!]!
-  getUserPortfolios: [Portfolio!]!
+  getUserPortfolios(fromVersion: Int): GetUserPortfoliosResponse!
   getPortfolioStocks(portfolioId: Int!): [PortfolioStock!]!
+  getAllPortfolios: [Portfolio!]!
+  getUserPortfoliosAll: [Portfolio!]!
   getStockPrices(ticker: String!, from: Float, to: Float): [StockPrice!]!
   getDistributedPortfolioAssets(capital: Float!, stockTickerList: [String!]!, weights: [Float!]!): PortfolioDistribution!
   getPortfolioReport(reportId: String!): PortfolioReport

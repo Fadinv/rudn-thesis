@@ -1,7 +1,6 @@
-import {Reference} from '@apollo/client';
 import {Button, Icon} from '@chakra-ui/react';
 import {FaPlus} from 'react-icons/fa';
-import {useCreatePortfolioMutation} from '@frontend/generated/graphql-hooks';
+import {GetUserPortfoliosDocument, useCreatePortfolioMutation} from '@frontend/generated/graphql-hooks';
 import {toaster} from '@frontend/components/ui/toaster';
 import React from 'react';
 
@@ -18,22 +17,23 @@ const CreateDefaultPortfolioButton: React.FC<CreateDefaultPortfolioButtonProps> 
 				name: 'Мой первый портфель',
 				stocks: [
 					{averagePrice: null, stockTicker: 'AAPL', quantity: 5},
-					{averagePrice: null, stockTicker: 'MSFT', quantity: 3},
+					{averagePrice: null, stockTicker: 'KO', quantity: 3},
 					{averagePrice: null, stockTicker: 'GOOG', quantity: 2},
 					{averagePrice: null, stockTicker: 'TSLA', quantity: 4},
 					{averagePrice: null, stockTicker: 'NFLX', quantity: 5},
 				],
 			},
-			update: (cache, {data}) => {
-				if (!data?.createPortfolio) return;
+			update: (cache, result) => {
+				const newItem = result.data?.createPortfolio;
+				if (!newItem) return;
 
-				cache.modify({
-					fields: {
-						getUserPortfolios(existingRefs: ReadonlyArray<Reference> = []) {
-							return [...existingRefs, {__ref: `Portfolio:${data.createPortfolio.id}`}];
-						},
+				cache.updateQuery({query: GetUserPortfoliosDocument}, (data) => ({
+					getUserPortfolios: {
+						...data.getUserPortfolios,
+						items: [...data.getUserPortfolios.items, newItem],
+						maxVersion: newItem.version,
 					},
-				});
+				}));
 			},
 		});
 

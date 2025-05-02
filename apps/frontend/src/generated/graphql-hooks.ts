@@ -27,6 +27,13 @@ export type FutureReturnForecastInput = {
   selectedPercentiles: Array<Scalars['Float']['input']>;
 };
 
+export type GetUserPortfoliosResponse = {
+  __typename?: 'GetUserPortfoliosResponse';
+  hasMoreData: Scalars['Boolean']['output'];
+  items: Array<Portfolio>;
+  maxVersion: Scalars['Int']['output'];
+};
+
 export type MarkovitzReportInput = {
   additionalTickers?: InputMaybe<Array<Scalars['String']['input']>>;
   covMethod?: InputMaybe<Scalars['String']['input']>;
@@ -153,6 +160,7 @@ export type MutationUpdateStockArgs = {
 export type Portfolio = {
   __typename?: 'Portfolio';
   createdAt: Scalars['DateTime']['output'];
+  deleted: Scalars['Boolean']['output'];
   id: Scalars['Int']['output'];
   isReadyForAnalysis: Scalars['Boolean']['output'];
   name: Scalars['String']['output'];
@@ -160,6 +168,7 @@ export type Portfolio = {
   stocks: Array<PortfolioStock>;
   updatedAt: Scalars['DateTime']['output'];
   user: User;
+  version: Scalars['Int']['output'];
 };
 
 export type PortfolioDistribution = {
@@ -200,6 +209,8 @@ export type PortfolioStockUpdateInput = {
 export type Query = {
   __typename?: 'Query';
   currentUser?: Maybe<User>;
+  getAllPortfolios: Array<Portfolio>;
+  getAllPortfolios2: Array<Array<Portfolio>>;
   getDistributedPortfolioAssets: PortfolioDistribution;
   getPortfolioReport?: Maybe<PortfolioReport>;
   getPortfolioReports: Array<PortfolioReport>;
@@ -208,7 +219,8 @@ export type Query = {
   getStockByTicker?: Maybe<Stock>;
   getStockPrices: Array<StockPrice>;
   getStocks: Array<Stock>;
-  getUserPortfolios: Array<Portfolio>;
+  getUserPortfolios: GetUserPortfoliosResponse;
+  getUserPortfoliosAll: Array<Portfolio>;
   searchStocks: Array<Stock>;
 };
 
@@ -249,6 +261,11 @@ export type QueryGetStockPricesArgs = {
   from?: InputMaybe<Scalars['Float']['input']>;
   ticker: Scalars['String']['input'];
   to?: InputMaybe<Scalars['Float']['input']>;
+};
+
+
+export type QueryGetUserPortfoliosArgs = {
+  fromVersion?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -353,7 +370,7 @@ export type CreatePortfolioMutationVariables = Exact<{
 }>;
 
 
-export type CreatePortfolioMutation = { __typename?: 'Mutation', createPortfolio: { __typename?: 'Portfolio', id: number, name: string, createdAt: any } };
+export type CreatePortfolioMutation = { __typename?: 'Mutation', createPortfolio: { __typename?: 'Portfolio', id: number, name: string, createdAt: any, deleted: boolean, version: number } };
 
 export type CurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -425,10 +442,12 @@ export type GetStockByTickerQueryVariables = Exact<{
 
 export type GetStockByTickerQuery = { __typename?: 'Query', getStockByTicker?: { __typename?: 'Stock', id: number, ticker: string, name: string, market: string, primaryExchange: string, currencyName: string, logoUrl?: string | null } | null };
 
-export type GetUserPortfoliosQueryVariables = Exact<{ [key: string]: never; }>;
+export type GetUserPortfoliosQueryVariables = Exact<{
+  fromVersion?: InputMaybe<Scalars['Int']['input']>;
+}>;
 
 
-export type GetUserPortfoliosQuery = { __typename?: 'Query', getUserPortfolios: Array<{ __typename?: 'Portfolio', id: number, name: string, createdAt: any }> };
+export type GetUserPortfoliosQuery = { __typename?: 'Query', getUserPortfolios: { __typename?: 'GetUserPortfoliosResponse', hasMoreData: boolean, maxVersion: number, items: Array<{ __typename?: 'Portfolio', id: number, name: string, createdAt: any, deleted: boolean, version: number }> } };
 
 export type LoginMutationVariables = Exact<{
   email: Scalars['String']['input'];
@@ -613,6 +632,8 @@ export const CreatePortfolioDocument = gql`
     id
     name
     createdAt
+    deleted
+    version
   }
 }
     `;
@@ -1053,11 +1074,17 @@ export type GetStockByTickerLazyQueryHookResult = ReturnType<typeof useGetStockB
 export type GetStockByTickerSuspenseQueryHookResult = ReturnType<typeof useGetStockByTickerSuspenseQuery>;
 export type GetStockByTickerQueryResult = Apollo.QueryResult<GetStockByTickerQuery, GetStockByTickerQueryVariables>;
 export const GetUserPortfoliosDocument = gql`
-    query GetUserPortfolios {
-  getUserPortfolios {
-    id
-    name
-    createdAt
+    query GetUserPortfolios($fromVersion: Int) {
+  getUserPortfolios(fromVersion: $fromVersion) {
+    items {
+      id
+      name
+      createdAt
+      deleted
+      version
+    }
+    hasMoreData
+    maxVersion
   }
 }
     `;
@@ -1074,6 +1101,7 @@ export const GetUserPortfoliosDocument = gql`
  * @example
  * const { data, loading, error } = useGetUserPortfoliosQuery({
  *   variables: {
+ *      fromVersion: // value for 'fromVersion'
  *   },
  * });
  */

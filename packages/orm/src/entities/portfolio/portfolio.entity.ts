@@ -19,6 +19,14 @@ export class Portfolio {
 	@PrimaryGeneratedColumn()
 	id!: number;
 
+	@Field(() => Int)
+	@Column({type: 'int', default: 1})
+	version!: number;
+
+	@Field(() => Boolean)
+	@Column({type: 'boolean', default: false})
+	deleted!: boolean;
+
 	@Field()
 	@Column()
 	name!: string; // Название портфеля
@@ -37,11 +45,11 @@ export class Portfolio {
 
 	@Field()
 	@CreateDateColumn()
-	createdAt!: Date; // Дата создания портфеля
+	createdAt!: Date;
 
 	@Field()
 	@UpdateDateColumn()
-	updatedAt!: Date; // Дата последнего обновления портфеля
+	updatedAt!: Date;
 
 	@Field(() => [PortfolioReport])
 	@OneToMany(() => PortfolioReport, (report) => report.portfolio)

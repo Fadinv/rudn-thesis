@@ -190,15 +190,25 @@ def _remove_duplicates(stock_prices):
     return list(reversed(filtered))
 
 
-def get_market_returns(start_date: str, end_date: str, ticker="SPY", target_currency='usd'):
+def get_market_returns(
+    start_date: str,
+    end_date: str,
+    ticker="SPY",
+    target_currency='usd',
+    expected_length: int | None = None
+):
     """
-    Получает дневные доходности рыночного индекса (например, SPY) из базы данных, с учётом валюты.
-    :param start_date: Начальная дата (YYYY-MM-DD)
-    :param end_date: Конечная дата (YYYY-MM-DD)
-    :param ticker: Тикер рыночного индекса
-    :param target_currency: Валюта результата ('usd' или 'sur')
-    :return: numpy массив доходностей (N дней)
+    Получает дневные доходности рыночного индекса с учётом валюты и выравниванием длины.
+    :param expected_length: если задано — результат будет ровно этой длины (с конца, с дополнением при нехватке)
+    :return: numpy-массив логарифмических доходностей
     """
+    # Если требуется выравнивание по длине, запрашиваем чуть раньше
+    if expected_length:
+        start_date_dt = date.fromisoformat(start_date)
+        extended_start_date = (start_date_dt - timedelta(days=10)).isoformat()
+    else:
+        extended_start_date = start_date
+
     with engine.connect() as conn:
         result = conn.execute(text("""
             SELECT sp.date, sp.close, s.currency_name
@@ -207,24 +217,51 @@ def get_market_returns(start_date: str, end_date: str, ticker="SPY", target_curr
             WHERE sp.ticker = :ticker
             AND sp.date BETWEEN :start_date AND :end_date
             ORDER BY sp.date ASC
-        """), {"ticker": ticker, "start_date": start_date, "end_date": end_date}).fetchall()
+        """), {
+            "ticker": ticker,
+            "start_date": extended_start_date,
+            "end_date": end_date
+        }).fetchall()
 
     if not result:
         raise ValueError(f"Нет данных по {ticker} за период {start_date} - {end_date}")
 
     currency = result[0][2].upper()
+    print(len(result))
+    # Обрезаем результат по дате до нужной длины
+    if expected_length is not None:
+        target_len = expected_length + 1
+        current_len = len(result)
+
+        if current_len < target_len:
+            missing = target_len - current_len
+            first_row = result[0]
+            pad = [first_row] * missing
+            result = pad + result
+
+        elif current_len > target_len:
+              result = result[-target_len:]
+    print(len(result))
     data = [(row[0], row[1]) for row in result]
 
-    # Конвертация, если необходимо
-    if target_currency == 'usd' and currency == 'SUR':
-        print(f"🔁 Конвертация индекса {ticker} из SUR в USD")
-        fx_rates = get_usd_rub_prices_in_range(start_date, end_date)
-        data = [(d, c / fx_rates[str(d)]) for d, c in data if str(d) in fx_rates]
+    converted = []
+    fx_rates = get_usd_rub_prices_in_range(extended_start_date, end_date)
+    last_fx = None
 
-    elif target_currency == 'sur' and currency == 'USD':
-        print(f"🔁 Конвертация индекса {ticker} из USD в SUR")
-        fx_rates = get_usd_rub_prices_in_range(start_date, end_date)
-        data = [(d, c * fx_rates[str(d)]) for d, c in data if str(d) in fx_rates]
+    for d, c, cur in result:
+        if target_currency == 'usd' and cur.upper() == 'SUR':
+            fx = fx_rates.get(str(d), last_fx)
+            if fx:
+                last_fx = fx
+                c = c / fx
+        elif target_currency == 'sur' and cur.upper() == 'USD':
+            fx = fx_rates.get(str(d), last_fx)
+            if fx:
+                last_fx = fx
+                c = c * fx
+        converted.append((d, c))  # сохраняем даже если курс не найден
+
+    data = converted
 
     closes = [c for _, c in data]
     returns = np.diff(np.log(closes))

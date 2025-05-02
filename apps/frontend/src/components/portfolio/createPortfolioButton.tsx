@@ -1,4 +1,3 @@
-import {Reference} from '@apollo/client';
 import {
 	DrawerActionTrigger,
 	DrawerBackdrop, DrawerBody, DrawerCloseTrigger,
@@ -9,7 +8,11 @@ import {
 	DrawerTrigger,
 } from '@frontend/components/ui/drawer';
 import {toaster} from '@frontend/components/ui/toaster';
-import {CreatePortfolioMutation, useCreatePortfolioMutation} from '@frontend/generated/graphql-hooks';
+import {
+	CreatePortfolioMutation,
+	GetUserPortfoliosDocument,
+	useCreatePortfolioMutation,
+} from '@frontend/generated/graphql-hooks';
 import React, {useEffect, useState} from 'react';
 import {
 	Button, Icon,
@@ -51,16 +54,17 @@ const CreatePortfolioButton: React.FC<CreatePortfolioModalProps> = (props) => {
 					quantity: item.quantity,
 				})),
 			},
-			update: (cache, {data}) => {
-				if (!data?.createPortfolio) return;
+			update: (cache, result) => {
+				const newItem = result.data?.createPortfolio;
+				if (!newItem) return;
 
-				cache.modify({
-					fields: {
-						getUserPortfolios(existingRefs: ReadonlyArray<Reference> = []) {
-							return [...existingRefs, {__ref: `Portfolio:${data.createPortfolio.id}`}];
-						},
+				cache.updateQuery({query: GetUserPortfoliosDocument}, (data) => ({
+					getUserPortfolios: {
+						...data.getUserPortfolios,
+						items: [...data.getUserPortfolios.items, newItem],
+						maxVersion: newItem.version,
 					},
-				});
+				}));
 			},
 		});
 

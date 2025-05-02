@@ -1,7 +1,13 @@
-query GetUserPortfolios {
-    getUserPortfolios {
-        id
-        name
-        createdAt
+query GetUserPortfolios($fromVersion: Int) {
+    getUserPortfolios(fromVersion: $fromVersion) {
+        items {
+            id
+            name
+            createdAt
+            deleted
+            version
+        }
+        hasMoreData
+        maxVersion
     }
 }
