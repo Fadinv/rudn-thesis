@@ -30,7 +30,7 @@ const LoginButton: React.FC = () => {
 			}
 		}}>
 			<DialogTrigger asChild>
-				<Button colorScheme="teal" colorPalette={'teal'} variant="solid" size="md">
+				<Button colorScheme="blue" colorPalette={'blue'} variant="solid" size="md">
 					Войти
 				</Button>
 			</DialogTrigger>

@@ -28,6 +28,7 @@
 		"apps/backend",
 		"apps/frontend",
 		"apps/ticker-updater",
+		"apps/invite-bot",
 		"packages/orm"
 	],
 	"dependencies": {
@@ -36,6 +37,11 @@
 		"@emotion/react": "^11.14.0",
 		"@nestjs/graphql": "^13.0.2",
 		"@nestjs/typeorm": "^11.0.0",
+		"@nestjs/common": "^11.0.9",
+		"@nestjs/core": "^11.0.9",
+		"reflect-metadata": "^0.2.2",
+		"dotenv": "^16.0.3",
+		"rxjs": "^7.8.1",
 		"@next/swc-wasm-nodejs": "^13.5.10",
 		"bcryptjs": "^3.0.0",
 		"graphql": "^16.10.0",

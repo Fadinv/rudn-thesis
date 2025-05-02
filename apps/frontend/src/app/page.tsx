@@ -1,95 +1,112 @@
 import React from 'react';
 import {
-	Box, Heading, Text, VStack, IconButton, Container, Link, SimpleGrid, Flex, Separator,
+	Box,
+	Heading,
+	Text,
+	VStack,
+	Container,
+	Link,
+	SimpleGrid,
+	Flex,
+	Separator,
+	Button,
+	Image,
 } from '@chakra-ui/react';
-import {FaTelegramPlane, FaChartLine, FaRobot, FaLock} from 'react-icons/fa';
+import {FaTelegramPlane} from 'react-icons/fa';
 import LoginButton from '@frontend/components/loginButton/loginButton';
-import {IconType} from 'react-icons/lib';
 
 export default function HomePage() {
 	return (
 		<>
 			{/* Hero */}
-			<Box
-				bgImage="url('/layout-min.png')"
-				bgSize="cover"
-				bgPos="center"
-				bgRepeat="no-repeat"
-				py={{base: 24, md: 48}}
-			>
-				<Container maxW="container.lg" py={{base: 24, md: 48}}>
-					<VStack
-						gap={6}
-						textAlign="center"
-						bg={'rgba(160, 185, 200, 0.75)'}
-						backdropFilter="blur(8px)"
-						p={8}
-						borderRadius="xl"
-					>
-						<Heading color={'black'} fontSize="4xl">Portfolio Analyzer</Heading>
-						<Text fontSize="xl" fontWeight={'600'} maxW="600px" color={'black'}>
-							Умный анализ инвестиционного портфеля по Марковицу, GBM-прогноз и поддержка MOEX.
-						</Text>
-						<LoginButton/>
-					</VStack>
+			<Box py={{base: 24, md: 48}}>
+				<Container maxW="container.lg">
+					<SimpleGrid columns={{base: 1, md: 2}} gap={12} alignItems="center">
+						<VStack gap={6} textAlign={{base: 'center', md: 'left'}}>
+							<Heading fontSize="4xl">Portfolio Analyzer</Heading>
+							<Text fontSize="xl" fontWeight="600" maxW="600px" color="gray.700">
+								Умный анализ инвестиционного портфеля по Марковицу, GBM-прогноз и поддержка MOEX.
+							</Text>
+							<LoginButton/>
+						</VStack>
+						<Image src="/illustrations/business-analytics.svg" alt="Анализ"/>
+					</SimpleGrid>
 				</Container>
 			</Box>
 
 			<Separator maxW={'7xl'} m={'0 auto'}/>
 
 			{/* Telegram */}
-			<Container borderRadius="xl" mt={8} mb={8} maxW="container.lg"
-			           py={{base: 12, md: 16}}>
-				<VStack gap={2} textAlign="center">
-					<Text fontSize="md" fontWeight="medium">
-						Приложение активно разрабатывается
-					</Text>
-					<Text fontSize="sm" maxW="400px" color={'gray.500'}>
-						Вы можете запросить доступ, написав мне в Telegram. Буду рад обратной связи!
-					</Text>
-					<Link href="https://t.me/vfadrik" target={'_blank'}>
-						<IconButton
-							aria-label="Написать в Telegram"
-							variant="solid"
-							colorPalette="blue"
-							size="xs"
-							rounded="full"
-						>
-							<FaTelegramPlane/>
-						</IconButton>
-					</Link>
+			<Container borderRadius="xl" mt={8} mb={8} maxW="container.lg" py={{base: 12, md: 16}}>
+				<VStack gap={8} textAlign="center">
+					{/* Доступ через бота */}
+					<VStack gap={3}>
+						<Text fontSize="md" fontWeight="medium">
+							Получите доступ к сервису через Telegram-бота за пару кликов.
+						</Text>
+						<Link href="https://t.me/portfolio_invite_bot" target="_blank">
+							<Button size="sm" colorPalette="blue" variant="solid">
+								<FaTelegramPlane/>
+								Получить доступ через бота
+							</Button>
+						</Link>
+					</VStack>
+
+					{/* Обратная связь */}
+					<VStack gap={3}>
+						<Text fontSize="sm" maxW="480px" color="gray.500">
+							Есть идеи, вопросы или пожелания? Напишите мне в Telegram. Буду рад обратной связи!
+						</Text>
+						<Link href="https://t.me/vfadrik" target="_blank">
+							<Button size="sm" variant="ghost" colorPalette="blue">
+								<FaTelegramPlane/>
+								Я в Telegram
+							</Button>
+						</Link>
+					</VStack>
 				</VStack>
 			</Container>
 
 			<Separator maxW={'7xl'} m={'0 auto'}/>
 
-			{/* О приложении */}
+			{/* Что делает */}
 			<Container py={{base: 12, md: 16}}>
-				<VStack gap={4} textAlign="center">
-					<Heading fontSize="2xl">Что делает приложение?</Heading>
-					<Text fontSize="md" maxW="700px">
-						Portfolio Analyzer помогает инвесторам принимать взвешенные решения, анализируя риски и
-						прогнозируя доходность с помощью финансовых моделей. Поддерживает мультивалютность и работает с
-						MOEX и NASDAQ.
-					</Text>
-				</VStack>
+				<SimpleGrid columns={{base: 1, md: 2}} gap={12} alignItems="center">
+					<Image src="/illustrations/success_factors.svg" alt="Функции"/>
+					<VStack gap={4} textAlign="left">
+						<Heading fontSize="2xl">Что делает приложение?</Heading>
+						<Text align="center" fontSize="md" maxW="700px">
+							Portfolio Analyzer — независимый сервис, который анализирует риски и прогнозирует доходность
+							инвестиционного портфеля на основе исторических данных. Поддерживает мультивалютность и
+							работает с активами, представленными на MOEX и NASDAQ.
+						</Text>
+					</VStack>
+				</SimpleGrid>
 			</Container>
 
 			<Separator maxW={'7xl'} m={'0 auto'}/>
 
 			{/* Преимущества */}
-			<Container borderRadius="xl" mt={8} mb={8} maxW="container.lg"
-			           py={{base: 12, md: 16}}>
+			<Container borderRadius="xl" mt={8} mb={8} maxW="container.lg" py={{base: 12, md: 16}}>
 				<VStack gap={4} textAlign="center">
 					<Heading fontSize="2xl">Как это работает?</Heading>
 				</VStack>
 				<SimpleGrid columns={{base: 1, md: 3}} gap={10} mt={8}>
-					<Feature icon={FaChartLine} title="Анализ по Марковицу"
-					         description="Оцениваем риск и доходность на основе исторических данных."/>
-					<Feature icon={FaRobot} title="GBM-прогноз"
-					         description="Моделируем будущее поведение портфеля с учетом волатильности."/>
-					<Feature icon={FaLock} title="Приватность данных"
-					         description="Ваши данные обрабатываются локально и безопасно."/>
+					<Feature
+						image="/illustrations/investing.svg"
+						title="Анализ по Марковицу"
+						description="Оцениваем риск и доходность на основе исторических данных."
+					/>
+					<Feature
+						image="/illustrations/predictive-analytics.svg"
+						title="GBM-прогноз"
+						description="Моделируем будущее поведение портфеля с учетом волатильности."
+					/>
+					<Feature
+						image="/illustrations/online-banking.svg"
+						title="Приватность данных"
+						description="Ваши данные обрабатываются локально и безопасно."
+					/>
 				</SimpleGrid>
 			</Container>
 
@@ -105,9 +122,9 @@ export default function HomePage() {
 					</Text>
 				</VStack>
 				<SimpleGrid columns={{base: 1, md: 3}} gap={8} mt={8}>
-					<UserCard icon={FaChartLine} label="Частным инвесторам"/>
-					<UserCard icon={FaRobot} label="Алго-трейдерам"/>
-					<UserCard icon={FaLock} label="Аналитикам и студентам"/>
+					<UserCard image="/illustrations/personal-finance.svg" label="Частным инвесторам"/>
+					<UserCard image="/illustrations/bull-market.svg" label="Алго-трейдерам"/>
+					<UserCard image="/illustrations/growth-chart.svg" label="Аналитикам и студентам"/>
 				</SimpleGrid>
 			</Container>
 
@@ -121,17 +138,17 @@ export default function HomePage() {
 	);
 }
 
-const Feature = ({icon: Icon, title, description}: { icon: IconType; title: string; description: string }) => (
+const Feature = ({image, title, description}: { image: string; title: string; description: string }) => (
 	<Flex direction="column" align="center" textAlign="center" px={4}>
-		<Icon size={32}/>
+		<Image src={image} alt={title} h="100px"/>
 		<Text fontWeight="bold" mt={4}>{title}</Text>
 		<Text fontSize="sm" mt={2}>{description}</Text>
 	</Flex>
 );
 
-const UserCard = ({icon: Icon, label}: { icon: IconType; label: string }) => (
+const UserCard = ({image, label}: { image: string; label: string }) => (
 	<Flex direction="column" align="center" gap={2}>
-		<Icon size={32}/>
+		<Image src={image} alt={label} h="100px"/>
 		<Text fontWeight="medium">{label}</Text>
 	</Flex>
 );

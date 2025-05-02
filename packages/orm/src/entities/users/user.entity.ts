@@ -17,6 +17,9 @@ export class User {
 	@Column()
 	password!: string;
 
+	@Column({unique: true, nullable: true})
+	telegramId?: string;
+
 	@Field(() => [Portfolio], {nullable: true})
 	@OneToMany(() => Portfolio, (portfolio) => portfolio.user, {cascade: true})
 	portfolios?: Portfolio[];

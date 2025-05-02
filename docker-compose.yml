@@ -73,6 +73,20 @@ services:
     volumes:
       - ./apps/analyzer:/app
 
+  invite-bot:
+    build:
+      context: .
+      dockerfile: apps/invite-bot/Dockerfile
+    env_file:
+      - ./.env.shared
+      - ./apps/invite-bot/.env.local
+    depends_on:
+      - backend
+      - redis
+    volumes:
+      - .:/monorepo
+    command: npm run start:dev
+
   redis:
     image: redis:7
     ports:

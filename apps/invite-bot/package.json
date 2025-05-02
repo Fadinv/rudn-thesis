@@ -1,0 +1,18 @@
+{
+	"name": "invite-bot",
+	"version": "1.0.0",
+	"private": true,
+	"main": "dist/index.js",
+	"scripts": {
+		"build": "tsc",
+		"prebuild": "cd ../.. && npm run build:orm && cd apps/invite-bot",
+		"prestart": "rm -rf dist && rm -f .tsbuildinfo && cd ../.. && npm run build:orm && cd apps/invite-bot && tsc",
+		"start": "npm run prestart && node dist/index.js",
+		"watch": "tsc -w",
+		"serve": "node dist/index.js",
+		"start:dev": "npm run prestart && npm-run-all --parallel watch serve"
+	},
+	"dependencies": {
+		"grammy": "^1.18.0"
+	}
+}
