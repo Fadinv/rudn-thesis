@@ -34,12 +34,10 @@ const DeletePortfolioStockButton: React.FC<DeletePortfolioStockButtonProps> = ({
 			await deletePortfolioStock({
 				variables: {portfolioStockId},
 				update: (cache, result) => {
-					console.log('result', result.data);
 					if (result?.data) {
 						cache.modify({
 							fields: {
 								getPortfolioStocks(existingRefs: ReadonlyArray<Reference> = [], {readField}) {
-									console.log(existingRefs);
 									return existingRefs.filter((ref) => {
 										return readField<number>('id', ref) !== id;
 									});

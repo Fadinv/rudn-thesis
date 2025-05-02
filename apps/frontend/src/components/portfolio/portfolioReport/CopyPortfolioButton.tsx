@@ -6,10 +6,11 @@ import {
 	DrawerTitle,
 	DrawerTrigger,
 } from '@frontend/components/ui/drawer';
+import {Tooltip} from '@frontend/components/ui/tooltip';
 import {
 	GetDistributedPortfolioAssetsQuery,
 	useCreatePortfolioMutation,
-	useGetDistributedPortfolioAssetsLazyQuery,
+	useGetDistributedPortfolioAssetsLazyQuery, useGetUserPortfoliosQuery,
 } from '@frontend/generated/graphql-hooks';
 import {StocksWhileCreatingPortfolio} from '@frontend/generated/graphql-types';
 import React, {useEffect, useState} from 'react';
@@ -36,6 +37,11 @@ const CopyPortfolioButton: React.FC<CopyPortfolioButtonProps> = ({onSave, stockT
 	const [distributedPortfolio, setDistributedPortfolio] = useState<GetDistributedPortfolioAssetsQuery | null>(null);
 	const [getDistributedPortfolioAssets, {loading}] = useGetDistributedPortfolioAssetsLazyQuery();
 	const [createPortfolio, {error, loading: creating}] = useCreatePortfolioMutation();
+	const {
+		data: getUserPortfoliosQueryData,
+		loading: getUserPortfoliosQueryDataLoading,
+		called: getUserPortfoliosQueryDataCalled,
+	} = useGetUserPortfoliosQuery({fetchPolicy: 'cache-only'});
 
 	const handleCalculate = async () => {
 		if (capital && capital > 0) {
@@ -43,6 +49,12 @@ const CopyPortfolioButton: React.FC<CopyPortfolioButtonProps> = ({onSave, stockT
 			setDistributedPortfolio(data.data ?? null);
 		}
 	};
+
+	const createButtonIsDisabled =
+		!getUserPortfoliosQueryData ||
+		!getUserPortfoliosQueryDataCalled ||
+		getUserPortfoliosQueryDataLoading ||
+		getUserPortfoliosQueryData.getUserPortfolios.items.length >= 5;
 
 	useEffect(() => {
 		if (open) {
@@ -83,17 +95,24 @@ const CopyPortfolioButton: React.FC<CopyPortfolioButtonProps> = ({onSave, stockT
 			onOpenChange={(e) => setOpen(e.open)}
 		>
 			<DrawerBackdrop/>
-			<DrawerTrigger asChild>
-				<Button
-					colorPalette="teal"
-					variant="solid"
-					size="xs"
-					mt={2}
-					// style={{margin: 'auto 0 auto 12px'}}
-				>
-					<Icon as={FaCopy} mr={2}/> Копировать портфель
-				</Button>
-			</DrawerTrigger>
+			<Tooltip
+				content={createButtonIsDisabled ? 'Ограничение по количеству портфелей: 5' : undefined}
+				disabled={!createButtonIsDisabled}
+				openDelay={0}
+				closeDelay={100}
+			>
+				<DrawerTrigger asChild>
+					<Button
+						colorPalette="teal"
+						variant="solid"
+						size="xs"
+						mt={2}
+						disabled={createButtonIsDisabled}
+					>
+						<Icon as={FaCopy} mr={2}/> Копировать портфель
+					</Button>
+				</DrawerTrigger>
+			</Tooltip>
 			<DrawerContent offset="4" rounded="md">
 				<DrawerHeader>
 					<DrawerTitle>Копирование портфеля</DrawerTitle>

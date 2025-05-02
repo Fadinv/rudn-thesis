@@ -38,11 +38,8 @@ const DeletePortfolioButton: React.FC<DeletePortfolioButtonProps> = ({
 					if (!deleted) return;
 
 					cache.updateQuery({query: GetUserPortfoliosDocument, overwrite: true}, (data) => {
-						console.log(data.getUserPortfolios.items, targetId);
-						console.log(data.getUserPortfolios.items, targetId);
 						const items = (data.getUserPortfolios.items || []).filter((item: Portfolio) => item.id !== targetId);
 
-						console.log('items', items);
 						return ({
 							getUserPortfolios: {
 								...data.getUserPortfolios,
@@ -51,7 +48,6 @@ const DeletePortfolioButton: React.FC<DeletePortfolioButtonProps> = ({
 							},
 						});
 					});
-					console.log('CACHE', cache);
 				},
 			});
 			setOpen(false);

@@ -8,10 +8,11 @@ import {
 	DrawerTrigger,
 } from '@frontend/components/ui/drawer';
 import {toaster} from '@frontend/components/ui/toaster';
+import {Tooltip} from '@frontend/components/ui/tooltip';
 import {
 	CreatePortfolioMutation,
 	GetUserPortfoliosDocument,
-	useCreatePortfolioMutation,
+	useCreatePortfolioMutation, useGetUserPortfoliosQuery,
 } from '@frontend/generated/graphql-hooks';
 import React, {useEffect, useState} from 'react';
 import {
@@ -35,7 +36,18 @@ const CreatePortfolioButton: React.FC<CreatePortfolioModalProps> = (props) => {
 	const [open, setOpen] = useState(false);
 	const [csvData, setCsvData] = useState<CsvPortfolioEntry[]>([]);
 
+	const {
+		data: getUserPortfoliosQueryData,
+		loading: getUserPortfoliosQueryDataLoading,
+		called: getUserPortfoliosQueryDataCalled,
+	} = useGetUserPortfoliosQuery({fetchPolicy: 'cache-only'});
 	const [createPortfolio, {error, loading}] = useCreatePortfolioMutation();
+
+	const createButtonIsDisabled =
+		!getUserPortfoliosQueryData ||
+		!getUserPortfoliosQueryDataCalled ||
+		getUserPortfoliosQueryDataLoading ||
+		getUserPortfoliosQueryData.getUserPortfolios.items.length >= 5;
 
 	useEffect(() => {
 		if (!open) {
@@ -149,11 +161,21 @@ const CreatePortfolioButton: React.FC<CreatePortfolioModalProps> = (props) => {
 	return (
 		<DrawerRoot size="lg" open={open} onOpenChange={(e) => setOpen(e.open)}>
 			<DrawerBackdrop/>
-			<DrawerTrigger asChild>
-				<Button w="100%" variant="solid" size="lg">
-					<Icon as={FaPlus} mr={2}/> Создать портфель
-				</Button>
-			</DrawerTrigger>
+			<Tooltip
+				content={createButtonIsDisabled ? 'Ограничение по количеству портфелей: 5' : undefined}
+				disabled={!createButtonIsDisabled}
+				openDelay={0}
+				closeDelay={100}
+			>
+				<DrawerTrigger asChild>
+					<Button
+						w="100%" variant="solid" size="lg"
+						disabled={createButtonIsDisabled}
+					>
+							<Icon as={FaPlus} mr={2}/> Создать портфель
+					</Button>
+				</DrawerTrigger>
+			</Tooltip>
 			<DrawerContent offset="4" rounded="md">
 				<DrawerHeader>
 					<DrawerTitle>Создание портфеля</DrawerTitle>
@@ -219,7 +241,12 @@ const CreatePortfolioButton: React.FC<CreatePortfolioModalProps> = (props) => {
 				</DrawerBody>
 				<DrawerFooter>
 					<DrawerActionTrigger asChild>
-						<Button disabled={loading} variant="outline">Отмена</Button>
+						<Button
+							disabled={loading}
+							variant="outline"
+						>
+							Отмена
+						</Button>
 					</DrawerActionTrigger>
 					<Button
 						onClick={handleSave}
