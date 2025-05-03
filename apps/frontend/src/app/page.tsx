@@ -1,5 +1,4 @@
 import Header from '@frontend/components/header/header';
-import Head from 'next/head';
 import React from 'react';
 import {
 	Box,
