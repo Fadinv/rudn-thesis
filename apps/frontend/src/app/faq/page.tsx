@@ -12,36 +12,36 @@ import {
 import {Timeline} from '@chakra-ui/react';
 import {LuCheck} from 'react-icons/lu';
 
-export const metadata = {
-	title: 'FAQ — Portfolio Analyzer',
-	description: 'Ответы на часто задаваемые вопросы по использованию Portfolio Analyzer.',
-	openGraph: {
-		title: 'FAQ — Portfolio Analyzer',
-		description: 'Ответы на часто задаваемые вопросы по использованию Portfolio Analyzer.',
-		url: 'https://portfolioanalyzer.ru/faq',
-		siteName: 'Portfolio Analyzer',
-		images: [
-			{
-				url: 'https://portfolioanalyzer.ru/og-cover.png',
-				width: 1200,
-				height: 630,
-				alt: 'Portfolio Analyzer FAQ',
-			},
-		],
-		locale: 'ru_RU',
-		type: 'website',
-	},
-	twitter: {
-		card: 'summary_large_image',
-		title: 'FAQ — Portfolio Analyzer',
-		description: 'Ответы на часто задаваемые вопросы по использованию Portfolio Analyzer',
-		images: ['https://portfolioanalyzer.ru/og-cover.png'],
-	},
-	robots: {
-		index: true,
-		follow: true,
-	},
-};
+// export const metadata = {
+// 	title: 'FAQ — Portfolio Analyzer',
+// 	description: 'Ответы на часто задаваемые вопросы по использованию Portfolio Analyzer.',
+// 	openGraph: {
+// 		title: 'FAQ — Portfolio Analyzer',
+// 		description: 'Ответы на часто задаваемые вопросы по использованию Portfolio Analyzer.',
+// 		url: 'https://portfolioanalyzer.ru/faq',
+// 		siteName: 'Portfolio Analyzer',
+// 		images: [
+// 			{
+// 				url: 'https://portfolioanalyzer.ru/og-cover.png',
+// 				width: 1200,
+// 				height: 630,
+// 				alt: 'Portfolio Analyzer FAQ',
+// 			},
+// 		],
+// 		locale: 'ru_RU',
+// 		type: 'website',
+// 	},
+// 	twitter: {
+// 		card: 'summary_large_image',
+// 		title: 'FAQ — Portfolio Analyzer',
+// 		description: 'Ответы на часто задаваемые вопросы по использованию Portfolio Analyzer',
+// 		images: ['https://portfolioanalyzer.ru/og-cover.png'],
+// 	},
+// 	robots: {
+// 		index: true,
+// 		follow: true,
+// 	},
+// };
 
 const FaqPage = () => {
 	return (
