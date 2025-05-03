@@ -26,10 +26,10 @@ const CreatePortfolioReportButton: React.FC<CreatePortfolioReportButtonProps> = 
 					>
 						<FiFileText/>
 					</IconButton>
-					<Text fontSize="xs">Создать</Text>
+					<Text textAlign="center" fontSize="xs">Создать <br/> отчет</Text>
 				</VStack>
 			) : (
-				<Button size="sm" colorScheme="blue" onClick={() => setOpen(true)}>
+				<Button size="xs" colorPalette="blue" onClick={() => setOpen(true)}>
 					<Icon as={FaFileAlt} mr={2}/> Создать отчет
 				</Button>
 			)}

@@ -20,7 +20,7 @@ const MobileActionBar: React.FC<MobileActionBarProps> = ({portfolioId, refetch})
 			borderRadius="xl"
 			shadow="lg"
 		>
-			<Flex justify="space-around" align="center">
+			<Flex justify="space-around" align="flex-start">
 				<AddStockToPortfolioButton onStockAdded={() => refetch()} portfolioId={portfolioId}/>
 				<CreatePortfolioReportButton portfolioId={portfolioId}/>
 				<ShowPortfolioReportButton portfolioId={portfolioId}/>

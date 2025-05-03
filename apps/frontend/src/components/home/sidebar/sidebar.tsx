@@ -31,6 +31,14 @@ const Sidebar: React.FC<SidebarProps> = ({
                                          }) => {
 	// Цвета для темной и светлой темы
 	const bgColor = useColorModeValue('white', 'gray.900');
+	const selectedBg = useColorModeValue('blue.50', 'blue.900');
+	const defaultBg = useColorModeValue('gray.50', 'gray.800');
+	const selectedHoverBg = useColorModeValue('blue.100', 'blue.800');
+	const defaultHoverBg = useColorModeValue('gray.100', 'gray.700');
+	const selectedBorder = useColorModeValue('blue.400', 'blue.300');
+	const defaultBorder = useColorModeValue('gray.200', 'gray.600');
+	const textColor = useColorModeValue('gray.800', 'gray.100');
+
 	const [editOpenId, setEditOpenId] = useState<number | null>(null);
 	const [deleteOpenId, setDeleteOpenId] = useState<number | null>(null);
 
@@ -61,6 +69,9 @@ const Sidebar: React.FC<SidebarProps> = ({
 					{portfolios.sort((a, b) => a.id - b.id)?.map((portfolio) => {
 						const isSelected = portfolio.id === selectedPortfolioId;
 
+						const bg = isSelected ? selectedBg : defaultBg;
+						const hoverBg = isSelected ? selectedHoverBg : defaultHoverBg;
+						const borderColor = isSelected ? selectedBorder : defaultBorder;
 						return (
 							<Flex
 								key={portfolio.id}
@@ -68,18 +79,18 @@ const Sidebar: React.FC<SidebarProps> = ({
 								justify="space-between"
 								p={3}
 								cursor="pointer"
-								bg={isSelected ? 'blue.50' : 'gray.50'}
+								bg={bg}
 								border="1px solid"
-								borderColor={isSelected ? 'blue.400' : 'gray.200'}
+								borderColor={borderColor}
 								borderRadius="lg"
 								shadow="base"
 								transition="background-color 0.3s ease-out"
-								_hover={{bg: isSelected ? 'blue.100' : 'gray.100'}}
+								_hover={{bg: hoverBg}}
 								onClick={() => onSelectPortfolio(portfolio.id)}
 							>
 								<Flex align="center" gap={2}>
 									<Icon as={FaChartPie} color="blue.500"/>
-									<Text fontWeight="semibold">{portfolio.name}</Text>
+									<Text fontWeight="semibold" color={textColor}>{portfolio.name}</Text>
 								</Flex>
 								<Menu.Root>
 									<Menu.Trigger

@@ -1,12 +1,13 @@
 'use client';
 import ActionsMenu from '@frontend/components/portfolio/actionsMenu';
 import BackButton from '@frontend/components/portfolio/backButton';
-import React from 'react';
-import {Box, Flex, Heading, Text, Spinner, Badge} from '@chakra-ui/react';
+import DeletePortfolioStockDialog from '@frontend/components/portfolio/dialogs/deletePortfolioStockDialog';
+import EditPortfolioStockDrawer from '@frontend/components/portfolio/drawers/EditPortfolioStockDrawer';
+import React, {useState} from 'react';
+import {Box, Flex, Heading, Text, Spinner, Badge, Menu, Portal, Icon, Button} from '@chakra-ui/react';
 import {Table} from '@chakra-ui/react';
 import {useGetPortfolioStocksQuery, useGetUserPortfoliosQuery} from '@frontend/generated/graphql-hooks';
-import EditPortfolioStockButton from '@frontend/components/portfolio/editPortfolioStockButton';
-import DeletePortfolioStockButton from '@frontend/components/portfolio/deletePortfolioStockButton';
+import {FaChartPie, FaEllipsisV} from 'react-icons/fa';
 
 interface PortfolioViewProps {
 	portfolioId: number;
@@ -16,6 +17,9 @@ interface PortfolioViewProps {
 const PortfolioView: React.FC<PortfolioViewProps> = ({portfolioId, onBack}) => {
 	const {data, loading, error, refetch} = useGetPortfolioStocksQuery({variables: {portfolioId}});
 	const {data: userPortfolio} = useGetUserPortfoliosQuery({fetchPolicy: 'cache-only'});
+
+	const [editOpenId, setEditOpenId] = useState<number | null>(null);
+	const [deleteOpenId, setDeleteOpenId] = useState<number | null>(null);
 
 	const currentPortfolio = (userPortfolio?.getUserPortfolios.items || []).find((portfolio) => portfolio.id === portfolioId);
 
@@ -42,6 +46,45 @@ const PortfolioView: React.FC<PortfolioViewProps> = ({portfolioId, onBack}) => {
 		}
 	};
 
+	const renderEditDrawer = (id: number | null) => {
+		if (typeof id !== 'number') return null;
+
+		const currentStock = data?.getPortfolioStocks.find(s => s.id === id);
+
+		if (!currentStock) return null;
+
+		return (
+			<EditPortfolioStockDrawer
+				portfolioStockId={id}
+				open
+				onOpenChange={(open) => {
+					if (!open) setEditOpenId(null);
+				}}
+				currentQuantity={currentStock.quantity}
+				currentAveragePrice={currentStock.averagePrice}
+			/>
+		);
+	};
+
+	const renderDeleteDialog = (id: number | null) => {
+		if (typeof id !== 'number') return null;
+
+		const currentStock = data?.getPortfolioStocks.find(s => s.id === id);
+
+		if (!currentStock) return null;
+
+		return (
+			<DeletePortfolioStockDialog
+				stockName={currentStock.stock?.name ?? '{UNKNOWN_NAME}'}
+				open
+				onOpenChange={(open) => {
+					if (!open) setDeleteOpenId(null);
+				}}
+				portfolioStockId={id}
+			/>
+		);
+	};
+
 	return (
 		<Flex direction="column" h="100%" gap={4} w="100%">
 			{/* Шапка */}
@@ -50,7 +93,8 @@ const PortfolioView: React.FC<PortfolioViewProps> = ({portfolioId, onBack}) => {
 					{onBack && <BackButton onClick={onBack}/>}
 
 					{currentPortfolio && (
-						<Heading size="md">
+						<Heading size="md" display="flex" alignItems="center" gap={2}>
+							<Icon as={FaChartPie} color="blue.500"/>
 							{currentPortfolio.name || 'Портфель'}
 						</Heading>
 					)}
@@ -60,12 +104,6 @@ const PortfolioView: React.FC<PortfolioViewProps> = ({portfolioId, onBack}) => {
 				portfolioId={portfolioId}
 				refetch={() => refetch()}
 			/>
-
-			{/*<Flex gap={2} wrap="wrap" justify={{base: 'flex-end', md: 'flex-start'}}>*/}
-			{/*	<AddStockToPortfolioButton portfolioId={portfolioId} onStockAdded={() => refetch()}/>*/}
-			{/*	<CreatePortfolioReportButton portfolioId={portfolioId}/>*/}
-			{/*	<ShowPortfolioReportButton portfolioId={portfolioId}/>*/}
-			{/*</Flex>*/}
 
 			{/* Ошибка */}
 			{error && (
@@ -116,18 +154,37 @@ const PortfolioView: React.FC<PortfolioViewProps> = ({portfolioId, onBack}) => {
 													{/*	{getCurrencyByExchange(pStock.stock.exchange)}*/}
 													{/*	{typeof pStock.averagePrice === 'number' ? pStock.averagePrice.toFixed(2) : '-'}*/}
 													{/*</Table.Cell>*/}
-													<Table.Cell>
-														<Flex justify="center" gap={2}>
-															<EditPortfolioStockButton
-																currentAveragePrice={pStock.averagePrice}
-																portfolioStockId={pStock.id}
-																currentQuantity={pStock.quantity}
-															/>
-															<DeletePortfolioStockButton
-																portfolioStockId={pStock.id}
-																stockName={pStock.stock.name}
-															/>
-														</Flex>
+													<Table.Cell textAlign="center">
+														<Menu.Root>
+															<Menu.Trigger
+																onClick={(e) => e.stopPropagation()}
+																asChild
+															>
+																<Button variant="ghost" colorPalette="gray" size="xs">
+																	<Icon as={FaEllipsisV} fontSize="xs"/>
+																</Button>
+															</Menu.Trigger>
+															<Portal>
+																<Menu.Positioner>
+																	<Menu.Content>
+																		<Menu.Item
+																			value="edit"
+																			onClick={() => setEditOpenId(pStock.id)}
+																		>
+																			Редактировать
+																		</Menu.Item>
+																		<Menu.Item
+																			value="delete"
+																			color="fg.error"
+																			_hover={{bg: 'bg.error', color: 'fg.error'}}
+																			onClick={() => setDeleteOpenId(pStock.id)}
+																		>
+																			Удалить...
+																		</Menu.Item>
+																	</Menu.Content>
+																</Menu.Positioner>
+															</Portal>
+														</Menu.Root>
 													</Table.Cell>
 												</Table.Row>
 											))
@@ -139,6 +196,8 @@ const PortfolioView: React.FC<PortfolioViewProps> = ({portfolioId, onBack}) => {
 					</Box>
 				</Box>
 			}
+			{renderEditDrawer(editOpenId)}
+			{renderDeleteDialog(deleteOpenId)}
 		</Flex>
 	);
 };

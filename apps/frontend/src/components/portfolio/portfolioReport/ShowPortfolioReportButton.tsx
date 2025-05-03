@@ -32,10 +32,10 @@ const ShowPortfolioReportButton: React.FC<CreatePortfolioReportButtonProps> = ({
 					>
 						<FiBarChart2/>
 					</IconButton>
-					<Text fontSize="xs">Отчеты</Text>
+					<Text textAlign="center" fontSize="xs">Список <br/> отчетов</Text>
 				</VStack>
 			) : (
-				<Button colorPalette="teal" onClick={() => setOpen(true)} size="sm">
+				<Button colorPalette="teal" onClick={() => setOpen(true)} size="xs">
 					<FaFileAlt/> Показать отчеты
 				</Button>
 			)}

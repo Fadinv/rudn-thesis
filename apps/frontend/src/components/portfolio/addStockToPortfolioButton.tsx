@@ -59,7 +59,7 @@ const AddStockToPortfolioButton: React.FC<AddStockToPortfolioButtonProps> = ({
 						>
 							<FiPlus/>
 						</IconButton>
-						<Text fontSize="xs">Добавить</Text>
+						<Text textAlign="center" fontSize="xs">Добавить <br/> акцию</Text>
 					</VStack>
 				</Tooltip>
 			) : (
@@ -69,7 +69,13 @@ const AddStockToPortfolioButton: React.FC<AddStockToPortfolioButtonProps> = ({
 					openDelay={0}
 					closeDelay={100}
 				>
-					<Button disabled={addButtonIsDisabled} size="sm" variant="solid" onClick={() => setOpen(true)}>
+					<Button
+						disabled={addButtonIsDisabled}
+						size="xs"
+						variant="solid"
+						onClick={() => setOpen(true)}
+						colorPalette="blue"
+					>
 						<Icon as={FaPlus}/> Добавить акцию
 					</Button>
 				</Tooltip>
