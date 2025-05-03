@@ -1,5 +1,6 @@
+'use client';
 import React from 'react';
-import {IconButton} from '@chakra-ui/react';
+import {Button} from '@chakra-ui/react';
 import {Tooltip} from '@frontend/components/ui/tooltip';
 import {usePathname, useRouter} from 'next/navigation';
 import {FaHome} from 'react-icons/fa';
@@ -16,9 +17,10 @@ const HomeButton = () => {
 			openDelay={300}
 			closeDelay={100}
 		>
-			<IconButton onClick={() => router.push('/')}>
+			<Button colorPalette="black" variant="outline" onClick={() => router.push('/')}>
 				<FaHome/>
-			</IconButton>
+				Portfolio Analyzer
+			</Button>
 		</Tooltip>
 	);
 };

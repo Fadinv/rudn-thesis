@@ -14,7 +14,12 @@ import {
 	DialogCloseTrigger,
 } from '@frontend/components/ui/dialog';
 
-const LoginButton: React.FC = () => {
+interface LoginButtonProps {
+	doNotRedirect?: boolean;
+	size?: "2xs" | "xs" | "sm" | "md" | "lg" | "xl" | "2xl";
+}
+
+const LoginButton: React.FC<LoginButtonProps> = ({doNotRedirect, size}) => {
 	const [open, setOpen] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const router = useRouter();
@@ -24,13 +29,13 @@ const LoginButton: React.FC = () => {
 		<DialogRoot role="dialog" placement={'center'} open={open} onOpenChange={(e) => {
 			if (data?.currentUser) {
 				setLoading(true);
-				router.push('/home');
+				if (!doNotRedirect) router.push('/home');
 			} else {
 				setOpen(e.open);
 			}
 		}}>
 			<DialogTrigger asChild>
-				<Button colorScheme="blue" colorPalette={'blue'} variant="solid" size="md">
+				<Button colorScheme="blue" colorPalette={'blue'} variant="solid" size={size ?? 'md'}>
 					Войти
 				</Button>
 			</DialogTrigger>

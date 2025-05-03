@@ -1,3 +1,4 @@
+import Header from '@frontend/components/header/header';
 import React from 'react';
 import {
 	Box,
@@ -18,6 +19,13 @@ import LoginButton from '@frontend/components/loginButton/loginButton';
 export default function HomePage() {
 	return (
 		<>
+			<Flex
+				p={4}
+				justify="flex-end"
+				height={'96px'}
+			>
+				<Header/>
+			</Flex>
 			{/* Hero */}
 			<Box py={{base: 24, md: 48}}>
 				<Container maxW="container.lg">
