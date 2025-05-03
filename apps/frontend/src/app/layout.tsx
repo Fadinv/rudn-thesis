@@ -2,14 +2,14 @@ import ClientProviders from '@frontend/app/clientProviders';
 import {Analytics} from '@vercel/analytics/next';
 import React from 'react';
 
-export const metadata = {
-	icons: {
-		icon: '/favicon-v2.ico',
-		shortcut: '/favicon.ico',
-		apple: '/icons/icon-192.png',
-	},
-	manifest: '/manifest.json',
-};
+// export const metadata = {
+// 	icons: {
+// 		icon: '/favicon-v2.ico',
+// 		shortcut: '/favicon.ico',
+// 		apple: '/icons/icon-192.png',
+// 	},
+// 	manifest: '/manifest.json',
+// };
 
 export default function RootLayout({children}: { children: React.ReactNode }) {
 	return (
