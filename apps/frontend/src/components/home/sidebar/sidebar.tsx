@@ -1,10 +1,9 @@
 import CreateDefaultPortfolioButton from '@frontend/components/portfolio/createDefaultPortfolioButton';
+import EditPortfolioDrawer from '@frontend/components/portfolio/drawers/editPortfolioDrawer';
 import {useColorModeValue} from '@frontend/components/ui/color-mode';
 import {Portfolio} from '@frontend/generated/graphql-types';
 import {useMemorySyncedQuery} from '@frontend/lib/useMemorySyncedQuery';
-import React from 'react';
-import DeletePortfolioButton from '@frontend/components/portfolio/deletePortfolioButton';
-import EditPortfolioButton from '@frontend/components/portfolio/editPortfolioButton';
+import React, {useState} from 'react';
 import {
 	GetUserPortfoliosQuery,
 	GetUserPortfoliosQueryVariables,
@@ -14,9 +13,12 @@ import {
 	Box,
 	Stack,
 	Text,
-	Flex,
+	Flex, Icon,
+	Menu, Button, Portal,
 } from '@chakra-ui/react';
 import CreatePortfolioButton from '@frontend/components/portfolio/createPortfolioButton';
+import {FaChartPie, FaEllipsisV} from 'react-icons/fa';
+import DeletePortfolioDialog from '@frontend/components/portfolio/dialogs/deletePortfolioDialog';
 
 interface SidebarProps {
 	onSelectPortfolio: (id: number | null) => void;
@@ -29,10 +31,9 @@ const Sidebar: React.FC<SidebarProps> = ({
                                          }) => {
 	// Цвета для темной и светлой темы
 	const bgColor = useColorModeValue('white', 'gray.900');
-	const hoverBgColor = useColorModeValue('gray.100', 'gray.700');
-	const activeBgColor = useColorModeValue('blue.100', 'blue.900');
-	const activeBorderColor = useColorModeValue('blue.500', 'blue.300');
-	const textColor = useColorModeValue('gray.800', 'gray.200');
+	const [editOpenId, setEditOpenId] = useState<number | null>(null);
+	const [deleteOpenId, setDeleteOpenId] = useState<number | null>(null);
+
 	const {
 		items: portfolios,
 		loading,
@@ -63,39 +64,81 @@ const Sidebar: React.FC<SidebarProps> = ({
 						return (
 							<Flex
 								key={portfolio.id}
-								p={3}
-								shadow="md"
-								borderRadius="lg"
-								cursor="pointer"
-								justify="space-between"
 								align="center"
-								bg={isSelected ? activeBgColor : bgColor}
-								border="2px solid"
-								borderColor={isSelected ? activeBorderColor : 'transparent'}
-								transition="all 0.2s ease-in-out"
-								_hover={isSelected ? {} : {bg: hoverBgColor}}
+								justify="space-between"
+								p={3}
+								cursor="pointer"
+								bg={isSelected ? 'blue.50' : 'gray.50'}
+								border="1px solid"
+								borderColor={isSelected ? 'blue.400' : 'gray.200'}
+								borderRadius="lg"
+								shadow="base"
+								transition="background-color 0.3s ease-out"
+								_hover={{bg: isSelected ? 'blue.100' : 'gray.100'}}
 								onClick={() => onSelectPortfolio(portfolio.id)}
 							>
-								<Text fontWeight="medium" color={textColor}>
-									{portfolio.name}
-								</Text>
-								<Flex gap={1}>
-									<EditPortfolioButton
-										portfolioId={portfolio.id}
-										currentName={portfolio.name}
-									/>
-									<DeletePortfolioButton
-										portfolioId={portfolio.id}
-										portfolioName={portfolio.name}
-										onDelete={() => onSelectPortfolio(null)}
-									/>
+								<Flex align="center" gap={2}>
+									<Icon as={FaChartPie} color="blue.500"/>
+									<Text fontWeight="semibold">{portfolio.name}</Text>
 								</Flex>
+								<Menu.Root>
+									<Menu.Trigger
+										onClick={(e) => e.stopPropagation()}
+										asChild
+									>
+										<Button variant="ghost" colorPalette="gray" size="xs">
+											<Icon as={FaEllipsisV} fontSize="xs"/>
+										</Button>
+									</Menu.Trigger>
+									<Portal>
+										<Menu.Positioner>
+											<Menu.Content
+												onClick={(e) => {
+													e.preventDefault();
+													e.stopPropagation();
+												}}
+											>
+												<Menu.Item
+													value="rename"
+													onClick={() => setEditOpenId(portfolio.id)}
+												>
+													Переименовать
+												</Menu.Item>
+												<Menu.Item
+													value="delete"
+													color="fg.error"
+													_hover={{bg: 'bg.error', color: 'fg.error'}}
+													onClick={() => setDeleteOpenId(portfolio.id)}
+												>
+													Удалить...
+												</Menu.Item>
+											</Menu.Content>
+										</Menu.Positioner>
+									</Portal>
+								</Menu.Root>
 							</Flex>
 						);
 					})}
 				</Stack>
 			</Box>
-
+			{typeof editOpenId === 'number' && (
+				<EditPortfolioDrawer
+					open
+					portfolioId={editOpenId}
+					onOpenChange={(open) => {
+						if (!open) setEditOpenId(null);
+					}}
+				/>
+			)}
+			{typeof deleteOpenId === 'number' && (
+				<DeletePortfolioDialog
+					open
+					portfolioId={deleteOpenId}
+					onOpenChange={(open) => {
+						if (!open) setDeleteOpenId(null);
+					}}
+				/>
+			)}
 		</Box>
 	);
 };

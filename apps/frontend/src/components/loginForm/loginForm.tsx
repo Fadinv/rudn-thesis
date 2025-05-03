@@ -51,7 +51,7 @@ const LoginForm = () => {
 						/>
 					</Field>
 					{error && <Text color="red.500">Не удалось выполнить вход</Text>}
-					<Button colorScheme="blue" width="full" type="submit" loading={loading || waitingForRedirect}>
+					<Button colorPalette="blue" width="full" type="submit" loading={loading || waitingForRedirect}>
 						Далее
 					</Button>
 				</Fieldset.Root>

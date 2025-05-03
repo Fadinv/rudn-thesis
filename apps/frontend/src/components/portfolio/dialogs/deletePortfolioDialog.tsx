@@ -1,11 +1,14 @@
+import {
+	GetUserPortfoliosDocument,
+	useDeletePortfolioMutation,
+	useGetUserPortfoliosQuery,
+} from '@frontend/generated/graphql-hooks';
 import {Portfolio} from '@frontend/generated/graphql-types';
-import React, {useState} from 'react';
-import {Button, Icon, IconButton, Text} from '@chakra-ui/react';
-import {FaTrash} from 'react-icons/fa';
-import {GetUserPortfoliosDocument, useDeletePortfolioMutation} from '@frontend/generated/graphql-hooks';
+import React from 'react';
+import {Button, Text} from '@chakra-ui/react';
 import {
 	DialogRoot,
-	DialogTrigger,
+	DialogBackdrop,
 	DialogContent,
 	DialogHeader,
 	DialogTitle,
@@ -14,21 +17,20 @@ import {
 	DialogCloseTrigger,
 } from '@frontend/components/ui/dialog';
 
-interface DeletePortfolioButtonProps {
+interface EditPortfolioButtonProps {
 	portfolioId: number;
-	portfolioName: string;
+	open: boolean;
+	onOpenChange: (open: boolean) => void;
 	onDelete?: (deleted: boolean) => void;
-	triggerChild?: React.ReactNode;
 }
 
-const DeletePortfolioButton: React.FC<DeletePortfolioButtonProps> = ({
-	                                                                     portfolioId,
-	                                                                     portfolioName,
-	                                                                     onDelete,
-	                                                                     triggerChild,
-                                                                     }) => {
-	const [open, setOpen] = useState(false);
+const DeletePortfolioDialog: React.FC<EditPortfolioButtonProps> = ({portfolioId, open, onOpenChange, onDelete}) => {
 	const [deletePortfolio, {loading}] = useDeletePortfolioMutation();
+	const {
+		data: portfolios,
+		loading: portfoliosAreLoading,
+		called: portfoliosHasCalled,
+	} = useGetUserPortfoliosQuery({fetchPolicy: 'cache-only'});
 
 	const handleDelete = async () => {
 		const targetId = portfolioId;
@@ -52,22 +54,25 @@ const DeletePortfolioButton: React.FC<DeletePortfolioButtonProps> = ({
 					});
 				},
 			});
-			setOpen(false);
+			onOpenChange(false);
 			onDelete?.(true);
 		} catch (err) {
 			console.error('Ошибка удаления портфеля:', err);
 		}
 	};
 
+	const currentPortfolio = portfolios?.getUserPortfolios?.items.find((p) => p.id === portfolioId);
+
+	if (
+		portfoliosAreLoading ||
+		!portfoliosHasCalled ||
+		!currentPortfolio
+	) {
+		return null;
+	}
+
 	return (
-		<DialogRoot role="alertdialog" open={open} onOpenChange={(e) => setOpen(e.open)}>
-			<DialogTrigger asChild>
-				{triggerChild ? triggerChild : (
-					<IconButton size="xs" colorScheme="red" colorPalette="red" variant="solid">
-						<Icon as={FaTrash}/>
-					</IconButton>
-				)}
-			</DialogTrigger>
+		<DialogRoot role="alertdialog" open={open} onOpenChange={(e) => onOpenChange(e.open)}>
 			<DialogContent
 				onClick={(e) => {
 					e.preventDefault();
@@ -78,7 +83,7 @@ const DeletePortfolioButton: React.FC<DeletePortfolioButtonProps> = ({
 					<DialogTitle>Удаление портфеля</DialogTitle>
 				</DialogHeader>
 				<DialogDescription>
-					<Text pl={8} pr={8}>Вы уверены, что хотите удалить портфель <b>{portfolioName}</b>?</Text>
+					<Text pl={8} pr={8}>Вы уверены, что хотите удалить портфель <b>{currentPortfolio.name}</b>?</Text>
 				</DialogDescription>
 				<DialogFooter>
 					<Button colorScheme="red" colorPalette="red" onClick={handleDelete} loading={loading}>
@@ -91,4 +96,4 @@ const DeletePortfolioButton: React.FC<DeletePortfolioButtonProps> = ({
 	);
 };
 
-export default DeletePortfolioButton;
+export default DeletePortfolioDialog;

@@ -169,10 +169,13 @@ const CreatePortfolioButton: React.FC<CreatePortfolioModalProps> = (props) => {
 			>
 				<DrawerTrigger asChild>
 					<Button
-						w="100%" variant="solid" size="lg"
+						w="100%"
+						variant="solid"
+						size="lg"
+						colorPalette="blue"
 						disabled={createButtonIsDisabled}
 					>
-							<Icon as={FaPlus} mr={2}/> Создать портфель
+						<Icon as={FaPlus} mr={2}/> Создать портфель
 					</Button>
 				</DrawerTrigger>
 			</Tooltip>
