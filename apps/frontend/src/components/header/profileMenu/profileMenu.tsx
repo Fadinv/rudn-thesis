@@ -8,7 +8,7 @@ import {
 } from '@chakra-ui/react';
 import {CurrentUserDocument, useLogoutMutation} from '@frontend/generated/graphql-hooks';
 import React, {MouseEventHandler, useEffect} from 'react';
-import {FaUserCircle, FaQuestionCircle, FaComment, FaDonate, FaSignOutAlt} from 'react-icons/fa';
+import {FaUserCircle, FaQuestionCircle, FaSignOutAlt} from 'react-icons/fa';
 import {useRouter} from 'next/navigation';
 
 export const ProfileMenu = () => {

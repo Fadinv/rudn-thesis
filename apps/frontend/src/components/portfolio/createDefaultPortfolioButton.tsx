@@ -56,14 +56,14 @@ const CreateDefaultPortfolioButton: React.FC<CreateDefaultPortfolioButtonProps> 
 	return (
 		<Button
 			w="100%"
-			variant="solid"
+			variant="outline"
 			size="lg"
 			colorPalette="blue"
 			onClick={handleClick}
 			loading={loading}
 		>
 			<Icon as={FaPlus}/>
-			Создать мой первый портфель
+			Создать пример портфеля
 		</Button>
 	);
 };

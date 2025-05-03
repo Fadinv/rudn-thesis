@@ -59,7 +59,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 			</Box>
 
 			{/* Список портфелей */}
-			<Box maxH="calc(100vh - 200px)" overflowY="auto" pr={2}>
+			<Box maxH="calc(100vh - 200px)" overflowY="auto">
 				<Stack align="stretch" gap={2}>
 					{!portfolios?.length && !loading && called && (
 						<CreateDefaultPortfolioButton

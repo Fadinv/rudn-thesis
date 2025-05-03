@@ -48,6 +48,10 @@ export const AddStockToPortfolioDrawer: React.FC<AddStockToPortfolioDrawerProps>
 		void getStockById({variables: {id: selectedStockId}});
 	}, [selectedStockId, getStockById]);
 
+	useEffect(() => {
+		setSelectedStockId(null);
+	}, [open]);
+
 	const handleSave = async () => {
 		if (!selectedStockId) return;
 
@@ -76,7 +80,7 @@ export const AddStockToPortfolioDrawer: React.FC<AddStockToPortfolioDrawerProps>
 				<DrawerBody>
 					<Field invalid={!!error} label="Укажите тикер">
 						<StockSearch
-							stockData={stockData}
+							stockData={stockData?.getStockById?.id === selectedStockId ? stockData : undefined}
 							onSelectStock={(v) => setSelectedStockId(v)}
 							includedStocks={includedStocks}
 						/>
