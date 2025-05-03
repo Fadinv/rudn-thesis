@@ -20,7 +20,7 @@ const Layout: FC<LayoutProps> = ({children, doNotRedirect}) => {
 	}, [doNotRedirect, data, loading, called, router]);
 
 	const isDark = colorMode === 'dark';
-	const colorPalette = isDark ? 'teal' : undefined;
+	const colorPalette = isDark ? 'blue' : undefined;
 
 	if (loading) {
 		return (

@@ -20,7 +20,7 @@ const Header: FC<HeaderProps> = ({doNotRedirect}) => {
 	const hasUser = !!data?.currentUser;
 
 	return (
-		<Flex justify="space-between" align="center" mb={6} px={4}>
+		<Flex width="100%" justify="space-between" align="center" mb={6} px={4}>
 			<Flex gap={4}>
 				<HomeButton/>
 			</Flex>

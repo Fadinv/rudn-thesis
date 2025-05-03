@@ -1,6 +1,6 @@
 'use client';
 import MainLayout from '@frontend/components/mainLayout/mainLayout';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Box, Flex, useBreakpointValue} from '@chakra-ui/react';
 import Sidebar from 'apps/frontend/src/components/home/sidebar/sidebar';
 import PortfolioView from '@frontend/components/portfolio/portfolioView';
@@ -8,6 +8,10 @@ import PortfolioView from '@frontend/components/portfolio/portfolioView';
 const Page: React.FC = () => {
 	const [selectedPortfolioId, setSelectedPortfolioId] = useState<number | null>(null);
 	const isMobile = useBreakpointValue({base: true, lg: false});
+
+	useEffect(() => {
+		document.title = 'Мой портфель — Portfolio Analyzer';
+	}, []);
 
 	return (
 		<MainLayout>

@@ -6,7 +6,7 @@ export const ServerErrorFallback = () => {
 	const {colorMode} = useColorMode();
 	const isDark = colorMode === 'dark';
 
-	const colorPalette = isDark ? 'teal' : undefined;
+	const colorPalette = isDark ? 'blue' : undefined;
 
 	return (
 		<Box

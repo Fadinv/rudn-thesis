@@ -1,42 +1,62 @@
-'use client';
-
-import MainLayout from '@frontend/components/mainLayout/mainLayout';
+import BackButton from '@frontend/app/faq/backButton';
+import Header from '@frontend/components/header/header';
 import React from 'react';
 import {
 	Box,
 	Heading,
 	Text,
 	VStack,
-	Button,
 	Link,
-	Icon,
 	Flex,
 } from '@chakra-ui/react';
 import {Timeline} from '@chakra-ui/react';
-import {LuCheck, LuArrowLeft} from 'react-icons/lu';
-import {useRouter} from 'next/navigation';
+import {LuCheck} from 'react-icons/lu';
+
+export const metadata = {
+	title: 'FAQ — Portfolio Analyzer',
+	description: 'Ответы на часто задаваемые вопросы по использованию Portfolio Analyzer.',
+	openGraph: {
+		title: 'FAQ — Portfolio Analyzer',
+		description: 'Ответы на часто задаваемые вопросы по использованию Portfolio Analyzer.',
+		url: 'https://portfolioanalyzer.ru/faq',
+		siteName: 'Portfolio Analyzer',
+		images: [
+			{
+				url: 'https://portfolioanalyzer.ru/og-cover.png',
+				width: 1200,
+				height: 630,
+				alt: 'Portfolio Analyzer FAQ',
+			},
+		],
+		locale: 'ru_RU',
+		type: 'website',
+	},
+	twitter: {
+		card: 'summary_large_image',
+		title: 'FAQ — Portfolio Analyzer',
+		description: 'Ответы на часто задаваемые вопросы по использованию Portfolio Analyzer',
+		images: ['https://portfolioanalyzer.ru/og-cover.png'],
+	},
+	robots: {
+		index: true,
+		follow: true,
+	},
+};
 
 const FaqPage = () => {
-	const router = useRouter();
-
 	return (
-		<MainLayout doNotRedirect>
+		<>
+			<Flex
+				p={4}
+				width="100%"
+				// justify="space-between"
+				height={'96px'}
+			>
+				<Header/>
+			</Flex>
 			<Box maxW="4xl" mx="auto" p={6}>
 				<Flex align="center" gap={3} mb={6}>
-					<Button
-						variant="ghost"
-						size="sm"
-						onClick={() => {
-							if (window.history.length > 1) {
-								router.back();
-							} else {
-								router.push('/');
-							}
-						}}
-					>
-						<Icon as={LuArrowLeft}/>
-						Назад
-					</Button>
+					<BackButton/>
 				</Flex>
 
 				<VStack align="stretch" gap={6}>
@@ -161,7 +181,7 @@ const FaqPage = () => {
 					</Box>
 				</VStack>
 			</Box>
-		</MainLayout>
+		</>
 	);
 };
 

@@ -1,4 +1,5 @@
 import Header from '@frontend/components/header/header';
+import Head from 'next/head';
 import React from 'react';
 import {
 	Box,
@@ -15,6 +16,37 @@ import {
 } from '@chakra-ui/react';
 import {FaTelegramPlane} from 'react-icons/fa';
 import LoginButton from '@frontend/components/loginButton/loginButton';
+
+export const metadata = {
+	title: 'Анализ инвестиционного портфеля — Portfolio Analyzer',
+	description: 'Онлайн-инструмент для анализа инвестиционных портфелей. Расчет структуры, прогноз стоимости, поддержка MOEX и NASDAQ.',
+	openGraph: {
+		title: 'Portfolio Analyzer',
+		description: 'Анализируй свои инвестиции с умом',
+		url: 'https://portfolioanalyzer.ru',
+		siteName: 'Portfolio Analyzer',
+		images: [
+			{
+				url: 'https://portfolioanalyzer.ru/og-cover.png',
+				width: 1200,
+				height: 630,
+				alt: 'Portfolio Analyzer',
+			},
+		],
+		locale: 'ru_RU',
+		type: 'website',
+	},
+	twitter: {
+		card: 'summary_large_image',
+		title: 'Portfolio Analyzer',
+		description: 'Анализируй свои инвестиции с умом',
+		images: ['https://portfolioanalyzer.ru/og-cover.png'],
+	},
+	robots: {
+		index: true,
+		follow: true,
+	},
+};
 
 export default function HomePage() {
 	return (
