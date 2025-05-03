@@ -21,8 +21,8 @@ const LoginForm = () => {
 			if (data?.login) {
 				setWaitingForRedirect(true);
 				console.log('redirect to home');
-				router.push('/home');
 				await refetchCurrentUser();
+				router.push('/home');
 			}
 		} catch (err) {
 			console.error('Login error:', err);
