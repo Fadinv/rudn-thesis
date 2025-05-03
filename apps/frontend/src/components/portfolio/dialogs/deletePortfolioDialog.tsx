@@ -8,7 +8,6 @@ import React from 'react';
 import {Button, Text} from '@chakra-ui/react';
 import {
 	DialogRoot,
-	DialogBackdrop,
 	DialogContent,
 	DialogHeader,
 	DialogTitle,
