@@ -1,7 +1,7 @@
 import {Injectable} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {Stock} from '@service/orm';
-import {ILike, In, Not, Repository} from 'typeorm';
+import {Brackets, Repository} from 'typeorm';
 
 @Injectable()
 export class StocksService {
@@ -44,8 +44,23 @@ export class StocksService {
 
 	// Поиск акций по тикеру или названию (регистр не учитывается)
 	async searchStocks(search: string, includedStocks?: string[]): Promise<Stock[]> {
+		const polygonTypes = ['CS', 'ETF', 'ADR', 'GDR', 'PFD'];
+		const moexTypes = ['1', '2', '3', '5', '9'];
+
 		const query = this.stockRepository.createQueryBuilder('stock')
-			.where('(stock.ticker ILIKE :search OR stock.name ILIKE :search)', {search: `%${search}%`});
+			.where('(stock.ticker ILIKE :search OR stock.name ILIKE :search)', {search: `%${search}%`})
+			.andWhere('stock.active = true')
+			.andWhere('stock.isIndex = false')
+			.andWhere(new Brackets(qb => {
+				qb.where('(stock.market = :stocksMarket AND stock.type IN (:...polygonTypes))', {
+					stocksMarket: 'stocks',
+					polygonTypes,
+				})
+					.orWhere('(stock.market = :moexMarket AND stock.type IN (:...moexTypes))', {
+						moexMarket: 'MOEX',
+						moexTypes,
+					});
+			}));
 
 		if (includedStocks?.length) {
 			query.andWhere('stock.ticker NOT IN (:...includedStocks)', {includedStocks});
