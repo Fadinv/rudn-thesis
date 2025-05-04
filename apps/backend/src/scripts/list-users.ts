@@ -13,7 +13,7 @@ async function main() {
 
 	const users = await usersService.findAll(); // метод должен вернуть список всех пользователей
 	for (const user of users) {
-		console.log(`📨 Пользователь: ${user.email}. Telegram: ${!!user.telegramId ? '+' : '-'}`);
+		console.log(`📨 Пользователь: (ID: ${user.id}) ${user.email}. Telegram: ${!!user.telegramId ? '+' : '-'}`);
 		const portfolios = await portfolioService.getUserPortfolios(user);
 
 		if (!portfolios?.items?.length) {
