@@ -63,7 +63,7 @@ export default function HomePage() {
 					<SimpleGrid columns={{base: 1, md: 2}} gap={12} alignItems="center">
 						<VStack gap={6} textAlign={{base: 'center', md: 'left'}}>
 							<Heading fontSize="4xl">Portfolio Analyzer</Heading>
-							<Text fontSize="xl" fontWeight="600" maxW="600px" color="gray.700">
+							<Text textAlign="center" fontSize="xl" fontWeight="600" maxW="600px" color="gray.500">
 								Умный анализ инвестиционного портфеля по Марковицу и GBM-прогноз.
 							</Text>
 							<LoginButton/>
