@@ -21,7 +21,7 @@ export const ProfileMenu = () => {
 		router.prefetch('/faq');
 		// router.prefetch('/feedback');
 		// router.prefetch('/support');
-	}, []);
+	}, [router]);
 
 	const handleLogout: MouseEventHandler<HTMLDivElement> = async (e) => {
 		e.preventDefault();
