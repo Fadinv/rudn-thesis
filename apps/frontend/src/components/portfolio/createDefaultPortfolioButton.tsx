@@ -1,6 +1,10 @@
 import {Button, Icon} from '@chakra-ui/react';
 import {FaPlus} from 'react-icons/fa';
-import {GetUserPortfoliosDocument, useCreatePortfolioMutation} from '@frontend/generated/graphql-hooks';
+import {
+	GetUserPortfoliosDocument,
+	useCreatePortfolioMutation,
+	useGetUserPortfoliosQuery,
+} from '@frontend/generated/graphql-hooks';
 import {toaster} from '@frontend/components/ui/toaster';
 import React from 'react';
 
@@ -10,6 +14,10 @@ interface CreateDefaultPortfolioButtonProps {
 
 const CreateDefaultPortfolioButton: React.FC<CreateDefaultPortfolioButtonProps> = ({onCreated}) => {
 	const [createPortfolio, {loading}] = useCreatePortfolioMutation();
+	const {
+		loading: portfoliosAreLoading,
+		called: portfoliosHasCalled,
+	} = useGetUserPortfoliosQuery({fetchPolicy: 'cache-only'});
 
 	const handleClick = async () => {
 		const portfolio = await createPortfolio({
@@ -29,8 +37,8 @@ const CreateDefaultPortfolioButton: React.FC<CreateDefaultPortfolioButtonProps> 
 
 				cache.updateQuery({query: GetUserPortfoliosDocument}, (data) => ({
 					getUserPortfolios: {
-						...data.getUserPortfolios,
-						items: [...data.getUserPortfolios.items, newItem],
+						...data?.getUserPortfolios,
+						items: !data?.getUserPortfolios.items.length ? [newItem] : [...data.getUserPortfolios.items, newItem],
 						maxVersion: newItem.version,
 					},
 				}));
@@ -61,6 +69,7 @@ const CreateDefaultPortfolioButton: React.FC<CreateDefaultPortfolioButtonProps> 
 			colorPalette="blue"
 			onClick={handleClick}
 			loading={loading}
+			disabled={portfoliosAreLoading || !portfoliosHasCalled}
 		>
 			<Icon as={FaPlus}/>
 			Создать пример портфеля

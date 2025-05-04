@@ -148,6 +148,9 @@ const Sidebar: React.FC<SidebarProps> = ({
 					onOpenChange={(open) => {
 						if (!open) setDeleteOpenId(null);
 					}}
+					onDelete={(deleted) => {
+						if (deleted && selectedPortfolioId === deleteOpenId) onSelectPortfolio(null);
+					}}
 				/>
 			)}
 		</Box>

@@ -180,7 +180,7 @@ export class MemoryCacheStore<T extends { id: number; version: number; deleted: 
 
 		return {
 			items,
-			maxVersion: items[items.length - 1].version ?? store.maxVersion,
+			maxVersion: items[items.length - 1]?.version ?? store.maxVersion ?? 0,
 			hasMoreData,
 		};
 	}
