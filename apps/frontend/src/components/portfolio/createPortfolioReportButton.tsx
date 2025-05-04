@@ -17,13 +17,13 @@ const CreatePortfolioReportButton: React.FC<CreatePortfolioReportButtonProps> = 
 	const {data} = useGetPortfolioStocksQuery({variables: {portfolioId}, fetchPolicy: 'cache-only'});
 
 	const stocksLength = data?.getPortfolioStocks.length ?? 0;
-	const createButtonIsDisabled = stocksLength <= 2;
+	const createButtonIsDisabled = stocksLength <= 1;
 	const isMobile = useBreakpointValue({base: true, lg: false});
 
 	return (
 		<>
 			<Tooltip
-				content={createButtonIsDisabled ? 'Нужно добавить 3 или более тикеров для анализа' : undefined}
+				content={createButtonIsDisabled ? 'Нужно добавить 2 или более тикеров для анализа' : undefined}
 				disabled={!createButtonIsDisabled}
 				openDelay={0}
 				closeDelay={100}
