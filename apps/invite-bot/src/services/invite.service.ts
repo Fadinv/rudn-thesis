@@ -35,7 +35,13 @@ export async function findOrCreateUserAndToken(telegramId: string) {
 	await deleteOldTokens(user.id);
 
 	const token = randomUUID();
-	await redis.set(`login:${token}`, user.id.toString(), 'EX', 600);
+	try {
+		await redis.set(`login:${token}`, user.id.toString(), 'EX', 600);
+	} catch (error) {
+		console.error('[REDIS SET ERROR]', error);
+
+		throw new Error('Не удалось сохранить токен авторизации. Попробуйте позже.');
+	}
 
 	return {
 		email: user.email,
