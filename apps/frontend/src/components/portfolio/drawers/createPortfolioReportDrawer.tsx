@@ -376,7 +376,15 @@ export const CreatePortfolioReportDrawer: React.FC<CreatePortfolioReportDrawerPr
 									<Text mb={1}>Безрисковая ставка (%):</Text>
 									<Field.Root
 										invalid={typeof riskFreeRate !== 'number' || riskFreeRate < 0 || riskFreeRate > 100}>
-										<NumberInputRoot w={'100%'}>
+										<NumberInputRoot
+											w={'100%'}
+											value={typeof riskFreeRate === 'number' ? String(riskFreeRate) : undefined}
+											onValueChange={(details) => {
+												setRiskFreeRate(Number(details.value));
+											}}
+											min={0}
+											max={100}
+										>
 											<NumberInputField
 												min={0}
 												max={100}
@@ -394,7 +402,15 @@ export const CreatePortfolioReportDrawer: React.FC<CreatePortfolioReportDrawerPr
 								<Box mt={2}>
 									<Text mb={1}>Количество портфелей:</Text>
 									<Field.Root invalid={!numPortfolios || numPortfolios < 3 || numPortfolios > 50}>
-										<NumberInputRoot w={'100%'}>
+										<NumberInputRoot
+											w={'100%'}
+											value={typeof numPortfolios === 'number' ? String(numPortfolios) : undefined}
+											onValueChange={(details) => {
+												setNumPortfolios(Number(details.value));
+											}}
+											min={3}
+											max={50}
+										>
 											<NumberInputField
 												min={3}
 												max={50}

@@ -87,7 +87,13 @@ export const AddStockToPortfolioDrawer: React.FC<AddStockToPortfolioDrawerProps>
 					</Field>
 
 					<Field mt={4} label="Количество" invalid={quantity <= 0}>
-						<NumberInputRoot>
+						<NumberInputRoot
+							value={typeof quantity === 'number' ? String(quantity) : undefined}
+							onValueChange={(details) => {
+								setQuantity(Number(details.value));
+							}}
+							min={0}
+						>
 							<NumberInputField
 								min={1}
 								defaultValue={1}

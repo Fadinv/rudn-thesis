@@ -73,11 +73,19 @@ const EditPortfolioStockButton: React.FC<EditPortfolioStockButtonProps> = ({
 						mt={4}
 						label={'Количество'}
 					>
-						<NumberInputRoot>
+						<NumberInputRoot
+							value={quantity ? String(quantity) : undefined}
+							onValueChange={(details) => {
+								setQuantity(Number(details.value));
+							}}
+							min={0}
+						>
 							<NumberInputField
 								min={1}
-								defaultValue="1"
-								onChange={(e) => setQuantity(Number(e.target.value))}
+								defaultValue={typeof currentQuantity === 'number' ? String(currentQuantity) : '1'}
+								onChange={(e) => {
+									setQuantity(Number(e.target.value));
+								}}
 							/>
 						</NumberInputRoot>
 					</Field>
