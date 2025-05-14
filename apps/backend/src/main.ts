@@ -1,10 +1,11 @@
 import {GqlTokenThrottleGuard} from '@backend/shared/guards/gql-token-throttle.guard';
-import {syncPortfolioVersions} from '@backend/initializations/update-portfolio-version';
+import {syncPortfolioVersions} from '@backend/initializations/portfolio.sync-version';
+import {syncPortfolioReportsVersions} from '@backend/initializations/portfolio-report.sync-version';
 import {NestFactory} from '@nestjs/core';
 import {ValidationPipe} from '@nestjs/common';
 import cookieParser from 'cookie-parser';
 import {AppModule} from '@backend/app/app.module';
-import rateLimit from 'express-rate-limit';
+import {config} from './shared/config';
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
@@ -13,19 +14,7 @@ async function bootstrap() {
 	app.use(cookieParser());
 
 	// Настраиваем CORS
-	app.enableCors({
-		origin: process.env.NODE_ENV === 'production'
-			? [
-				'https://www.portfolioanalyzer.ru',
-				'https://portfolioanalyzer.ru',
-				'https://rudn-thesis.vercel.app',
-			]
-			: [
-				'http://localhost:3000',
-				'http://localhost:4000',
-			],
-		credentials: true,
-	});
+	app.enableCors(config.corsConfig);
 
 	// Настраиваем GraphQL-контекст, чтобы Passport мог работать
 	app.use((req, res, next) => {
@@ -33,17 +22,14 @@ async function bootstrap() {
 		next();
 	});
 
-	app.use(
-		rateLimit({
-			windowMs: 1 * 60 * 1000,
-			limit: 60,
-			message: 'toManyRequests',
-		}),
-	);
+	// app.use(config.rateLimit);
 
-	app.useGlobalGuards(new GqlTokenThrottleGuard());
+	// app.useGlobalGuards(new GqlTokenThrottleGuard());
 
 	await syncPortfolioVersions(app);
+	await syncPortfolioReportsVersions(app);
+
+	app.connectMicroservice(config.connectMicroService.portfolioQueue);
 
 	await app.listen(4000, '0.0.0.0');
 }

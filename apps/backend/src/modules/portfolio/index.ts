@@ -1,1 +1,1 @@
-export * from '@backend/modules/portfolio/portfolio.module';
+export * from './portfolio.module';

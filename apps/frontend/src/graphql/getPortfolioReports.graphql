@@ -1,9 +1,15 @@
-query GetPortfolioReports($portfolioId: Int!) {
-    getPortfolioReports(portfolioId: $portfolioId) {
-        id
-        reportType
-        status
-        errorMessage
-        createdAt
+query GetPortfolioReports($portfolioId: Int!, $fromVersion: Int) {
+    getPortfolioReports(portfolioId: $portfolioId, fromVersion: $fromVersion) {
+        items {
+            id
+            deleted
+            version
+            reportType
+            status
+            errorMessage
+            createdAt
+        }
+        maxVersion
+        hasMoreData
     }
 }

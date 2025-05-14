@@ -25,11 +25,11 @@ async function main() {
 			console.log(`  └─ 📁 ${portfolio.name}`);
 
 			const reports = await reportService.getReportsByPortfolio(portfolio.id);
-			if (!reports.length) {
+			if (!reports?.items.length) {
 				console.log(`     └─ 📉 Отчётов нет`);
 			} else {
 				const byStatus: Record<string, number> = {};
-				for (const report of reports) {
+				for (const report of reports.items) {
 					byStatus[report.status] = (byStatus[report.status] || 0) + 1;
 				}
 

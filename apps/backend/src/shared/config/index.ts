@@ -1,0 +1,1 @@
+export * from 'apps/backend/src/shared/config/config';

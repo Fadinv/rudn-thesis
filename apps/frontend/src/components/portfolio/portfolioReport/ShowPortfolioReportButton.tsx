@@ -1,8 +1,5 @@
 import ShowPortfolioReportDrawer from '@frontend/components/portfolio/drawers/showPortfolioReportDrawer';
-import React, {useEffect, useState} from 'react';
-import {
-	useGetPortfolioReportsQuery,
-} from '@frontend/generated/graphql-hooks';
+import React, {useState} from 'react';
 import {Button, IconButton, Text, useBreakpointValue, VStack} from '@chakra-ui/react';
 import {FaFileAlt} from 'react-icons/fa';
 import {FiBarChart2} from 'react-icons/fi';
@@ -14,11 +11,6 @@ interface CreatePortfolioReportButtonProps {
 const ShowPortfolioReportButton: React.FC<CreatePortfolioReportButtonProps> = ({portfolioId}) => {
 	const [open, setOpen] = useState(false);
 	const isMobile = useBreakpointValue({base: true, lg: false});
-	const {refetch} = useGetPortfolioReportsQuery({variables: {portfolioId}});
-
-	useEffect(() => {
-		if (open) void refetch();
-	}, [open, refetch]);
 
 	return (
 		<>

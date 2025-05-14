@@ -37,13 +37,33 @@ type PortfolioStock {
 }
 
 type PortfolioReport {
+  """Уникальный идентификатор отчета"""
   id: String!
+  version: Int!
+  deleted: Boolean!
+
+  """Связь с портфелем"""
   portfolio: Portfolio!
   reportType: String!
+
+  """JSON с входными данными"""
+  inputParams: JSON
+
+  """JSON с расчетами"""
   data: JSON
+
+  """Статус отчета"""
   status: String!
+
+  """
+  Описание ошибки, если status = "error"
+  """
   errorMessage: String
+
+  """Дата создания"""
   createdAt: DateTime!
+
+  """Дата обновления"""
   updatedAt: DateTime!
 }
 
@@ -86,6 +106,12 @@ type StockPrice {
   volume: Float
 }
 
+type GetUserPortfolioReportsResponse {
+  items: [PortfolioReport!]!
+  maxVersion: Int!
+  hasMoreData: Boolean!
+}
+
 type PortfolioDistribution {
   stocks: [String!]!
   quantities: [Int!]!
@@ -110,7 +136,7 @@ type Query {
   getStockPrices(ticker: String!, from: Float, to: Float): [StockPrice!]!
   getDistributedPortfolioAssets(capital: Float!, stockTickerList: [String!]!, weights: [Float!]!): PortfolioDistribution!
   getPortfolioReport(reportId: String!): PortfolioReport
-  getPortfolioReports(portfolioId: Int!): [PortfolioReport!]!
+  getPortfolioReports(portfolioId: Int!, fromVersion: Int): GetUserPortfolioReportsResponse!
 }
 
 type Mutation {

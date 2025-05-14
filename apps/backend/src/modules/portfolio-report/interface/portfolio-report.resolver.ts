@@ -1,4 +1,7 @@
 import {AuthUser} from '@backend/modules/auth/domain';
+import {
+	GetUserPortfolioReportsResponse
+} from '@backend/modules/portfolio-report/interface/dto/get-portfolio-reports.response';
 import {Resolver, Query, Mutation, Args, Int, Float} from '@nestjs/graphql';
 import {PortfolioReport, User} from '@service/orm';
 import {MarkovitzReportInput} from '@backend/modules/portfolio-report/interface/dto/markovitz-report.input';
@@ -58,12 +61,13 @@ export class PortfolioReportResolver {
 	}
 
 	// Получение всех отчетов по портфелю
-	@Query(() => [PortfolioReport])
+	@Query(() => GetUserPortfolioReportsResponse)
 	async getPortfolioReports(
 		@AuthUser() _user: User,
 		@Args('portfolioId', {type: () => Int}) portfolioId: number,
-	): Promise<PortfolioReport[]> {
-		return this.portfolioReportService.getReportsByPortfolio(portfolioId);
+		@Args('fromVersion', {type: () => Int, nullable: true}) fromVersion?: number,
+	): Promise<GetUserPortfolioReportsResponse> {
+		return this.portfolioReportService.getReportsByPortfolio(portfolioId, fromVersion);
 	}
 
 	// Удаление отчета

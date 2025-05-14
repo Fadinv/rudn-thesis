@@ -20,8 +20,8 @@ async function runUpdate() {
 	isUpdating = true;
 	try {
 		console.log('🔄 Запуск обновления тикеров...');
-		await updateTickers();
-		await updateMoexTickers();
+		// await updateTickers();
+		// await updateMoexTickers();
 		console.log('✅ Обновление завершено!');
 	} catch (error) {
 		console.error('❌ Ошибка при обновлении тикеров:', error);

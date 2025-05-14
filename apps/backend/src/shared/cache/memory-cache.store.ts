@@ -1,23 +1,21 @@
 import {Injectable} from '@nestjs/common';
-import {Portfolio} from '@service/orm';
-import * as console from 'node:console';
 
 // Функция, по которой строится агрегатный ключ (например userId)
 type AggregateFn<T> = (item: T) => number;
 
 // Структура хранилища для одного aggregateKey
 interface StoreEntry<T> {
-	byId: Map<number, T>;
+	byId: Map<number | string, T>;
 	sortedByVersion: T[];         // отсортированный массив
 	freshSortedByVersion: T[];         // отсортированный массив не удаленных
 	versionSortedIndex: Map<number, number>; // id -> индекс в sortedByVersion
 	maxVersion: number;
-	maxItemId: number;
+	maxItemId: number | string;
 }
 
 @Injectable()
-export class MemoryCacheStore<T extends { id: number; version: number; deleted: boolean }> {
-	private _itemsByAggregateKey = new Map<number, StoreEntry<T>>();
+export class MemoryCacheStore<T extends { id: number | string; version: number; deleted: boolean }> {
+	private _itemsByAggregateKey = new Map<number | string, StoreEntry<T>>();
 	private _maxVersion = 0;
 
 	constructor(private readonly _aggregateFn: AggregateFn<T>) {}
@@ -152,7 +150,7 @@ export class MemoryCacheStore<T extends { id: number; version: number; deleted: 
 		return this._maxVersion;
 	}
 
-	getItems(key: number, fromVersion?: number, maxCount: number = 100): {
+	getItems(key: number | string, fromVersion?: number, maxCount: number = 100): {
 		items: T[],
 		maxVersion: number,
 		hasMoreData: boolean
@@ -171,7 +169,8 @@ export class MemoryCacheStore<T extends { id: number; version: number; deleted: 
 			hasMoreData = store.freshSortedByVersion.length > maxCount;
 		} else {
 			let startIdx = store.versionSortedIndex.get(fromVersion);
-			if (!startIdx) startIdx = this.findInsertIndex(store.sortedByVersion, fromVersion);
+			if (!startIdx) startIdx = this.findInsertIndex(store.sortedByVersion, fromVersion) + 1;
+			else startIdx += 1;
 
 			const endIdx = startIdx + maxCount;
 			items = store.sortedByVersion.slice(startIdx, endIdx);
@@ -186,23 +185,23 @@ export class MemoryCacheStore<T extends { id: number; version: number; deleted: 
 	}
 
 	getAllItems() {
-		const response: Partial<Portfolio>[] = [];
+		const response: Partial<T>[] = [];
 
 		this._itemsByAggregateKey.forEach(store => {
 			store.byId.forEach(item => response.push(item));
 		});
 
-		return response as Portfolio[];
+		return response as T[];
 	}
 
 	getAllItems2() {
-		const response: Partial<Portfolio>[][] = [];
+		const response: Partial<T>[][] = [];
 
 		this._itemsByAggregateKey.forEach(store => {
 			response.push(store.freshSortedByVersion);
 		});
 
-		return response as Portfolio[][];
+		return response as T[][];
 	}
 
 	private findInsertIndex(array: T[], version: number): number {

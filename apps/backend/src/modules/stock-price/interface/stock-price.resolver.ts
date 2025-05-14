@@ -9,7 +9,7 @@ export class StockPriceResolver {
 	constructor(private readonly stockPriceService: StockPriceService) {}
 
 	@Query(() => [StockPrice])
-	@UseGuards(GqlAuthGuard)
+	// @UseGuards(GqlAuthGuard)
 	async getStockPrices(
 		@Args('ticker', {type: () => String}) ticker: string,
 		@Args('from', {type: () => Float, nullable: true}) from?: number,

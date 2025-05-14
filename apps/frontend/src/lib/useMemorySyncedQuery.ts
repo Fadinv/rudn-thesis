@@ -1,6 +1,6 @@
 import {QueryResult} from '@apollo/client';
-import type {OperationVariables} from '@apollo/client/core';
-import {useState, useEffect, useLayoutEffect} from 'react';
+import {Exact, InputMaybe, Scalars} from '@frontend/generated/graphql-hooks';
+import {useState, useEffect, useLayoutEffect, useCallback, useRef} from 'react';
 import * as ApolloReactHooks from '@apollo/client';
 
 interface SyncData<TItem> {
@@ -9,41 +9,94 @@ interface SyncData<TItem> {
 	hasMoreData: boolean;
 }
 
+type VersionedVariables = Exact<{
+	fromVersion?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
 export function useMemorySyncedQuery<
 	QueryT,
-	VariablesT extends OperationVariables = OperationVariables,
-	TItem = object,
+	VariablesT extends VersionedVariables = VersionedVariables,
+	TItem extends { id: number | string, deleted: boolean, version: number } = {
+		id: number | string,
+		deleted: boolean,
+		version: number
+	},
 >(
-	useQueryHook: (baseOptions?: ApolloReactHooks.QueryHookOptions<QueryT, VariablesT>) => QueryResult<QueryT, VariablesT>,
+	useQueryHook: (baseOptions: ApolloReactHooks.QueryHookOptions<QueryT, VariablesT> & ({
+		variables: VariablesT;
+		skip?: boolean;
+	} | { skip: boolean; })) => QueryResult<QueryT, VariablesT>,
 	selectSyncData: (data: QueryT) => SyncData<TItem>,
+	pollInterval?: number,
 	variables?: VariablesT,
 	externalMaxVersion?: number,
 ) {
 	const {data, loading, fetchMore, refetch, called} = useQueryHook({
 		variables,
+		skip: false,
 		notifyOnNetworkStatusChange: true,
 	});
 
 	const [allItems, setAllItems] = useState<TItem[]>([]);
 	const [localMaxVersion, setLocalMaxVersion] = useState<number>(0);
+	const initialLoaded = useRef(false);
+
+	const updateItems = (newItems: TItem[]) => {
+		if (!newItems?.length) return;
+		const deletedNewItems = new Set<number | string>();
+		const itemsToAddIds = new Set<number | string>();
+		const newItemsToAdd: TItem[] = [];
+		newItems.forEach((item) => {
+			if (item.deleted) deletedNewItems.add(item.id);
+			else {
+				itemsToAddIds.add(item.id);
+				newItemsToAdd.push(item);
+			}
+		});
+		setAllItems((prevItems) => {
+			const existingItems = prevItems.filter((prevItem) => !itemsToAddIds.has(prevItem.id) && !deletedNewItems.has(prevItem.id));
+			return [...existingItems, ...newItemsToAdd];
+		});
+	};
+
+	const createList = (newItems: TItem[]) => {
+		const deletedNewItems = new Set<number | string>();
+		const itemsToAddIds = new Set<number | string>();
+		const newItemsToAdd: TItem[] = [];
+		newItems.forEach((item) => {
+			if (item.deleted) deletedNewItems.add(item.id);
+			else {
+				itemsToAddIds.add(item.id);
+				newItemsToAdd.push(item);
+			}
+		});
+		setAllItems(newItemsToAdd);
+	};
 
 	const initialLoad = () => {
 		if (!data) return;
 
 		const syncData = selectSyncData(data);
-
-		setAllItems(syncData.items.filter((item) => !(item as Record<string, unknown>)['deleted']));
+		updateItems(syncData.items);
 		setLocalMaxVersion(syncData.maxVersion);
 
-		// TODO: Написать обработку ошибок
 		if (syncData.hasMoreData) fetchAll().catch(console.error);
 	};
 
 	useLayoutEffect(() => {
-		if (data && called && !loading) {
+		if (!initialLoaded.current && data && called && !loading && !allItems.length) {
 			initialLoad();
+			initialLoaded.current = true;
 		}
-	}, [data, called, loading]);
+	}, [data, called, loading, allItems, initialLoaded]);
+
+	useLayoutEffect(() => {
+		if (initialLoaded.current && data) {
+			const syncData = selectSyncData(data);
+			createList(syncData.items);
+			setLocalMaxVersion(syncData.maxVersion);
+		}
+	}, [data, initialLoaded.current]);
 
 	const fetchAll = async () => {
 		if (!data) return;
@@ -54,13 +107,13 @@ export function useMemorySyncedQuery<
 			const {data: moreData} = await fetchMore({
 				variables: {
 					...variables,
-					...(syncData.maxVersion ? {fromVersion: syncData.maxVersion} : {}),
-				},
+					fromVersion: syncData.maxVersion,
+				} as VariablesT,
 			});
 
 			if (moreData) {
 				const moreSyncData = selectSyncData(moreData);
-				setAllItems((prev) => [...prev, ...moreSyncData.items]);
+				updateItems(moreSyncData.items);
 				setLocalMaxVersion(moreSyncData.maxVersion);
 
 				if (!moreSyncData.hasMoreData) {
@@ -72,24 +125,50 @@ export function useMemorySyncedQuery<
 		}
 	};
 
-	const refetchFromCurrentVersion = async () => {
-		const {data: newData} = await refetch({
-			...variables,
-			fromVersion: localMaxVersion,
-		} as never);
+	const pollingInProgress = useRef(false);
 
-		if (newData) {
-			const syncData = selectSyncData(newData);
-			setAllItems((prev) => [...prev, ...syncData.items]);
-			setLocalMaxVersion(syncData.maxVersion);
+	const pollForUpdates = useCallback(async () => {
+		if (!called || pollingInProgress.current) return;
+
+		pollingInProgress.current = true;
+
+		try {
+			const {data: newData} = await fetchMore({
+				variables: {
+					...variables,
+					fromVersion: localMaxVersion,
+				},
+			});
+			if (newData) {
+				const syncData = selectSyncData(newData);
+				if (syncData.items.length) {
+					updateItems(syncData.items);
+					if (syncData.maxVersion > localMaxVersion) {
+						setLocalMaxVersion(syncData.maxVersion);
+					}
+				}
+			}
+		} finally {
+			pollingInProgress.current = false;
 		}
-	};
+	}, [called, loading, localMaxVersion, refetch, variables]);
 
 	useEffect(() => {
 		if (externalMaxVersion !== undefined && externalMaxVersion > localMaxVersion) {
-			void refetchFromCurrentVersion();
+			void pollForUpdates();
 		}
-	}, [externalMaxVersion, localMaxVersion, refetchFromCurrentVersion]);
+	}, [externalMaxVersion, pollForUpdates]);
+
+	useEffect(() => {
+		if (!pollInterval) return;
+
+		console.log('setInterval', pollInterval);
+		const intervalId = setInterval(() => {
+			void pollForUpdates();
+		}, pollInterval);
+
+		return () => clearInterval(intervalId);
+	}, [pollInterval, pollForUpdates]);
 
 	return {
 		items: allItems,
@@ -98,6 +177,6 @@ export function useMemorySyncedQuery<
 		loading: !called || (loading && allItems.length === 0),
 		called,
 		fetchAll,
-		refetchFromCurrentVersion,
+		refetchFromCurrentVersion: pollForUpdates,
 	};
 }

@@ -1,3 +1,5 @@
+import {AppController} from '@backend/app/app.controller';
+import {AppService} from '@backend/app/app.service';
 import {RedisClientModule} from '@backend/shared/redis/redis-client.module';
 import {Module} from '@nestjs/common';
 import {GraphQLModule} from '@nestjs/graphql';
@@ -11,9 +13,11 @@ import {PortfolioModule} from '@backend/modules/portfolio';
 import {AuthModule} from '@backend/modules/auth';
 import {JwtService} from '@nestjs/jwt';
 import {EventEmitterModule} from '@nestjs/event-emitter';
+import {PrometheusModule} from '@willsoto/nestjs-prometheus';
 
 @Module({
 	imports: [
+		PrometheusModule.register(),
 		EventEmitterModule.forRoot(),
 		RedisClientModule,
 		GraphQLModule.forRootAsync({
@@ -40,5 +44,7 @@ import {EventEmitterModule} from '@nestjs/event-emitter';
 		StockPriceModule,
 		PortfolioReportModule,
 	],
+	controllers: [AppController],
+	providers: [AppService],
 })
 export class AppModule {}

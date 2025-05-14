@@ -11,8 +11,14 @@ import {
 	DrawerRoot,
 	DrawerTitle,
 } from '@frontend/components/ui/drawer';
-import {useGetPortfolioReportsQuery} from '@frontend/generated/graphql-hooks';
-import React, {useEffect, useState} from 'react';
+import {
+	GetPortfolioReportsQuery,
+	GetPortfolioReportsQueryVariables,
+	useGetPortfolioReportsQuery,
+} from '@frontend/generated/graphql-hooks';
+import {PortfolioReport} from '@frontend/generated/graphql-types';
+import {useMemorySyncedQuery} from '@frontend/lib/useMemorySyncedQuery';
+import React, {useEffect, useMemo, useState} from 'react';
 import {FaCheckCircle, FaHourglassHalf, FaTimesCircle} from 'react-icons/fa';
 
 interface ShowPortfolioReportDrawerProps {
@@ -27,13 +33,33 @@ const ShowPortfolioReportDrawer: React.FC<ShowPortfolioReportDrawerProps> = ({
 	                                                                             onOpenChange,
                                                                              }) => {
 	const [openedReportId, setOpenedReportId] = useState('');
-	const {data, refetch} = useGetPortfolioReportsQuery({variables: {portfolioId}});
-	const portfolioReports = data?.getPortfolioReports;
 	const isMobile = useBreakpointValue({base: true, lg: false});
 
+	const variables = useMemo(() => ({portfolioId}), [portfolioId])
+
+	const {
+		refetchFromCurrentVersion,
+		items: portfolioReports,
+	} = useMemorySyncedQuery<
+		GetPortfolioReportsQuery,
+		GetPortfolioReportsQueryVariables,
+		Pick<PortfolioReport, 'id' | 'version' | 'deleted' | 'status' | 'reportType' | 'createdAt'>
+	>(
+		useGetPortfolioReportsQuery,
+		(selectSyncData) => selectSyncData.getPortfolioReports,
+		// undefined,
+		2000,
+		variables,
+	);
+
 	useEffect(() => {
-		if (open) void refetch();
-	}, [open, refetch]);
+		if (open) void refetchFromCurrentVersion();
+	}, [open, refetchFromCurrentVersion]);
+
+
+	useEffect(() => {
+		if (open) void refetchFromCurrentVersion();
+	}, [open, refetchFromCurrentVersion]);
 
 	const openedReport = portfolioReports?.find((r) => r.id === openedReportId);
 
@@ -107,7 +133,7 @@ const ShowPortfolioReportDrawer: React.FC<ShowPortfolioReportDrawerProps> = ({
 													report={report}
 													reportLabel={reportLabel}
 													onOpen={handleOpenReport}
-													onDelete={refetch}
+													onDelete={refetchFromCurrentVersion}
 												/>
 											);
 										})}

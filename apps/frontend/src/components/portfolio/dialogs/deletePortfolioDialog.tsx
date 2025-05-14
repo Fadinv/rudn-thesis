@@ -43,6 +43,7 @@ const DeletePortfolioDialog: React.FC<EditPortfolioButtonProps> = ({portfolioId,
 					cache.updateQuery({query: GetUserPortfoliosDocument, overwrite: true}, (data) => {
 						const items = (data.getUserPortfolios.items || []).filter((item: Portfolio) => item.id !== targetId);
 
+						console.log('items', items);
 						return ({
 							getUserPortfolios: {
 								...data.getUserPortfolios,

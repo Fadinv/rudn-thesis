@@ -27,6 +27,13 @@ export type FutureReturnForecastInput = {
   selectedPercentiles: Array<Scalars['Float']['input']>;
 };
 
+export type GetUserPortfolioReportsResponse = {
+  __typename?: 'GetUserPortfolioReportsResponse';
+  hasMoreData: Scalars['Boolean']['output'];
+  items: Array<PortfolioReport>;
+  maxVersion: Scalars['Int']['output'];
+};
+
 export type GetUserPortfoliosResponse = {
   __typename?: 'GetUserPortfoliosResponse';
   hasMoreData: Scalars['Boolean']['output'];
@@ -183,12 +190,14 @@ export type PortfolioReport = {
   __typename?: 'PortfolioReport';
   createdAt: Scalars['DateTime']['output'];
   data?: Maybe<Scalars['JSON']['output']>;
+  deleted: Scalars['Boolean']['output'];
   errorMessage?: Maybe<Scalars['String']['output']>;
   id: Scalars['String']['output'];
   portfolio: Portfolio;
   reportType: Scalars['String']['output'];
   status: Scalars['String']['output'];
   updatedAt: Scalars['DateTime']['output'];
+  version: Scalars['Int']['output'];
 };
 
 export type PortfolioStock = {
@@ -209,18 +218,15 @@ export type PortfolioStockUpdateInput = {
 export type Query = {
   __typename?: 'Query';
   currentUser?: Maybe<User>;
-  getAllPortfolios: Array<Portfolio>;
-  getAllPortfolios2: Array<Array<Portfolio>>;
   getDistributedPortfolioAssets: PortfolioDistribution;
   getPortfolioReport?: Maybe<PortfolioReport>;
-  getPortfolioReports: Array<PortfolioReport>;
+  getPortfolioReports: GetUserPortfolioReportsResponse;
   getPortfolioStocks: Array<PortfolioStock>;
   getStockById?: Maybe<Stock>;
   getStockByTicker?: Maybe<Stock>;
   getStockPrices: Array<StockPrice>;
   getStocks: Array<Stock>;
   getUserPortfolios: GetUserPortfoliosResponse;
-  getUserPortfoliosAll: Array<Portfolio>;
   searchStocks: Array<Stock>;
 };
 
@@ -238,6 +244,7 @@ export type QueryGetPortfolioReportArgs = {
 
 
 export type QueryGetPortfolioReportsArgs = {
+  fromVersion?: InputMaybe<Scalars['Int']['input']>;
   portfolioId: Scalars['Int']['input'];
 };
 
@@ -416,10 +423,11 @@ export type GetPortfolioReportQuery = { __typename?: 'Query', getPortfolioReport
 
 export type GetPortfolioReportsQueryVariables = Exact<{
   portfolioId: Scalars['Int']['input'];
+  fromVersion?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
 
-export type GetPortfolioReportsQuery = { __typename?: 'Query', getPortfolioReports: Array<{ __typename?: 'PortfolioReport', id: string, reportType: string, status: string, errorMessage?: string | null, createdAt: any }> };
+export type GetPortfolioReportsQuery = { __typename?: 'Query', getPortfolioReports: { __typename?: 'GetUserPortfolioReportsResponse', maxVersion: number, hasMoreData: boolean, items: Array<{ __typename?: 'PortfolioReport', id: string, deleted: boolean, version: number, reportType: string, status: string, errorMessage?: string | null, createdAt: any }> } };
 
 export type GetPortfolioStocksQueryVariables = Exact<{
   portfolioId: Scalars['Int']['input'];
@@ -890,13 +898,19 @@ export type GetPortfolioReportLazyQueryHookResult = ReturnType<typeof useGetPort
 export type GetPortfolioReportSuspenseQueryHookResult = ReturnType<typeof useGetPortfolioReportSuspenseQuery>;
 export type GetPortfolioReportQueryResult = Apollo.QueryResult<GetPortfolioReportQuery, GetPortfolioReportQueryVariables>;
 export const GetPortfolioReportsDocument = gql`
-    query GetPortfolioReports($portfolioId: Int!) {
-  getPortfolioReports(portfolioId: $portfolioId) {
-    id
-    reportType
-    status
-    errorMessage
-    createdAt
+    query GetPortfolioReports($portfolioId: Int!, $fromVersion: Int) {
+  getPortfolioReports(portfolioId: $portfolioId, fromVersion: $fromVersion) {
+    items {
+      id
+      deleted
+      version
+      reportType
+      status
+      errorMessage
+      createdAt
+    }
+    maxVersion
+    hasMoreData
   }
 }
     `;
@@ -914,6 +928,7 @@ export const GetPortfolioReportsDocument = gql`
  * const { data, loading, error } = useGetPortfolioReportsQuery({
  *   variables: {
  *      portfolioId: // value for 'portfolioId'
+ *      fromVersion: // value for 'fromVersion'
  *   },
  * });
  */

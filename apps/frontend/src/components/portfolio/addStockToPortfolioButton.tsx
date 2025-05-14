@@ -30,8 +30,8 @@ const AddStockToPortfolioButton: React.FC<AddStockToPortfolioButtonProps> = ({
 	const addButtonIsDisabled =
 		!getPortfolioStocksQueryData ||
 		!getPortfolioStocksQueryDataCalled ||
-		getPortfolioStocksQueryDataLoading ||
-		getPortfolioStocksQueryData.getPortfolioStocks.length >= 10;
+		getPortfolioStocksQueryDataLoading
+		// getPortfolioStocksQueryData.getPortfolioStocks.length >= 10;
 
 	return (
 		<>
