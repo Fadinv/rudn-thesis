@@ -54,9 +54,12 @@ const MarkovitzViewer: FC<MarkovitzViewerProps> = ({reportId}) => {
 	const [tabValue, setTabValue] = useState<'frontier' | 'portfolio' | 'metrics'>('portfolio');
 	const {refetch} = useGetUserPortfoliosQuery({fetchPolicy: 'cache-only'});
 
-	const rawData = data?.getPortfolioReport?.data as any;
+	const rawData = data?.getPortfolioReport?.data as MarkovitzData | {
+		portfolios: MarkovitzData,
+		currentPortfolio: MarkovitzPortfolio
+	};
 	const reports: MarkovitzData | undefined = Array.isArray(rawData) ? rawData : rawData?.portfolios;
-	const currentPortfolio = Array.isArray(rawData) ? undefined : rawData?.currentPortfolio as MarkovitzPortfolio | undefined;
+	const currentPortfolio = Array.isArray(rawData) ? undefined : rawData?.currentPortfolio;
 	const totalPortfolios = reports?.length ?? 0;
 	const isCurrent = selectedPortfolio === -1 && currentPortfolio;
 	const report = isCurrent ? currentPortfolio : reports?.[selectedPortfolio];
