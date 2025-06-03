@@ -65,7 +65,7 @@ export const CreatePortfolioReportDrawer: React.FC<CreatePortfolioReportDrawerPr
 			setNumPortfolios(20);
 			setCovMethod('ledoit');
 			setForecastHorizons([30, 60, 90, 180, 365, 730, 1095]);
-			setSelectedPercentiles([10, 50, 90]);
+			setSelectedPercentiles([5, 50, 95]);
 		}
 	}, [open]);
 
