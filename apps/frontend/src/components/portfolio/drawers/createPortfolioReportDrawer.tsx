@@ -25,7 +25,7 @@ import React, {useState, useEffect} from 'react';
 import {createListCollection} from '@chakra-ui/react';
 import {
 	useCreateFutureReturnForecastGbmReportMutation,
-	useCreateMarkovitzReportMutation,
+	useCreateMarkovitzReportMutation, useGetPortfolioStocksQuery,
 } from '@frontend/generated/graphql-hooks';
 import {FaTrash} from 'react-icons/fa';
 
@@ -34,6 +34,11 @@ interface CreatePortfolioReportDrawerProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 }
+
+const currencyByExchange = {
+	'MOEX': 'sur',
+	'NASDAQ': 'usd',
+} as const;
 
 export const CreatePortfolioReportDrawer: React.FC<CreatePortfolioReportDrawerProps> = ({
 	                                                                                        portfolioId,
@@ -51,13 +56,25 @@ export const CreatePortfolioReportDrawer: React.FC<CreatePortfolioReportDrawerPr
 	const [numPortfolios, setNumPortfolios] = useState<number | null>(20);
 	const [covMethod, setCovMethod] = useState('ledoit');
 
+	const {data, loading: portfolioStocksIsLoading} = useGetPortfolioStocksQuery({
+		variables: {portfolioId},
+		fetchPolicy: 'cache-first',
+	});
+
+	const frequency = new Set<string>(data?.getPortfolioStocks.map((v) => {
+		return v.stock.exchange;
+	}) ?? []);
+
+	const currencyIsDisabled = frequency.size === 1;
+
 	const [createMarkovitzReport, {loading: markowitzLoading}] = useCreateMarkovitzReportMutation();
 	const [createFutureReport, {loading: futureReportLoading}] = useCreateFutureReturnForecastGbmReportMutation();
 
-	const loading = markowitzLoading || futureReportLoading;
+	const loading = markowitzLoading || futureReportLoading || portfolioStocksIsLoading;
 
 	useEffect(() => {
 		if (open) {
+			setCurrency(currencyIsDisabled ? (currencyByExchange[frequency.values().next().value as keyof typeof currencyByExchange]) : 'usd');
 			setAdditionalStocks([]);
 			setReportType('markowitz');
 			setDateRange('3y');
@@ -191,12 +208,13 @@ export const CreatePortfolioReportDrawer: React.FC<CreatePortfolioReportDrawerPr
 						<Box>
 							<Field.Root invalid={!currency}>
 								<SelectRoot
-									defaultValue={['usd']}
+									defaultValue={frequency.size === 1 ? [currencyByExchange[frequency.values().next().value as keyof typeof currencyByExchange] as 'usd' | 'sur'] : ['usd']}
 									onValueChange={(e) => {
 										setCurrency(e.value[0] as 'usd' | 'sur');
 									}}
 									collection={currencyCollection}
 									size="sm"
+									disabled={currencyIsDisabled}
 								>
 									<SelectLabel>Валюта</SelectLabel>
 									<SelectTrigger>
