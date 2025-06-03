@@ -44,7 +44,7 @@ export const CreatePortfolioReportDrawer: React.FC<CreatePortfolioReportDrawerPr
 	const [reportType, setReportType] = useState<'markowitz' | 'future_returns_forecast_gbm' | 'value_at_risk'>('markowitz');
 	const [currency, setCurrency] = useState<'usd' | 'sur'>('usd');
 	const [additionalStocks, setAdditionalStocks] = useState<{ id: number; name: string; ticker: string }[]>([]);
-	const [selectedPercentiles, setSelectedPercentiles] = useState<[number, number, number]>([10, 50, 90]);
+	const [selectedPercentiles, setSelectedPercentiles] = useState<[number, number, number]>([5, 50, 95]);
 	const [forecastHorizons, setForecastHorizons] = useState([30, 60, 90, 180, 365, 730, 1095]);
 	const [dateRange, setDateRange] = useState('3y');
 	const [riskFreeRate, setRiskFreeRate] = useState<number | null>(4);
@@ -241,7 +241,6 @@ export const CreatePortfolioReportDrawer: React.FC<CreatePortfolioReportDrawerPr
 
 								{/* Горизонты прогнозирования */}
 								<Box>
-									<Text mb={1}>Горизонты прогнозирования (в днях):</Text>
 									<SelectRoot
 										defaultValue={['short_medium_long']}
 										onValueChange={(e) => {
@@ -263,7 +262,7 @@ export const CreatePortfolioReportDrawer: React.FC<CreatePortfolioReportDrawerPr
 										collection={forecastHorizonsCollection}
 										size="sm"
 									>
-										<SelectLabel>Выберите горизонты</SelectLabel>
+										<SelectLabel>Горизонты прогнозирования</SelectLabel>
 										<SelectTrigger>
 											<SelectValueText placeholder="Выберите"/>
 										</SelectTrigger>
@@ -279,7 +278,7 @@ export const CreatePortfolioReportDrawer: React.FC<CreatePortfolioReportDrawerPr
 
 								{/* Ползунки перцентилей */}
 								<Box>
-									<Text mb={1}>Выберите перцентили (p10, p50, p90):</Text>
+									<Text mb={1}>Выберите перцентили:</Text>
 									<Flex direction="column" gap={3}>
 										<Flex align="center" gap={4}>
 											<Slider
@@ -424,7 +423,6 @@ export const CreatePortfolioReportDrawer: React.FC<CreatePortfolioReportDrawerPr
 								</Box>
 
 								<Box mt={2}>
-									<Text mb={1}>Метод оценки ковариации:</Text>
 									<SelectRoot
 										defaultValue={['ledoit']}
 										onValueChange={(e) => setCovMethod(e.value[0])}
