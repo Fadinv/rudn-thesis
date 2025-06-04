@@ -83,33 +83,15 @@ export class PortfolioReportService {
 	async createMarkovitzReport(portfolioId: number, input: MarkovitzReportInput): Promise<PortfolioReport> {
 		const savedReport = await this.createDefaultReport(portfolioId, 'markowitz', input);
 
-		// Переводим на event-driven архитектуру
-		this.analyzeMarkovitzPortfolio(savedReport.id, input).catch(async (error) => {
-			console.error('Ошибка при анализе портфеля:', error);
-			await this.reportRepository.update(savedReport.id, {
-				status: 'error',
-				errorMessage: 'Ошибка при анализе портфеля',
-			});
-		});
-
-		return savedReport;
-	}
+                return savedReport;
+        }
 
 	// Создать отчет с изначальным статусом "calculating"
 	async createFutureReturnForecastGBMReport(portfolioId: number, input: FutureReturnForecastInput): Promise<PortfolioReport> {
 		const savedReport = await this.createDefaultReport(portfolioId, 'future_returns_forecast_gbm', input);
 
-		// Переводим на event-driven архитектуру
-		this.analyzeFutureReturnsForecastGBM(savedReport.id, input).catch(async (error) => {
-			console.error('Ошибка при анализе портфеля:', error);
-			await this.reportRepository.update(savedReport.id, {
-				status: 'error',
-				errorMessage: 'Ошибка при анализе портфеля',
-			});
-		});
-
-		return savedReport;
-	}
+                return savedReport;
+        }
 
 	// Обновить отчет (данные + статус)
 	async updateReport(reportId: string, data: any, status: 'ready' | 'error', errorMessage?: string): Promise<PortfolioReport> {

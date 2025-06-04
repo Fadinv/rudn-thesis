@@ -5,6 +5,9 @@ export const RmqQueues = {
                name: 'RABBITMQ_PORTFOLIO_CLIENT',
                queue: 'portfolio_events_queue',
        },
+       analyzer: {
+               queue: 'analyzer_events_queue',
+       },
        // можно добавить другие очереди позже:
        // reports: {
        //   name: 'RABBITMQ_REPORTS_CLIENT',
@@ -18,14 +21,9 @@ export const RmqExchanges = {
 
 export function createRmqClientOptions(queueName: string): RmqOptions['options'] {
        return {
-               urls: ['amqp://guest:guest@rabbitmq:5672'], // позже подключим dotenv
+               urls: [process.env.RABBITMQ_URL || 'amqp://guest:guest@rabbitmq:5672'],
                queue: queueName,
                queueOptions: {
-                       durable: true,
-               },
-               exchange: RmqExchanges.reports,
-               exchangeType: 'direct',
-               exchangeOptions: {
                        durable: true,
                },
        };

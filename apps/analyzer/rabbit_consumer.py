@@ -1,6 +1,7 @@
 import aio_pika
 import asyncio
 import json
+import os
 from rabbitmq import RabbitPublisher
 from reports.markovitz.pipeline import process_markovitz_report
 from reports.gbm.pipeline import process_gbm_report
@@ -82,9 +83,9 @@ async def handle_report_created(payload):
 
 async def consume():
     print('start to conntent: rmq ...', flush=True)
-    connection = await aio_pika.connect_robust("amqp://guest:guest@rabbitmq/")
+    connection = await aio_pika.connect_robust(os.getenv("RABBITMQ_URL", "amqp://guest:guest@rabbitmq/"))
     channel = await connection.channel()
-    queue = await channel.declare_queue("portfolio_events_queue", durable=True)
+    queue = await channel.declare_queue("analyzer_events_queue", durable=True)
     exchange = await channel.declare_exchange("reports_exchange", aio_pika.ExchangeType.DIRECT, durable=True)
     await queue.bind(exchange, routing_key="report.created")
 
@@ -92,8 +93,12 @@ async def consume():
 
     async with queue.iterator() as queue_iter:
         async for message in queue_iter:
-            async with message.process():
+            try:
                 payload = json.loads(message.body.decode())
                 print(f'message {message}', flush=True)
                 if message.routing_key == "report.created":
                     await handle_report_created(payload)
+                await message.ack()
+            except Exception as e:
+                print(f"❌ Error processing message: {e}", flush=True)
+                await message.nack(requeue=True)
