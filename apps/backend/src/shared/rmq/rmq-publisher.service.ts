@@ -1,16 +1,31 @@
-import {Inject, Injectable} from '@nestjs/common';
-import {ClientProxy} from '@nestjs/microservices';
-import {RmqQueues} from './rmq.config';
+import {Injectable} from '@nestjs/common';
+import {connect, ChannelWrapper} from 'amqp-connection-manager';
+import {RmqExchanges} from './rmq.config';
+import {ConfirmChannel} from 'amqplib';
 
 @Injectable()
 export class RmqPublisherService {
-	constructor(
-		@Inject(RmqQueues.portfolio.name) // ✅ правильный токен
-		private readonly client: ClientProxy,
-	) {}
+       private channel: ChannelWrapper;
 
-	async emit(event: string, data: any) {
-		const {firstValueFrom} = await import('rxjs');
-		return firstValueFrom(this.client.emit(event, data));
-	}
+       constructor() {
+               const connection = connect(['amqp://guest:guest@rabbitmq:5672']);
+               this.channel = connection.createChannel({
+                       json: true,
+                       setup: async (channel: ConfirmChannel) => {
+                               await channel.assertExchange(
+                                       RmqExchanges.reports,
+                                       'direct',
+                                       {durable: true},
+                               );
+                       },
+               });
+       }
+
+       async emit(routingKey: string, payload: any) {
+               await this.channel.publish(
+                       RmqExchanges.reports,
+                       routingKey,
+                       payload,
+               );
+       }
 }

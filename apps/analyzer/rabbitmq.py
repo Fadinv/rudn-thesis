@@ -16,7 +16,9 @@ class RabbitPublisher:
             await self.connect()
 
         channel = await self.connection.channel()
-        await channel.default_exchange.publish(
-            aio_pika.Message(body=json.dumps(payload).encode()),
-            routing_key=routing_key,
+        exchange = await channel.declare_exchange(
+            "reports_exchange", aio_pika.ExchangeType.DIRECT, durable=True
+        )
+        await exchange.publish(
+            aio_pika.Message(body=json.dumps(payload).encode()), routing_key=routing_key
         )
