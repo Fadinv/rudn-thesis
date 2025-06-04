@@ -32,11 +32,13 @@ const ShowPortfolioReportButton: React.FC<CreatePortfolioReportButtonProps> = ({
 				</Button>
 			)}
 
-			<ShowPortfolioReportDrawer
-				portfolioId={portfolioId}
-				open={open}
-				onOpenChange={(open) => setOpen(open)}
-			/>
+			{open && (
+				<ShowPortfolioReportDrawer
+					portfolioId={portfolioId}
+					open
+					onOpenChange={(open) => setOpen(open)}
+				/>
+			)}
 		</>
 	);
 };

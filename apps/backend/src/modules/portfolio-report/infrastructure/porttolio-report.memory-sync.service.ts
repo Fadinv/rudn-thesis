@@ -13,13 +13,13 @@ export class PortfolioReportMemorySyncService {
 		this.portfolioStore.addItem(portfolio);
 	}
 
-        @OnEvent(PortfolioReportEvents.updated)
-        handlePortfolioUpdated(portfolio: PortfolioReport) {
-                this.portfolioStore.updateItem(portfolio);
-        }
+    @OnEvent(PortfolioReportEvents.updated)
+    handlePortfolioUpdated(portfolio: PortfolioReport) {
+        this.portfolioStore.updateItem(portfolio);
+    }
 
-       @OnEvent(PortfolioReportEvents.deleted)
-       handlePortfolioDeleted(portfolio: PortfolioReport) {
-               this.portfolioStore.updateItem(portfolio);
-       }
+   @OnEvent(PortfolioReportEvents.deleted)
+   handlePortfolioDeleted(portfolio: PortfolioReport) {
+       this.portfolioStore.updateItem(portfolio);
+   }
 }

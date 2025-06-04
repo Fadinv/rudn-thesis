@@ -60,13 +60,13 @@ export class PortfolioReportService {
 
 		if (!savedReport) throw new Error(`Ошибка при создании портфеля (reportType: "markowitz"`);
 
-                console.log('createDefaultReport PortfolioReportEvents.created');
-                /** Внешнее событие */
-                await this.rmqPublisher.emit(PortfolioReportEvents.created, {
-                        ...savedReport,
-                        portfolio: portfolioId,
+        /** Внешнее событие */
+        await this.rmqPublisher.emit(PortfolioReportEvents.created, {
+            ...savedReport,
+            portfolio: portfolioId,
 			inputParams,
 		});
+
 		return savedReport;
 	}
 
@@ -74,15 +74,15 @@ export class PortfolioReportService {
 	async createMarkovitzReport(portfolioId: number, input: MarkovitzReportInput): Promise<PortfolioReport> {
 		const savedReport = await this.createDefaultReport(portfolioId, 'markowitz', input);
 
-                return savedReport;
-        }
+        return savedReport;
+    }
 
 	// Создать отчет с изначальным статусом "calculating"
 	async createFutureReturnForecastGBMReport(portfolioId: number, input: FutureReturnForecastInput): Promise<PortfolioReport> {
 		const savedReport = await this.createDefaultReport(portfolioId, 'future_returns_forecast_gbm', input);
 
-                return savedReport;
-        }
+        return savedReport;
+    }
 
 	// Обновить отчет (данные + статус)
 	async updateReport(reportId: string, data: any, status: 'ready' | 'error', errorMessage?: string): Promise<PortfolioReport> {
@@ -106,21 +106,22 @@ export class PortfolioReportService {
 		return this.reportRepository.findOne({where: {id: reportId}});
 	}
 
-        async deleteReport(reportId: string): Promise<boolean> {
-                const report = await this.reportRepository.findOne({
-                        where: {id: reportId},
-                        loadRelationIds: {relations: ['portfolio']},
-                });
-                if (!report) return false;
+    async deleteReport(reportId: string): Promise<boolean> {
+        const report = await this.reportRepository.findOne({
+            where: {id: reportId},
+            loadRelationIds: {relations: ['portfolio']},
+        });
 
-                report.deleted = true;
-                report.version = this.portfolioReportStore.maxVersion() + 1;
+        if (!report) return false;
 
-                await this.reportRepository.save(report);
-                await this.rmqPublisher.emit(PortfolioReportEvents.updated, report);
+        report.deleted = true;
+        report.version = this.portfolioReportStore.maxVersion() + 1;
 
-                return true;
-        }
+        await this.reportRepository.save(report);
+        await this.rmqPublisher.emit(PortfolioReportEvents.updated, report);
+
+        return true;
+    }
 
 	async getDistributedPortfolioAssets(
 		capital: number,

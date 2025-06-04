@@ -17,7 +17,7 @@ export class TooManyRequestsException extends HttpException {
 export class GqlTokenThrottleGuard implements CanActivate {
 	private readonly requestCounts = new Map<string, number>();
 	private readonly windowMs = 60 * 1000;
-	private readonly limit = 60;
+	private readonly limit = 120;
 
 	canActivate(context: ExecutionContext): boolean {
 		const ctx = GqlExecutionContext.create(context);
