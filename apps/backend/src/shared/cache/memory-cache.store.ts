@@ -55,6 +55,13 @@ export class MemoryCacheStore<T extends { id: number | string; version: number; 
 	/** Безопасная функция получения store по сущности */
 	private getStoreByItem(item: T): StoreEntry<T> {
 		const key = this._aggregateFn(item);
+		if (key === undefined) {
+			let foundStore: StoreEntry<T> | null;
+			console.log('this._itemsByAggregateKey.values()', this._itemsByAggregateKey.values());
+			foundStore = [...this._itemsByAggregateKey.values()].find((store) => store.byId.has(item.id)) ?? null;;
+
+			if (foundStore) return foundStore;
+		}
 		return this.getOrCreateStore(key);
 	}
 
@@ -89,8 +96,10 @@ export class MemoryCacheStore<T extends { id: number | string; version: number; 
 	updateItem(newItem: T) {
 		const store = this.getStoreByItem(newItem);
 
+		console.log('store', store);
 		// Получаем элемент по id
 		const item = store.byId.get(newItem.id);
+		console.log('item', this._itemsByAggregateKey, item, newItem, newItem.id);
 		// Если мы не нашли этот элемент, то выходим
 		if (!item || !store.versionSortedIndex.has(item.version) || newItem.version <= item.version) {
 			throw new Error(
