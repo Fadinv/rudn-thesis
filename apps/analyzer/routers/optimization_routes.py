@@ -17,11 +17,11 @@ router = APIRouter()
 async def create_markovitz_report(request: dict):
     report_id = request["reportId"]
     additional_tickers = request.get("additionalTickers", [])
-    date_range = request["date_range"]
-    risk_free_rate = request["risk_free_rate"]
-    num_portfolios = request["num_portfolios"]
-    cov_method = request["cov_method"]
-    target_currency = request.get("target_currency", 'usd')
+    date_range = request.get("date_range") or request.get("dateRange", "3y")
+    risk_free_rate = request.get("risk_free_rate") or request.get("riskFreeRate")
+    num_portfolios = request.get("num_portfolios") or request.get("numPortfolios")
+    cov_method = request.get("cov_method") or request.get("covMethod")
+    target_currency = request.get("target_currency") or request.get("currency", "usd")
 
     print('report_id', report_id)
     print('additional_tickers', additional_tickers)
@@ -45,18 +45,39 @@ async def create_markovitz_report(request: dict):
         )
 
         with engine.connect() as conn:
-            conn.execute(text("""
+            conn.execute(
+                text(
+                    """
                 UPDATE portfolio_reports
-                SET data = :data, status = 'ready'
+                SET data = :data, status = 'ready', "errorMessage" = NULL
                 WHERE id = :report_id
-            """), {"data": json.dumps(result), "report_id": report_id})
+            """
+                ),
+                {"data": json.dumps(result), "report_id": report_id},
+            )
             conn.commit()
 
         print(f"✅ Отчёт {report_id} обновлён!")
         return {"status": "ready", "message": "Report updated successfully"}
 
     except Exception as e:
-        print(f"❌ Ошибка при обработке отчёта {report_id}: {e}")
+        error_message = str(e)
+        print(f"❌ Ошибка при обработке отчёта {report_id}: {error_message}")
+        try:
+            with engine.connect() as conn:
+                conn.execute(
+                    text(
+                        """
+                UPDATE portfolio_reports
+                SET status = 'error', "errorMessage" = :msg
+                WHERE id = :report_id
+            """
+                    ),
+                    {"msg": error_message, "report_id": report_id},
+                )
+                conn.commit()
+        except Exception as db_error:
+            print(f"❌ Failed to update report {report_id} status: {db_error}")
         raise HTTPException(status_code=500, detail="Ошибка при расчёте отчёта")
 
 
@@ -64,28 +85,49 @@ async def create_markovitz_report(request: dict):
 async def create_gbm_report(request: dict):
     try:
         report_id = request["reportId"]
-        target_currency = request.get("target_currency", 'usd')
+        target_currency = request.get("target_currency") or request.get("currency", 'usd')
         selected_percentiles = request.get("selectedPercentiles", [10, 50, 90])
         forecast_horizons = request.get("forecastHorizons", [30, 60, 90, 180, 365, 730, 1095])
-        date_range = request.get("date_range", "3y")
+        date_range = request.get("date_range") or request.get("dateRange", "3y")
 
         print(f"🔍 Запускаем GBM прогноз для отчёта {report_id}")
 
         result = process_gbm_report(report_id, selected_percentiles, forecast_horizons, date_range, target_currency)
 
         with engine.connect() as conn:
-            conn.execute(text("""
+            conn.execute(
+                text(
+                    """
                 UPDATE portfolio_reports
-                SET data = :data, status = 'ready'
+                SET data = :data, status = 'ready', "errorMessage" = NULL
                 WHERE id = :report_id
-            """), {"data": json.dumps(result), "report_id": report_id})
+            """
+                ),
+                {"data": json.dumps(result), "report_id": report_id},
+            )
             conn.commit()
 
         print(f"✅ Отчёт {report_id} обновлён с GBM прогнозом и историей портфеля!")
         return {"status": "ready", "message": "Report updated with GBM forecast and portfolio history"}
 
     except Exception as e:
-        print(f"❌ Ошибка при создании GBM отчёта: {e}")
+        error_message = str(e)
+        print(f"❌ Ошибка при создании GBM отчёта: {error_message}")
+        try:
+            with engine.connect() as conn:
+                conn.execute(
+                    text(
+                        """
+                UPDATE portfolio_reports
+                SET status = 'error', "errorMessage" = :msg
+                WHERE id = :report_id
+            """
+                    ),
+                    {"msg": error_message, "report_id": report_id},
+                )
+                conn.commit()
+        except Exception as db_error:
+            print(f"❌ Failed to update report {report_id} status: {db_error}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
