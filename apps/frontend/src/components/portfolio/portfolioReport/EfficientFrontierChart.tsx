@@ -1,4 +1,4 @@
-import {MarkovitzData} from '@frontend/components/portfolio/portfolioReport/MarkovitzViewer';
+import {MarkovitzData, MarkovitzPortfolio} from '@frontend/components/portfolio/portfolioReport/MarkovitzViewer';
 import React, {FC} from 'react';
 import {
 	ScatterChart,
@@ -14,10 +14,11 @@ import {Box, Flex, Text} from '@chakra-ui/react';
 import {ResponsiveContainer} from 'recharts';
 
 interface EfficientFrontierChartProps {
-	portfolios: MarkovitzData;
-	selectedIndex?: number;
-	onSelect: (index: number) => void;
-	selected?: number;
+        portfolios: MarkovitzData;
+        currentPortfolio?: MarkovitzPortfolio;
+        selectedIndex?: number;
+        onSelect: (index: number) => void;
+        selected?: number;
 }
 
 const riskCategoryColors: Record<string, string> = {
@@ -27,22 +28,27 @@ const riskCategoryColors: Record<string, string> = {
 	default: '#A0AEC0',      // серый
 };
 
-const EfficientFrontierChart: FC<EfficientFrontierChartProps> = ({portfolios, selected, onSelect}) => {
+const EfficientFrontierChart: FC<EfficientFrontierChartProps> = ({portfolios, currentPortfolio, selected, onSelect}) => {
 	if (!portfolios || portfolios.length === 0) return <Text>Нет данных для отображения.</Text>;
 
-	const chartData = portfolios.map((p, index) => ({
-		risk: +(p.risk_annual * 100).toFixed(2),
-		return: +(p.return_annual * 100).toFixed(2),
-		sharpe: p.sharpe_ratio_annual,
-		index,
-		category: p.risk_category,
-		color: riskCategoryColors[p.risk_category] || riskCategoryColors.default,
-		isSelected: index === selected,
-	}));
+        const chartData = portfolios.map((p, index) => ({
+                risk: +(p.risk_annual * 100).toFixed(2),
+                return: +(p.return_annual * 100).toFixed(2),
+                sharpe: p.sharpe_ratio_annual,
+                index,
+                category: p.risk_category,
+                color: riskCategoryColors[p.risk_category] || riskCategoryColors.default,
+                isSelected: index === selected,
+        }));
 
-	const risks = chartData.map(d => d.risk);
-	const minRisk = Math.floor(risks[0]);
-	const maxRisk = Math.ceil(risks[risks.length - 1]);
+        const currentPoint = currentPortfolio ? {
+                risk: +(currentPortfolio.risk_annual * 100).toFixed(2),
+                return: +(currentPortfolio.return_annual * 100).toFixed(2),
+        } : null;
+
+        const risks = chartData.map(d => d.risk).concat(currentPoint ? [currentPoint.risk] : []);
+        const minRisk = Math.floor(Math.min(...risks));
+        const maxRisk = Math.ceil(Math.max(...risks));
 
 	return (
 		<Box width="100%" minH="520px" overflowX="auto">
@@ -73,20 +79,30 @@ const EfficientFrontierChart: FC<EfficientFrontierChartProps> = ({portfolios, se
 						labelFormatter={() => ''}
 					/>
 					<Legend verticalAlign="top" height={36}/>
-					<Scatter
-						name="Портфели"
-						data={chartData}
-						shape="circle"
-						onClick={(e) => onSelect(e.index)}
-					>
-						{chartData.map((entry, index) => (
-							<Cell
-								key={`cell-${index}`}
-								fill={entry.isSelected ? '#000' : entry.color}
-								r={entry.isSelected ? 6 : 4}
-							/>
-						))}
-					</Scatter>
+                                        <Scatter
+                                                name="Портфели"
+                                                data={chartData}
+                                                shape="circle"
+                                                onClick={(e) => onSelect(e.index)}
+                                        >
+                                                {chartData.map((entry, index) => (
+                                                        <Cell
+                                                                key={`cell-${index}`}
+                                                                fill={entry.isSelected ? '#000' : entry.color}
+                                                                r={entry.isSelected ? 6 : 4}
+                                                        />
+                                                ))}
+                                        </Scatter>
+                                        {currentPoint && (
+                                                <Scatter
+                                                        name="Текущий портфель"
+                                                        data={[currentPoint]}
+                                                        shape="diamond"
+                                                        onClick={() => onSelect(-1)}
+                                                >
+                                                        <Cell fill="#6c757d" r={selected === -1 ? 8 : 6}/>
+                                                </Scatter>
+                                        )}
 				</ScatterChart>
 			</ResponsiveContainer>
 			{/* Легенда внизу */}

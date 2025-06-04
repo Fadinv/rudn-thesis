@@ -1,5 +1,9 @@
 from datetime import datetime, timedelta
-from nest_api.nest_api import get_portfolio_data, get_market_returns
+from nest_api.nest_api import (
+    get_portfolio_data,
+    get_market_returns,
+    get_portfolio_data_with_history,
+)
 from reports.markovitz.optimizer import calculate_markowitz_efficient_frontier
 from reports.markovitz.risk_metrics import calculate_sortino_ratio, calculate_beta
 from reports.utils.utils import classify_risk_levels, get_date_range
@@ -23,7 +27,9 @@ def process_markovitz_report(
     start_date, end_date = get_date_range(date_range)
 
     # 2. Получаем данные портфеля
-    portfolio_data = get_portfolio_data(report_id, additional_tickers, start_date, end_date, target_currency)
+    portfolio_data = get_portfolio_data_with_history(
+        report_id, additional_tickers, start_date, end_date, target_currency
+    )
     if not portfolio_data:
         raise ValueError("Report not found")
 
@@ -126,5 +132,63 @@ def postprocess_markovitz_results(
         else:
             portfolio["risk_category"] = "aggressive"
 
+    quantities = portfolio_data.get("quantities")
+    last_prices = portfolio_data.get("last_prices")
+    tickers = portfolio_data.get("tickers")
+    current_portfolio = None
+
+    if quantities and last_prices and tickers:
+        values = [quantities.get(t, 0) * last_prices.get(t, 0) for t in tickers]
+        total = sum(values)
+        if total > 0:
+            weights = np.array([v / total for v in values])
+
+            daily_returns = np.dot(portfolio_data["returns"], weights)
+            daily_return = np.mean(daily_returns)
+            daily_risk = np.std(daily_returns)
+
+            annual_return = (1 + daily_return) ** 252 - 1
+            annual_risk = daily_risk * np.sqrt(252)
+
+            if market_returns is not None:
+                beta = calculate_beta(portfolio_data["returns"], market_returns, weights)
+                treynor_ratio_daily = (daily_return - daily_risk_free_rate) / beta if beta > 0 else 0
+                treynor_ratio_annual = (annual_return - risk_free_rate) / beta if beta > 0 else 0
+            else:
+                beta = None
+                treynor_ratio_daily = None
+                treynor_ratio_annual = None
+
+            sortino_daily, sortino_annual = calculate_sortino_ratio(
+                portfolio_data["returns"], weights
+            )
+
+            current_portfolio = {
+                "risk_daily": daily_risk,
+                "return_daily": daily_return,
+                "sharpe_ratio_daily": (daily_return - daily_risk_free_rate) / daily_risk if daily_risk > 0 else 0,
+                "beta": beta,
+                "sortino_ratio_daily": sortino_daily,
+                "treynor_ratio_daily": treynor_ratio_daily,
+                "risk_annual": annual_risk,
+                "return_annual": annual_return,
+                "sharpe_ratio_annual": (annual_return - risk_free_rate) / annual_risk if annual_risk > 0 else 0,
+                "sortino_ratio_annual": sortino_annual,
+                "treynor_ratio_annual": treynor_ratio_annual,
+                "weights": {t: float(w) for t, w in zip(tickers, weights)},
+            }
+
+            risk = current_portfolio["risk_annual"]
+            if risk < conservative_threshold:
+                current_portfolio["risk_category"] = "conservative"
+            elif risk < balanced_threshold:
+                current_portfolio["risk_category"] = "standard"
+            else:
+                current_portfolio["risk_category"] = "aggressive"
+
     print('---', corrected_result, '---')
-    return corrected_result
+    return {
+        "portfolios": corrected_result,
+        "currentPortfolio": current_portfolio,
+        "portfolioHistory": portfolio_data.get("portfolio_history"),
+    }

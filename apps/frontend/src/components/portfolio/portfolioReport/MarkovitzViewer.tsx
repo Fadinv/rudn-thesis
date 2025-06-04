@@ -19,21 +19,23 @@ import {
 import {Tooltip} from '@frontend/components/ui/tooltip';
 import {ResponsiveContainer} from 'recharts';
 
-export type MarkovitzData = {
-	risk_annual: number;
-	risk_daily: number;
-	return_annual: number;
-	beta: number;
-	return_daily: number;
-	weights: { [key: string]: number };
-	sharpe_ratio_annual: number;
-	sharpe_ratio_daily: number;
-	sortino_ratio_annual: number;
-	sortino_ratio_daily: number;
-	treynor_ratio_annual: number;
-	treynor_ratio_daily: number;
-	risk_category: string; // Добавляем новое поле
-}[];
+export type MarkovitzPortfolio = {
+        risk_annual: number;
+        risk_daily: number;
+        return_annual: number;
+        beta?: number;
+        return_daily: number;
+        weights: { [key: string]: number };
+        sharpe_ratio_annual: number;
+        sharpe_ratio_daily: number;
+        sortino_ratio_annual: number;
+        sortino_ratio_daily: number;
+        treynor_ratio_annual?: number;
+        treynor_ratio_daily?: number;
+        risk_category: string; // Добавляем новое поле
+};
+
+export type MarkovitzData = MarkovitzPortfolio[];
 
 const COLORS = [
 	'#390099', '#9e0059', '#ff0054', '#ff5400', '#ffbd00',
@@ -46,14 +48,17 @@ interface MarkovitzViewerProps {
 }
 
 const MarkovitzViewer: FC<MarkovitzViewerProps> = ({reportId}) => {
-	const [selectedPortfolio, setSelectedPortfolio] = useState(0);
+        const [selectedPortfolio, setSelectedPortfolio] = useState(0);
 	const {data, loading} = useGetPortfolioReportQuery({variables: {reportId}});
 	const [tabValue, setTabValue] = useState<'frontier' | 'portfolio' | 'metrics'>('portfolio');
 	const {refetch} = useGetUserPortfoliosQuery({fetchPolicy: 'cache-only'});
 
-	const reports = data?.getPortfolioReport?.data as MarkovitzData | undefined;
-	const totalPortfolios = reports?.length ?? 0;
-	const report = reports?.[selectedPortfolio];
+        const rawData = data?.getPortfolioReport?.data as any;
+        const reports: MarkovitzData | undefined = Array.isArray(rawData) ? rawData : rawData?.portfolios;
+        const currentPortfolio = Array.isArray(rawData) ? undefined : rawData?.currentPortfolio as MarkovitzPortfolio | undefined;
+        const totalPortfolios = reports?.length ?? 0;
+        const isCurrent = selectedPortfolio === -1 && currentPortfolio;
+        const report = isCurrent ? currentPortfolio : reports?.[selectedPortfolio];
 
 	if (!reportId) return null;
 
@@ -68,13 +73,19 @@ const MarkovitzViewer: FC<MarkovitzViewerProps> = ({reportId}) => {
 	const stockTickers = allocation.map((al) => al.name);
 
 	// Функции для переключения портфелей
-	const prevPortfolio = () => {
-		setSelectedPortfolio((prev) => Math.max(0, prev - 1));
-	};
+        const prevPortfolio = () => {
+                setSelectedPortfolio((prev) => {
+                        if (prev <= 0) return 0;
+                        return prev - 1;
+                });
+        };
 
-	const nextPortfolio = () => {
-		setSelectedPortfolio((prev) => Math.min(totalPortfolios - 1, prev + 1));
-	};
+        const nextPortfolio = () => {
+                setSelectedPortfolio((prev) => {
+                        if (prev < 0) return 0;
+                        return Math.min(totalPortfolios - 1, prev + 1);
+                });
+        };
 
 	// Функция для отображения категории риска
 	const getRiskCategoryLabel = (category: string) => {
@@ -151,23 +162,23 @@ const MarkovitzViewer: FC<MarkovitzViewerProps> = ({reportId}) => {
 				<Spinner size="xl" color="blue.500"/>
 			) : (
 				<>
-					<Text fontSize="lg" mb={4} fontWeight="bold">
-						Выберите портфель
-					</Text>
+                                        <Text fontSize="lg" mb={4} fontWeight="bold">
+                                                {isCurrent ? 'Текущий портфель' : 'Выберите портфель'}
+                                        </Text>
 
 					{/* Кнопки переключения портфелей */}
 					<Flex align="center" justify="center" mb={4}>
-						<Button variant="solid" size="xs" colorScheme="blue" onClick={prevPortfolio}
-						        disabled={selectedPortfolio === 0}>
-							<Icon as={FaChevronLeft}/>
-						</Button>
-						<Text w={70} fontSize="md" mx={4} fontWeight="bold">
-							{selectedPortfolio + 1} / {totalPortfolios}
-						</Text>
-						<Button variant="solid" size="xs" colorScheme="blue" onClick={nextPortfolio}
-						        disabled={selectedPortfolio === totalPortfolios - 1}>
-							<Icon as={FaChevronRight}/>
-						</Button>
+                                                <Button variant="solid" size="xs" colorScheme="blue" onClick={prevPortfolio}
+                                                        disabled={isCurrent || selectedPortfolio === 0}>
+                                                        <Icon as={FaChevronLeft}/>
+                                                </Button>
+                                                <Text w={70} fontSize="md" mx={4} fontWeight="bold">
+                                                        {isCurrent ? 'Текущий' : `${selectedPortfolio + 1} / ${totalPortfolios}`}
+                                                </Text>
+                                                <Button variant="solid" size="xs" colorScheme="blue" onClick={nextPortfolio}
+                                                        disabled={isCurrent || selectedPortfolio === totalPortfolios - 1}>
+                                                        <Icon as={FaChevronRight}/>
+                                                </Button>
 					</Flex>
 
 					<Tabs.Root
@@ -196,14 +207,15 @@ const MarkovitzViewer: FC<MarkovitzViewerProps> = ({reportId}) => {
 							</Tabs.List>
 						</Box>
 						<Tabs.Content value={'frontier'}>
-							<EfficientFrontierChart
-								onSelect={(index) => {
-									setTabValue('portfolio');
-									setSelectedPortfolio(index);
-								}}
-								portfolios={reports!}
-								selected={selectedPortfolio}
-							/>
+                                                        <EfficientFrontierChart
+                                                                onSelect={(index) => {
+                                                                        setTabValue('portfolio');
+                                                                        setSelectedPortfolio(index);
+                                                                }}
+                                                                portfolios={reports!}
+                                                                currentPortfolio={currentPortfolio}
+                                                                selected={selectedPortfolio}
+                                                        />
 						</Tabs.Content>
 						<Tabs.Content value="portfolio">
 							{/* Pie Chart */}
@@ -324,13 +336,15 @@ const MarkovitzViewer: FC<MarkovitzViewerProps> = ({reportId}) => {
 					</Tabs.Root>
 				</>
 			)}
-			<CopyPortfolioButton
-				stockTickerList={stockTickers}
-				weights={weights}
-				onSave={() => refetch()}
-			/>
-		</Box>
-	);
+                        {!isCurrent && (
+                                <CopyPortfolioButton
+                                        stockTickerList={stockTickers}
+                                        weights={weights}
+                                        onSave={() => refetch()}
+                                />
+                        )}
+                </Box>
+        );
 };
 
 export default MarkovitzViewer;
