@@ -21,11 +21,16 @@ async def handle_report_created(payload):
             result = process_markovitz_report(
                 report_id=report_id,
                 additional_tickers=input_params.get("additionalTickers", []),
-                date_range=input_params["date_range"],
-                risk_free_rate=input_params["risk_free_rate"],
-                num_portfolios=input_params["num_portfolios"],
-                cov_method=input_params["cov_method"],
-                target_currency=input_params.get("target_currency", "usd"),
+                date_range=input_params.get("date_range")
+                or input_params.get("dateRange", "3y"),
+                risk_free_rate=input_params.get("risk_free_rate")
+                or input_params.get("riskFreeRate"),
+                num_portfolios=input_params.get("num_portfolios")
+                or input_params.get("numPortfolios"),
+                cov_method=input_params.get("cov_method")
+                or input_params.get("covMethod"),
+                target_currency=input_params.get("target_currency")
+                or input_params.get("currency", "usd"),
             )
 
         elif report_type == "future_returns_forecast_gbm":
@@ -33,8 +38,10 @@ async def handle_report_created(payload):
                 report_id=report_id,
                 selected_percentiles=input_params.get("selectedPercentiles", [10, 50, 90]),
                 forecast_horizons=input_params.get("forecastHorizons", [30, 60, 90, 180, 365]),
-                date_range=input_params.get("date_range", "3y"),
-                target_currency=input_params.get("target_currency", "usd"),
+                date_range=input_params.get("date_range")
+                or input_params.get("dateRange", "3y"),
+                target_currency=input_params.get("target_currency")
+                or input_params.get("currency", "usd"),
             )
 
         else:
@@ -43,7 +50,7 @@ async def handle_report_created(payload):
         with engine.connect() as conn:
             conn.execute(text("""
                 UPDATE portfolio_reports
-                SET data = :data, status = 'ready', error_message = NULL
+                SET data = :data, status = 'ready', "errorMessage" = NULL
                 WHERE id = :report_id
             """), {
                 "data": json.dumps(result),
@@ -61,24 +68,34 @@ async def handle_report_created(payload):
 
     except Exception as e:
         error_message = str(e)
-        print(f"❌ Ошибка при расчёте отчёта {report_id}: {error_message}", flush=True)
+        print(
+            f"❌ Ошибка при расчёте отчёта {report_id}: {error_message}",
+            flush=True,
+        )
 
-        with engine.connect() as conn:
-            conn.execute(text("""
+        try:
+            with engine.connect() as conn:
+                conn.execute(
+                    text(
+                        """
                 UPDATE portfolio_reports
-                SET status = 'error', error_message = :msg
+                SET status = 'error', "errorMessage" = :msg
                 WHERE id = :report_id
-            """), {
-                "msg": error_message,
-                "report_id": report_id
-            })
-            conn.commit()
+            """
+                    ),
+                    {"msg": error_message, "report_id": report_id},
+                )
+                conn.commit()
+        except Exception as db_error:
+            print(
+                f"❌ Failed to update report {report_id} status: {db_error}",
+                flush=True,
+            )
 
-        await publisher.send_event("report.updated", {
-            "id": report_id,
-            "status": "error",
-            "errorMessage": error_message,
-        })
+        await publisher.send_event(
+            "report.updated",
+            {"id": report_id, "status": "error", "errorMessage": error_message},
+        )
 
 
 async def consume():
