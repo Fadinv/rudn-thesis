@@ -1,7 +1,7 @@
 import {PortfolioReportEvents} from '@backend/modules/portfolio-report/domain/portfolio-report.events';
 import {PortfolioReportStore} from '@backend/modules/portfolio-report/infrastructure/portfolio-report.store';
 import {
-	GetUserPortfolioReportsResponse
+	GetUserPortfolioReportsResponse,
 } from '@backend/modules/portfolio-report/interface/dto/get-portfolio-reports.response';
 import {RmqPublisherService} from '@backend/shared/rmq/rmq-publisher.service';
 import axios from 'axios';
@@ -25,11 +25,11 @@ export class PortfolioReportService {
 		private readonly portfolioRepository: Repository<Portfolio>,
 		@InjectRepository(StockPrice)
 		private readonly stockPriceRepository: Repository<StockPrice>,
-                @InjectRepository(PortfolioStock)
-                private readonly portfolioStockRepository: Repository<PortfolioStock>,
-                private readonly portfolioReportStore: PortfolioReportStore,
-                private readonly rmqPublisher: RmqPublisherService,
-        ) {}
+		@InjectRepository(PortfolioStock)
+		private readonly portfolioStockRepository: Repository<PortfolioStock>,
+		private readonly portfolioReportStore: PortfolioReportStore,
+		private readonly rmqPublisher: RmqPublisherService,
+	) {}
 
 	private _supportedReports: Partial<Record<ReportType, boolean>> = {
 		'markowitz': true,
@@ -60,10 +60,10 @@ export class PortfolioReportService {
 
 		if (!savedReport) throw new Error(`Ошибка при создании портфеля (reportType: "markowitz"`);
 
-        /** Внешнее событие */
-        await this.rmqPublisher.emit(PortfolioReportEvents.created, {
-            ...savedReport,
-            portfolio: portfolioId,
+		/** Внешнее событие */
+		await this.rmqPublisher.emit(PortfolioReportEvents.created, {
+			...savedReport,
+			portfolio: portfolioId,
 			inputParams,
 		});
 
@@ -74,15 +74,15 @@ export class PortfolioReportService {
 	async createMarkovitzReport(portfolioId: number, input: MarkovitzReportInput): Promise<PortfolioReport> {
 		const savedReport = await this.createDefaultReport(portfolioId, 'markowitz', input);
 
-        return savedReport;
-    }
+		return savedReport;
+	}
 
 	// Создать отчет с изначальным статусом "calculating"
 	async createFutureReturnForecastGBMReport(portfolioId: number, input: FutureReturnForecastInput): Promise<PortfolioReport> {
 		const savedReport = await this.createDefaultReport(portfolioId, 'future_returns_forecast_gbm', input);
 
-        return savedReport;
-    }
+		return savedReport;
+	}
 
 	// Обновить отчет (данные + статус)
 	async updateReport(reportId: string, data: any, status: 'ready' | 'error', errorMessage?: string): Promise<PortfolioReport> {
@@ -106,22 +106,22 @@ export class PortfolioReportService {
 		return this.reportRepository.findOne({where: {id: reportId}});
 	}
 
-    async deleteReport(reportId: string): Promise<boolean> {
-        const report = await this.reportRepository.findOne({
-            where: {id: reportId},
-            loadRelationIds: {relations: ['portfolio']},
-        });
+	async deleteReport(reportId: string): Promise<boolean> {
+		const report = await this.reportRepository.findOne({
+			where: {id: reportId},
+			loadRelationIds: {relations: ['portfolio']},
+		});
 
-        if (!report) return false;
+		if (!report) return false;
 
-        report.deleted = true;
-        report.version = this.portfolioReportStore.maxVersion() + 1;
+		report.deleted = true;
+		report.version = this.portfolioReportStore.maxVersion() + 1;
 
-        await this.reportRepository.save(report);
-        await this.rmqPublisher.emit(PortfolioReportEvents.updated, report);
+		await this.reportRepository.save(report);
+		await this.rmqPublisher.emit(PortfolioReportEvents.updated, report);
 
-        return true;
-    }
+		return true;
+	}
 
 	async getDistributedPortfolioAssets(
 		capital: number,
