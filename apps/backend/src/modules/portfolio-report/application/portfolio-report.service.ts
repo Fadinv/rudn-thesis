@@ -1,10 +1,9 @@
 import {PortfolioReportEvents} from '@backend/modules/portfolio-report/domain/portfolio-report.events';
 import {PortfolioReportStore} from '@backend/modules/portfolio-report/infrastructure/portfolio-report.store';
 import {
-	GetUserPortfolioReportsResponse
+	GetUserPortfolioReportsResponse,
 } from '@backend/modules/portfolio-report/interface/dto/get-portfolio-reports.response';
 import {RmqPublisherService} from '@backend/shared/rmq/rmq-publisher.service';
-import {EventEmitter2} from '@nestjs/event-emitter';
 import axios from 'axios';
 import {Injectable} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
@@ -28,7 +27,6 @@ export class PortfolioReportService {
 		private readonly stockPriceRepository: Repository<StockPrice>,
 		@InjectRepository(PortfolioStock)
 		private readonly portfolioStockRepository: Repository<PortfolioStock>,
-		private readonly eventEmitter: EventEmitter2,
 		private readonly portfolioReportStore: PortfolioReportStore,
 		private readonly rmqPublisher: RmqPublisherService,
 	) {}
@@ -62,20 +60,13 @@ export class PortfolioReportService {
 
 		if (!savedReport) throw new Error(`Ошибка при создании портфеля (reportType: "markowitz"`);
 
-		/** Локальное событие */
-		this.eventEmitter.emit(PortfolioReportEvents.created, {
-			...savedReport,
-			portfolio: portfolioId,
-			inputParams,
-		});
-
-		console.log('createDefaultReport PortfolioReportEvents.created');
 		/** Внешнее событие */
 		await this.rmqPublisher.emit(PortfolioReportEvents.created, {
 			...savedReport,
 			portfolio: portfolioId,
 			inputParams,
 		});
+
 		return savedReport;
 	}
 
@@ -83,30 +74,12 @@ export class PortfolioReportService {
 	async createMarkovitzReport(portfolioId: number, input: MarkovitzReportInput): Promise<PortfolioReport> {
 		const savedReport = await this.createDefaultReport(portfolioId, 'markowitz', input);
 
-		// Переводим на event-driven архитектуру
-		this.analyzeMarkovitzPortfolio(savedReport.id, input).catch(async (error) => {
-			console.error('Ошибка при анализе портфеля:', error);
-			await this.reportRepository.update(savedReport.id, {
-				status: 'error',
-				errorMessage: 'Ошибка при анализе портфеля',
-			});
-		});
-
 		return savedReport;
 	}
 
 	// Создать отчет с изначальным статусом "calculating"
 	async createFutureReturnForecastGBMReport(portfolioId: number, input: FutureReturnForecastInput): Promise<PortfolioReport> {
 		const savedReport = await this.createDefaultReport(portfolioId, 'future_returns_forecast_gbm', input);
-
-		// Переводим на event-driven архитектуру
-		this.analyzeFutureReturnsForecastGBM(savedReport.id, input).catch(async (error) => {
-			console.error('Ошибка при анализе портфеля:', error);
-			await this.reportRepository.update(savedReport.id, {
-				status: 'error',
-				errorMessage: 'Ошибка при анализе портфеля',
-			});
-		});
 
 		return savedReport;
 	}
@@ -134,9 +107,19 @@ export class PortfolioReportService {
 	}
 
 	async deleteReport(reportId: string): Promise<boolean> {
-		const report = await this.reportRepository.findOne({where: {id: reportId}});
+		const report = await this.reportRepository.findOne({
+			where: {id: reportId},
+			loadRelationIds: {relations: ['portfolio']},
+		});
+
 		if (!report) return false;
-		await this.reportRepository.remove(report);
+
+		report.deleted = true;
+		report.version = this.portfolioReportStore.maxVersion() + 1;
+
+		await this.reportRepository.save(report);
+		await this.rmqPublisher.emit(PortfolioReportEvents.updated, report);
+
 		return true;
 	}
 

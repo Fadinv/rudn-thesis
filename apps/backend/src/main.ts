@@ -22,16 +22,17 @@ async function bootstrap() {
 		next();
 	});
 
-	// app.use(config.rateLimit);
+	app.use(config.rateLimit);
 
-	// app.useGlobalGuards(new GqlTokenThrottleGuard());
+	app.useGlobalGuards(new GqlTokenThrottleGuard());
 
 	await syncPortfolioVersions(app);
 	await syncPortfolioReportsVersions(app);
 
-	app.connectMicroservice(config.connectMicroService.portfolioQueue);
+    app.connectMicroservice(config.connectMicroService.portfolioQueue);
+    await app.startAllMicroservices();
 
-	await app.listen(4000, '0.0.0.0');
+    await app.listen(4000, '0.0.0.0');
 }
 
 void bootstrap();

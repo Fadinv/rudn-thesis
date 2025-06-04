@@ -19,7 +19,7 @@ export class PortfolioReportResolver {
 		@AuthUser() _user: User,
 		@Args('portfolioId', {type: () => Int}) portfolioId: number,
 		@Args('input') input: MarkovitzReportInput,
-	): Promise<PortfolioReport> {
+	): Promise<PortfolioReport | null> {
 		return this.portfolioReportService.createMarkovitzReport(portfolioId, input);
 	}
 
@@ -29,7 +29,7 @@ export class PortfolioReportResolver {
 		@AuthUser() _user: User,
 		@Args('portfolioId', {type: () => Int}) portfolioId: number,
 		@Args('input') input: FutureReturnForecastInput,
-	): Promise<PortfolioReport> {
+	): Promise<PortfolioReport | null> {
 		return this.portfolioReportService.createFutureReturnForecastGBMReport(
 			portfolioId,
 			input,

@@ -16,12 +16,21 @@ export class PortfolioReportEventsController {
 		context.getChannelRef().ack(context.getMessage());
 	}
 
-	@EventPattern(PortfolioReportEvents.updated)
-	handleReportUpdated(@Payload() payload: PortfolioReport, @Ctx() context: RmqContext) {
-		console.log('---handleReportUpdated / payload---');
-		console.dir(payload);
+    @EventPattern(PortfolioReportEvents.updated)
+    handleReportUpdated(@Payload() payload: PortfolioReport, @Ctx() context: RmqContext) {
+        console.log('---handleReportUpdated / payload---');
+        console.dir(payload);
 
-		this.syncService.handlePortfolioUpdated(payload);
-		context.getChannelRef().ack(context.getMessage());
-	}
+        this.syncService.handlePortfolioUpdated(payload);
+        context.getChannelRef().ack(context.getMessage());
+    }
+
+   @EventPattern(PortfolioReportEvents.deleted)
+   handleReportDeleted(@Payload() payload: PortfolioReport, @Ctx() context: RmqContext) {
+       console.log('---handleReportDeleted / payload---');
+       console.dir(payload);
+
+       this.syncService.handlePortfolioDeleted(payload);
+       context.getChannelRef().ack(context.getMessage());
+   }
 }
