@@ -1,4 +1,5 @@
 export enum PortfolioReportEvents {
-	created = 'report.created',
-	updated = 'report.updated',
+        created = 'report.created',
+        updated = 'report.updated',
+        deleted = 'report.deleted',
 }

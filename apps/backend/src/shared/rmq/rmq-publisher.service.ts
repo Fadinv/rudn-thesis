@@ -26,11 +26,32 @@ export class RmqPublisherService {
                                        RmqExchanges.reports,
                                        'report.created',
                                );
+                               await channel.bindQueue(
+                                       RmqQueues.portfolio.queue,
+                                       RmqExchanges.reports,
+                                       'report.updated',
+                               );
+                               await channel.bindQueue(
+                                       RmqQueues.portfolio.queue,
+                                       RmqExchanges.reports,
+                                       'report.deleted',
+                               );
+
                                await channel.assertQueue(RmqQueues.analyzer.queue, {durable: true});
                                await channel.bindQueue(
                                        RmqQueues.analyzer.queue,
                                        RmqExchanges.reports,
                                        'report.created',
+                               );
+                               await channel.bindQueue(
+                                       RmqQueues.analyzer.queue,
+                                       RmqExchanges.reports,
+                                       'report.updated',
+                               );
+                               await channel.bindQueue(
+                                       RmqQueues.analyzer.queue,
+                                       RmqExchanges.reports,
+                                       'report.deleted',
                                );
                        },
                });

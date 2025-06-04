@@ -4,7 +4,6 @@ import {
 	GetUserPortfolioReportsResponse
 } from '@backend/modules/portfolio-report/interface/dto/get-portfolio-reports.response';
 import {RmqPublisherService} from '@backend/shared/rmq/rmq-publisher.service';
-import {EventEmitter2} from '@nestjs/event-emitter';
 import axios from 'axios';
 import {Injectable} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
@@ -26,12 +25,11 @@ export class PortfolioReportService {
 		private readonly portfolioRepository: Repository<Portfolio>,
 		@InjectRepository(StockPrice)
 		private readonly stockPriceRepository: Repository<StockPrice>,
-		@InjectRepository(PortfolioStock)
-		private readonly portfolioStockRepository: Repository<PortfolioStock>,
-		private readonly eventEmitter: EventEmitter2,
-		private readonly portfolioReportStore: PortfolioReportStore,
-		private readonly rmqPublisher: RmqPublisherService,
-	) {}
+                @InjectRepository(PortfolioStock)
+                private readonly portfolioStockRepository: Repository<PortfolioStock>,
+                private readonly portfolioReportStore: PortfolioReportStore,
+                private readonly rmqPublisher: RmqPublisherService,
+        ) {}
 
 	private _supportedReports: Partial<Record<ReportType, boolean>> = {
 		'markowitz': true,
@@ -62,18 +60,11 @@ export class PortfolioReportService {
 
 		if (!savedReport) throw new Error(`Ошибка при создании портфеля (reportType: "markowitz"`);
 
-		/** Локальное событие */
-		this.eventEmitter.emit(PortfolioReportEvents.created, {
-			...savedReport,
-			portfolio: portfolioId,
-			inputParams,
-		});
-
-		console.log('createDefaultReport PortfolioReportEvents.created');
-		/** Внешнее событие */
-		await this.rmqPublisher.emit(PortfolioReportEvents.created, {
-			...savedReport,
-			portfolio: portfolioId,
+                console.log('createDefaultReport PortfolioReportEvents.created');
+                /** Внешнее событие */
+                await this.rmqPublisher.emit(PortfolioReportEvents.created, {
+                        ...savedReport,
+                        portfolio: portfolioId,
 			inputParams,
 		});
 		return savedReport;
@@ -115,12 +106,21 @@ export class PortfolioReportService {
 		return this.reportRepository.findOne({where: {id: reportId}});
 	}
 
-	async deleteReport(reportId: string): Promise<boolean> {
-		const report = await this.reportRepository.findOne({where: {id: reportId}});
-		if (!report) return false;
-		await this.reportRepository.remove(report);
-		return true;
-	}
+        async deleteReport(reportId: string): Promise<boolean> {
+                const report = await this.reportRepository.findOne({
+                        where: {id: reportId},
+                        loadRelationIds: {relations: ['portfolio']},
+                });
+                if (!report) return false;
+
+                report.deleted = true;
+                report.version = this.portfolioReportStore.maxVersion() + 1;
+
+                await this.reportRepository.save(report);
+                await this.rmqPublisher.emit(PortfolioReportEvents.updated, report);
+
+                return true;
+        }
 
 	async getDistributedPortfolioAssets(
 		capital: number,
