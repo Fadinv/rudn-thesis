@@ -1,4 +1,4 @@
-import {MarkovitzData} from '@frontend/components/portfolio/portfolioReport/MarkovitzViewer';
+import {MarkovitzData, MarkovitzPortfolio} from '@frontend/components/portfolio/portfolioReport/MarkovitzViewer';
 import React, {FC} from 'react';
 import {
 	ScatterChart,
@@ -15,6 +15,7 @@ import {ResponsiveContainer} from 'recharts';
 
 interface EfficientFrontierChartProps {
 	portfolios: MarkovitzData;
+	currentPortfolio?: MarkovitzPortfolio;
 	selectedIndex?: number;
 	onSelect: (index: number) => void;
 	selected?: number;
@@ -27,7 +28,7 @@ const riskCategoryColors: Record<string, string> = {
 	default: '#A0AEC0',      // серый
 };
 
-const EfficientFrontierChart: FC<EfficientFrontierChartProps> = ({portfolios, selected, onSelect}) => {
+const EfficientFrontierChart: FC<EfficientFrontierChartProps> = ({portfolios, currentPortfolio, selected, onSelect}) => {
 	if (!portfolios || portfolios.length === 0) return <Text>Нет данных для отображения.</Text>;
 
 	const chartData = portfolios.map((p, index) => ({
@@ -40,9 +41,16 @@ const EfficientFrontierChart: FC<EfficientFrontierChartProps> = ({portfolios, se
 		isSelected: index === selected,
 	}));
 
-	const risks = chartData.map(d => d.risk);
-	const minRisk = Math.floor(risks[0]);
-	const maxRisk = Math.ceil(risks[risks.length - 1]);
+	const currentPoint = currentPortfolio ? {
+		risk: +(currentPortfolio.risk_annual * 100).toFixed(2),
+		return: +(currentPortfolio.return_annual * 100).toFixed(2),
+		sharpe: currentPortfolio.sharpe_ratio_annual,
+		isCurrent: 1,
+	} : null;
+
+	const risks = chartData.map(d => d.risk).concat(currentPoint ? [currentPoint.risk] : []);
+	const minRisk = Math.floor(Math.min(...risks));
+	const maxRisk = Math.ceil(Math.max(...risks));
 
 	return (
 		<Box width="100%" minH="520px" overflowX="auto">
@@ -87,6 +95,18 @@ const EfficientFrontierChart: FC<EfficientFrontierChartProps> = ({portfolios, se
 							/>
 						))}
 					</Scatter>
+					{currentPoint && (
+						<Scatter
+							legendType="star"
+							name="Текущий портфель"
+							data={[currentPoint]}
+							shape="star"
+							fill="#6c757d"
+							onClick={() => onSelect(-1)}
+						>
+							<Cell fill="#6c757d" r={selected === -1 ? 8 : 6}/>
+						</Scatter>
+					)}
 				</ScatterChart>
 			</ResponsiveContainer>
 			{/* Легенда внизу */}

@@ -106,6 +106,7 @@ def calculate_markowitz_efficient_frontier(
     """
     mean_returns = np.mean(returns, axis=0)
     cov_matrix = calculate_covariance_matrix(returns, method=cov_method)
+    print('cov ---> ', cov_matrix)
 
     bounds = tuple((0, 1) for _ in tickers)
     constraints = [{'type': 'eq', 'fun': lambda w: np.sum(w) - 1}]

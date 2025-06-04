@@ -384,7 +384,7 @@ def _convert_currencies_general(stock_prices, currency_by_ticker, currency_set, 
         rate = fx_rates.get(str(date_))
         if target_currency == 'usd' and currency == 'SUR' and rate:
             close /= rate
-        elif target_currency == 'rub' and currency == 'USD' and rate:
+        elif target_currency == 'sur' and currency == 'USD' and rate:
             close *= rate
         converted.append((ticker, date_, close, exchange))
 

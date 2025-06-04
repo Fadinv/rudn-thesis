@@ -25,7 +25,7 @@ import React, {useState, useEffect} from 'react';
 import {createListCollection} from '@chakra-ui/react';
 import {
 	useCreateFutureReturnForecastGbmReportMutation,
-	useCreateMarkovitzReportMutation,
+	useCreateMarkovitzReportMutation, useGetPortfolioStocksQuery,
 } from '@frontend/generated/graphql-hooks';
 import {FaTrash} from 'react-icons/fa';
 
@@ -34,6 +34,11 @@ interface CreatePortfolioReportDrawerProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 }
+
+const currencyByExchange = {
+	'MOEX': 'sur',
+	'NASDAQ': 'usd',
+} as const;
 
 export const CreatePortfolioReportDrawer: React.FC<CreatePortfolioReportDrawerProps> = ({
 	                                                                                        portfolioId,
@@ -44,20 +49,32 @@ export const CreatePortfolioReportDrawer: React.FC<CreatePortfolioReportDrawerPr
 	const [reportType, setReportType] = useState<'markowitz' | 'future_returns_forecast_gbm' | 'value_at_risk'>('markowitz');
 	const [currency, setCurrency] = useState<'usd' | 'sur'>('usd');
 	const [additionalStocks, setAdditionalStocks] = useState<{ id: number; name: string; ticker: string }[]>([]);
-	const [selectedPercentiles, setSelectedPercentiles] = useState<[number, number, number]>([10, 50, 90]);
+	const [selectedPercentiles, setSelectedPercentiles] = useState<[number, number, number]>([5, 50, 95]);
 	const [forecastHorizons, setForecastHorizons] = useState([30, 60, 90, 180, 365, 730, 1095]);
 	const [dateRange, setDateRange] = useState('3y');
 	const [riskFreeRate, setRiskFreeRate] = useState<number | null>(4);
 	const [numPortfolios, setNumPortfolios] = useState<number | null>(20);
 	const [covMethod, setCovMethod] = useState('ledoit');
 
+	const {data, loading: portfolioStocksIsLoading} = useGetPortfolioStocksQuery({
+		variables: {portfolioId},
+		fetchPolicy: 'cache-first',
+	});
+
+	const frequency = new Set<string>(data?.getPortfolioStocks.map((v) => {
+		return v.stock.exchange;
+	}) ?? []);
+
+	const currencyIsDisabled = frequency.size === 1;
+
 	const [createMarkovitzReport, {loading: markowitzLoading}] = useCreateMarkovitzReportMutation();
 	const [createFutureReport, {loading: futureReportLoading}] = useCreateFutureReturnForecastGbmReportMutation();
 
-	const loading = markowitzLoading || futureReportLoading;
+	const loading = markowitzLoading || futureReportLoading || portfolioStocksIsLoading;
 
 	useEffect(() => {
 		if (open) {
+			setCurrency(currencyIsDisabled ? (currencyByExchange[frequency.values().next().value as keyof typeof currencyByExchange]) : 'usd');
 			setAdditionalStocks([]);
 			setReportType('markowitz');
 			setDateRange('3y');
@@ -65,7 +82,7 @@ export const CreatePortfolioReportDrawer: React.FC<CreatePortfolioReportDrawerPr
 			setNumPortfolios(20);
 			setCovMethod('ledoit');
 			setForecastHorizons([30, 60, 90, 180, 365, 730, 1095]);
-			setSelectedPercentiles([10, 50, 90]);
+			setSelectedPercentiles([5, 50, 95]);
 		}
 	}, [open]);
 
@@ -191,12 +208,13 @@ export const CreatePortfolioReportDrawer: React.FC<CreatePortfolioReportDrawerPr
 						<Box>
 							<Field.Root invalid={!currency}>
 								<SelectRoot
-									defaultValue={['usd']}
+									defaultValue={frequency.size === 1 ? [currencyByExchange[frequency.values().next().value as keyof typeof currencyByExchange] as 'usd' | 'sur'] : ['usd']}
 									onValueChange={(e) => {
 										setCurrency(e.value[0] as 'usd' | 'sur');
 									}}
 									collection={currencyCollection}
 									size="sm"
+									disabled={currencyIsDisabled}
 								>
 									<SelectLabel>Валюта</SelectLabel>
 									<SelectTrigger>
@@ -241,7 +259,6 @@ export const CreatePortfolioReportDrawer: React.FC<CreatePortfolioReportDrawerPr
 
 								{/* Горизонты прогнозирования */}
 								<Box>
-									<Text mb={1}>Горизонты прогнозирования (в днях):</Text>
 									<SelectRoot
 										defaultValue={['short_medium_long']}
 										onValueChange={(e) => {
@@ -263,7 +280,7 @@ export const CreatePortfolioReportDrawer: React.FC<CreatePortfolioReportDrawerPr
 										collection={forecastHorizonsCollection}
 										size="sm"
 									>
-										<SelectLabel>Выберите горизонты</SelectLabel>
+										<SelectLabel>Горизонты прогнозирования</SelectLabel>
 										<SelectTrigger>
 											<SelectValueText placeholder="Выберите"/>
 										</SelectTrigger>
@@ -279,7 +296,7 @@ export const CreatePortfolioReportDrawer: React.FC<CreatePortfolioReportDrawerPr
 
 								{/* Ползунки перцентилей */}
 								<Box>
-									<Text mb={1}>Выберите перцентили (p10, p50, p90):</Text>
+									<Text mb={1}>Выберите перцентили:</Text>
 									<Flex direction="column" gap={3}>
 										<Flex align="center" gap={4}>
 											<Slider
@@ -424,7 +441,6 @@ export const CreatePortfolioReportDrawer: React.FC<CreatePortfolioReportDrawerPr
 								</Box>
 
 								<Box mt={2}>
-									<Text mb={1}>Метод оценки ковариации:</Text>
 									<SelectRoot
 										defaultValue={['ledoit']}
 										onValueChange={(e) => setCovMethod(e.value[0])}
